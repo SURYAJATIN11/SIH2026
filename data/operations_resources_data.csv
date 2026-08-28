@@ -1,0 +1,51 @@
+train_no,train_name,source,destination,departure_time,arrival_time,days_of_run,train_type,status,priority_tier,section_id,scheduled_entry,scheduled_exit,Unnamed: 13,Unnamed: 14,Unnamed: 15,Unnamed: 16,Unnamed: 17,Unnamed: 18,Unnamed: 19,Unnamed: 20,Unnamed: 21,Unnamed: 22,Unnamed: 23,Unnamed: 24,4,source_table
+20643,Coimbatore Vande Bharat Express,MAS,CBE,14:15:00,20:15:00,Except Wed,Vande Bharat,Running,2,SEC-MAS-CBE,2026-08-24 14:15:00,2026-08-24 20:15:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12635,Vaigai Superfast Express,MAS,MDU,13:50:00,21:30:00,Daily,Superfast,Running,3,SEC-MAS-AJJ,2026-08-24 13:50:00,2026-08-24 21:30:00,,,,,,,,,,,,,2.0,COA_train_schedule
+16344,Amritha Express,MDU,TVC,16:10:00,04:55:00,Daily,Express,Running,2,SEC-MAS-AJJ,2026-08-24 16:10:00,2026-08-24 04:55:00,,,,,,,,,,,,,4.0,COA_train_schedule
+12623,Chennai - Thiruvananthapuram Mail,MAS,TVC,19:45:00,11:30:00,Daily,Superfast,Active,3,SEC-MAS-CBE,2026-08-24 19:45:00,2026-08-24 11:30:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12624,Thiruvananthapuram - Chennai Mail,TVC,MAS,15:00:00,07:30:00,Daily,Superfast,Active,3,SEC-MAS-AJJ,2026-08-24 15:00:00,2026-08-24 07:30:00,,,,,,,,,,,,,2.0,COA_train_schedule
+12637,Pandian Express,MAS,MDU,21:40:00,05:25:00,Daily,Superfast,Active,3,SEC-MAS-MDU,2026-08-24 21:40:00,2026-08-24 05:25:00,,,,,,,,,,,,,2.0,COA_train_schedule
+12638,Pandian Express,MDU,MAS,21:35:00,05:15:00,Daily,Superfast,Active,3,SEC-MAS-CBE,2026-08-24 21:35:00,2026-08-24 05:15:00,,,,,,,,,,,,,4.0,COA_train_schedule
+12631,Nellai Express,MAS,TEN,20:10:00,07:10:00,Daily,Superfast,Active,1,SEC-SA-TPJ,2026-08-24 20:10:00,2026-08-24 07:10:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12632,Nellai Express,TEN,MAS,19:50:00,06:55:00,Daily,Superfast,Active,1,SEC-SA-TPJ,2026-08-24 19:50:00,2026-08-24 06:55:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12671,Nilgiri Express,MAS,MAS,21:05:00,06:15:00,Daily,Superfast,Active,4,SEC-MAS-AJJ,2026-08-24 21:05:00,2026-08-24 06:15:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12672,Nilgiri Express,MAS,MAS,21:20:00,06:25:00,Daily,Superfast,Active,2,SEC-MAS-AJJ,2026-08-24 21:20:00,2026-08-24 06:25:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12673,Cheran Express,MAS,CBE,22:00:00,06:00:00,Daily,Superfast,Active,3,SEC-MDU-TVC,2026-08-24 22:00:00,2026-08-24 06:00:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12674,Cheran Express,CBE,MAS,22:50:00,07:00:00,Daily,Superfast,Active,3,SEC-MAS-CBE,2026-08-24 22:50:00,2026-08-24 07:00:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12675,Kovai Express,MAS,CBE,06:10:00,14:05:00,Daily,Superfast,Active,1,SEC-MDU-TVC,2026-08-24 06:10:00,2026-08-24 14:05:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12676,Kovai Express,CBE,MAS,15:15:00,22:50:00,Daily,Superfast,Active,1,SEC-MDU-TVC,2026-08-24 15:15:00,2026-08-24 22:50:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12679,Intercity Express,MAS,CBE,14:30:00,22:15:00,Daily,Superfast,Active,3,SEC-SA-TPJ,2026-08-24 14:30:00,2026-08-24 22:15:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12680,Intercity Express,CBE,MAS,06:15:00,13:50:00,Daily,Superfast,Active,2,SEC-MAS-AJJ,2026-08-24 06:15:00,2026-08-24 13:50:00,,,,,,,,,,,,,4.0,COA_train_schedule
+12693,Pearl City Express,MAS,TN,19:30:00,06:30:00,Daily,Superfast,Active,1,SEC-MAS-AJJ,2026-08-24 19:30:00,2026-08-24 06:30:00,,,,,,,,,,,,,2.0,COA_train_schedule
+12694,Pearl City Express,TN,MAS,20:05:00,07:30:00,Daily,Superfast,Active,3,SEC-MAS-CBE,2026-08-24 20:05:00,2026-08-24 07:30:00,,,,,,,,,,,,,3.0,COA_train_schedule
+16105,Tiruchendur Express,MS,MAS,16:05:00,06:50:00,Daily,Express,Active,4,SEC-MAS-MDU,2026-08-24 16:05:00,2026-08-24 06:50:00,,,,,,,,,,,,,4.0,COA_train_schedule
+16106,Tiruchendur Express,MAS,MS,20:25:00,10:25:00,Daily,Express,Active,4,SEC-SA-TPJ,2026-08-24 20:25:00,2026-08-24 10:25:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12633,Kanyakumari Express,MS,MAS,17:20:00,05:35:00,Daily,Superfast,Active,2,SEC-MAS-CBE,2026-08-24 17:20:00,2026-08-24 05:35:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12634,Kanyakumari Express,MAS,MS,17:50:00,06:10:00,Daily,Superfast,Active,2,SEC-MAS-AJJ,2026-08-24 17:50:00,2026-08-24 06:10:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12695,Trivandrum Express,MAS,TVC,15:20:00,07:40:00,Daily,Superfast,Active,3,SEC-MAS-AJJ,2026-08-24 15:20:00,2026-08-24 07:40:00,,,,,,,,,,,,,2.0,COA_train_schedule
+12696,Trivandrum Express,TVC,MAS,17:15:00,10:00:00,Daily,Superfast,Active,3,SEC-MAS-CBE,2026-08-24 17:15:00,2026-08-24 10:00:00,,,,,,,,,,,,,4.0,COA_train_schedule
+12605,Pallavan Express,MS,KKDI,15:45:00,22:25:00,Daily,Superfast,Active,3,SEC-SA-TPJ,2026-08-24 15:45:00,2026-08-24 22:25:00,,,,,,,,,,,,,2.0,COA_train_schedule
+12606,Pallavan Express,KKDI,MS,05:30:00,12:15:00,Daily,Superfast,Active,1,SEC-MAS-AJJ,2026-08-24 05:30:00,2026-08-24 12:15:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12635,Vaigai Express,MS,MDU,13:50:00,21:15:00,Daily,Superfast,Active,3,SEC-MAS-CBE,2026-08-24 13:50:00,2026-08-24 21:15:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12636,Vaigai Express,MDU,MS,07:10:00,14:25:00,Daily,Superfast,Active,3,SEC-MAS-CBE,2026-08-24 07:10:00,2026-08-24 14:25:00,,,,,,,,,,,,,3.0,COA_train_schedule
+16127,Guruvayur Express,MS,MAS,09:00:00,06:40:00,Daily,Express,Active,2,SEC-MDU-TVC,2026-08-24 09:00:00,2026-08-24 06:40:00,,,,,,,,,,,,,4.0,COA_train_schedule
+16128,Guruvayur Express,MAS,MS,23:15:00,20:35:00,Daily,Express,Active,1,SEC-MAS-AJJ,2026-08-24 23:15:00,2026-08-24 20:35:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12685,Mangaluru Express,MAS,MAQ,16:20:00,07:10:00,Daily,Superfast,Active,4,SEC-MAS-CBE,2026-08-24 16:20:00,2026-08-24 07:10:00,,,,,,,,,,,,,4.0,COA_train_schedule
+12686,Mangaluru Express,MAQ,MAS,16:55:00,08:05:00,Daily,Superfast,Active,4,SEC-MAS-CBE,2026-08-24 16:55:00,2026-08-24 08:05:00,,,,,,,,,,,,,4.0,COA_train_schedule
+12601,Mangaluru Mail,MAS,MAQ,20:10:00,12:05:00,Daily,Superfast,Active,2,SEC-MAS-MDU,2026-08-24 20:10:00,2026-08-24 12:05:00,,,,,,,,,,,,,1.0,COA_train_schedule
+12602,Mangaluru Mail,MAQ,MAS,13:55:00,05:40:00,Daily,Superfast,Active,1,SEC-SA-TPJ,2026-08-24 13:55:00,2026-08-24 05:40:00,,,,,,,,,,,,,3.0,COA_train_schedule
+16159,Mangaluru Express,MS,MAQ,23:15:00,22:15:00,Daily,Express,Active,3,SEC-MDU-TVC,2026-08-24 23:15:00,2026-08-24 22:15:00,,,,,,,,,,,,,3.0,COA_train_schedule
+16160,Mangaluru Express,MAQ,MS,06:45:00,03:30:00,Daily,Express,Active,1,SEC-MAS-MDU,2026-08-24 06:45:00,2026-08-24 03:30:00,,,,,,,,,,,,,4.0,COA_train_schedule
+16343,Amritha Express,TVC,MDU,20:30:00,10:00:00,Daily,Express,Active,3,SEC-MDU-TVC,2026-08-24 20:30:00,2026-08-24 10:00:00,,,,,,,,,,,,,3.0,COA_train_schedule
+16344,Amritha Express,MDU,TVC,16:10:00,05:00:00,Daily,Express,Active,3,SEC-MDU-TVC,2026-08-24 16:10:00,2026-08-24 05:00:00,,,,,,,,,,,,,1.0,COA_train_schedule
+16381,Jayanthi Janata Express,MAS,MAS,23:50:00,12:30:00,Daily,Express,Active,4,SEC-MAS-MDU,2026-08-24 23:50:00,2026-08-24 12:30:00,,,,,,,,,,,,,1.0,COA_train_schedule
+16382,Jayanthi Janata Express,MAS,MAS,08:40:00,22:20:00,Daily,Express,Active,4,SEC-MAS-CBE,2026-08-24 08:40:00,2026-08-24 22:20:00,,,,,,,,,,,,,1.0,COA_train_schedule
+16315,Kochuveli Express,MAS,MAS,12:50:00,09:15:00,Daily,Express,Active,4,SEC-MAS-MDU,2026-08-24 12:50:00,2026-08-24 09:15:00,,,,,,,,,,,,,3.0,COA_train_schedule
+16316,Kochuveli Express,MAS,MAS,16:45:00,11:15:00,Daily,Express,Active,3,SEC-MDU-TVC,2026-08-24 16:45:00,2026-08-24 11:15:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12625,Kerala Express,MAS,TVC,20:10:00,13:20:00,Daily,Superfast,Active,1,SEC-MAS-MDU,2026-08-24 20:10:00,2026-08-24 13:20:00,,,,,,,,,,,,,4.0,COA_train_schedule
+12626,Kerala Express,TVC,MAS,11:15:00,13:30:00,Daily,Superfast,Active,3,SEC-MAS-AJJ,2026-08-24 11:15:00,2026-08-24 13:30:00,,,,,,,,,,,,,2.0,COA_train_schedule
+12617,Mangala Lakshadweep,ERS,MAS,13:25:00,13:30:00,Daily,Superfast,Active,3,SEC-MAS-AJJ,2026-08-24 13:25:00,2026-08-24 13:30:00,,,,,,,,,,,,,4.0,COA_train_schedule
+12618,Mangala Lakshadweep,MAS,ERS,05:40:00,07:30:00,Daily,Superfast,Active,1,SEC-MAS-CBE,2026-08-24 05:40:00,2026-08-24 07:30:00,,,,,,,,,,,,,4.0,COA_train_schedule
+22639,Alleppey Express,MAS,MAS,20:55:00,10:40:00,Daily,Superfast,Active,3,SEC-MAS-CBE,2026-08-24 20:55:00,2026-08-24 10:40:00,,,,,,,,,,,,,2.0,COA_train_schedule
+22640,Alleppey Express,MAS,MAS,15:20:00,05:30:00,Daily,Superfast,Active,1,SEC-MDU-TVC,2026-08-24 15:20:00,2026-08-24 05:30:00,,,,,,,,,,,,,3.0,COA_train_schedule
+12697,Trivandrum Express,MAS,TVC,15:10:00,06:40:00,Weekly,Superfast,Active,1,SEC-SA-TPJ,2026-08-24 15:10:00,2026-08-24 06:40:00,,,,,,,,,,,,,,COA_train_schedule

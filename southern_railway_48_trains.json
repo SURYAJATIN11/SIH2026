@@ -1,0 +1,4705 @@
+[
+  {
+    "train_no": "20643",
+    "name": "Coimbatore - MGR Chennai Central Vande Bharat",
+    "origin": "CBE",
+    "origin_name": "Coimbatore Jn",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "06:00",
+    "arrival_time": "11:50",
+    "type": "Vande Bharat",
+    "division": "SA",
+    "speed": 120,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "SA",
+    "current_station_name": "Salem Jn",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 11.6643,
+    "lng": 78.146,
+    "route_stations": [
+      "Coimbatore Jn",
+      "Tiruppur",
+      "Erode Jn",
+      "Salem Jn",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "CBE",
+      "TUP",
+      "ED",
+      "SA",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "20644",
+    "name": "MGR Chennai Central - Coimbatore Vande Bharat",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "CBE",
+    "destination_name": "Coimbatore Jn",
+    "departure_time": "14:15",
+    "arrival_time": "20:05",
+    "type": "Vande Bharat",
+    "division": "MAS",
+    "speed": 120,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "JTJ",
+    "current_station_name": "Jolarpettai Jn",
+    "next_station": "SA",
+    "next_station_name": "Salem Jn",
+    "lat": 12.5638,
+    "lng": 78.5802,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Tiruppur",
+      "Coimbatore Jn"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "SA",
+      "ED",
+      "TUP",
+      "CBE"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.0016,
+        76.9629
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12675",
+    "name": "Kovai Superfast Express",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "CBE",
+    "destination_name": "Coimbatore Jn",
+    "departure_time": "06:10",
+    "arrival_time": "14:05",
+    "type": "Superfast",
+    "division": "MAS",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "JTJ",
+    "current_station_name": "Jolarpettai Jn",
+    "next_station": "SA",
+    "next_station_name": "Salem Jn",
+    "lat": 12.5638,
+    "lng": 78.5802,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Tiruppur",
+      "Coimbatore Jn"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "SA",
+      "ED",
+      "TUP",
+      "CBE"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.0016,
+        76.9629
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12676",
+    "name": "Kovai Superfast Express",
+    "origin": "CBE",
+    "origin_name": "Coimbatore Jn",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "15:15",
+    "arrival_time": "22:50",
+    "type": "Superfast",
+    "division": "SA",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "SA",
+    "current_station_name": "Salem Jn",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 11.6643,
+    "lng": 78.146,
+    "route_stations": [
+      "Coimbatore Jn",
+      "Tiruppur",
+      "Erode Jn",
+      "Salem Jn",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "CBE",
+      "TUP",
+      "ED",
+      "SA",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12671",
+    "name": "Nilgiri (Blue Mountain) Superfast Express",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "MTP",
+    "destination_name": "Mettupalayam",
+    "departure_time": "21:05",
+    "arrival_time": "06:15",
+    "type": "Superfast",
+    "division": "MAS",
+    "speed": 95,
+    "status": "Late by 12m",
+    "delay_minutes": 12,
+    "current_station": "JTJ",
+    "current_station_name": "Jolarpettai Jn",
+    "next_station": "SA",
+    "next_station_name": "Salem Jn",
+    "lat": 12.5638,
+    "lng": 78.5802,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Tiruppur",
+      "Coimbatore Jn",
+      "Mettupalayam"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "SA",
+      "ED",
+      "TUP",
+      "CBE",
+      "MTP"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.2989,
+        76.9427
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12672",
+    "name": "Nilgiri (Blue Mountain) Superfast Express",
+    "origin": "MTP",
+    "origin_name": "Mettupalayam",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "20:40",
+    "arrival_time": "06:20",
+    "type": "Superfast",
+    "division": "SA",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "ED",
+    "current_station_name": "Erode Jn",
+    "next_station": "SA",
+    "next_station_name": "Salem Jn",
+    "lat": 11.341,
+    "lng": 77.7172,
+    "route_stations": [
+      "Mettupalayam",
+      "Coimbatore Jn",
+      "Tiruppur",
+      "Erode Jn",
+      "Salem Jn",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "MTP",
+      "CBE",
+      "TUP",
+      "ED",
+      "SA",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        11.2989,
+        76.9427
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12673",
+    "name": "Cheran Superfast Express",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "CBE",
+    "destination_name": "Coimbatore Jn",
+    "departure_time": "22:00",
+    "arrival_time": "06:00",
+    "type": "Superfast",
+    "division": "MAS",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "JTJ",
+    "current_station_name": "Jolarpettai Jn",
+    "next_station": "SA",
+    "next_station_name": "Salem Jn",
+    "lat": 12.5638,
+    "lng": 78.5802,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Tiruppur",
+      "Coimbatore Jn"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "SA",
+      "ED",
+      "TUP",
+      "CBE"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.0016,
+        76.9629
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12674",
+    "name": "Cheran Superfast Express",
+    "origin": "CBE",
+    "origin_name": "Coimbatore Jn",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "22:50",
+    "arrival_time": "07:00",
+    "type": "Superfast",
+    "division": "SA",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "SA",
+    "current_station_name": "Salem Jn",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 11.6643,
+    "lng": 78.146,
+    "route_stations": [
+      "Coimbatore Jn",
+      "Tiruppur",
+      "Erode Jn",
+      "Salem Jn",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "CBE",
+      "TUP",
+      "ED",
+      "SA",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12679",
+    "name": "Intercity Superfast Express",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "CBE",
+    "destination_name": "Coimbatore Jn",
+    "departure_time": "13:50",
+    "arrival_time": "22:15",
+    "type": "Superfast",
+    "division": "MAS",
+    "speed": 95,
+    "status": "Late by 24m",
+    "delay_minutes": 24,
+    "current_station": "JTJ",
+    "current_station_name": "Jolarpettai Jn",
+    "next_station": "SA",
+    "next_station_name": "Salem Jn",
+    "lat": 12.5638,
+    "lng": 78.5802,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Tiruppur",
+      "Coimbatore Jn"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "SA",
+      "ED",
+      "TUP",
+      "CBE"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.0016,
+        76.9629
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12680",
+    "name": "Intercity Superfast Express",
+    "origin": "CBE",
+    "origin_name": "Coimbatore Jn",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "06:20",
+    "arrival_time": "13:50",
+    "type": "Superfast",
+    "division": "SA",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "SA",
+    "current_station_name": "Salem Jn",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 11.6643,
+    "lng": 78.146,
+    "route_stations": [
+      "Coimbatore Jn",
+      "Tiruppur",
+      "Erode Jn",
+      "Salem Jn",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "CBE",
+      "TUP",
+      "ED",
+      "SA",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "20607",
+    "name": "MGR Chennai Central - Mysuru Vande Bharat",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "MYS",
+    "destination_name": "Mysuru Jn",
+    "departure_time": "05:50",
+    "arrival_time": "12:20",
+    "type": "Vande Bharat",
+    "division": "MAS",
+    "speed": 120,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "JTJ",
+    "current_station_name": "Jolarpettai Jn",
+    "next_station": "BWT",
+    "next_station_name": "Bangarapet",
+    "lat": 12.5638,
+    "lng": 78.5802,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Bangarapet",
+      "Krishnarajapuram",
+      "KSR Bengaluru",
+      "Mysuru Jn"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "BWT",
+      "KJM",
+      "SBC",
+      "MYS"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9942,
+        78.2017
+      ],
+      [
+        12.994,
+        77.678
+      ],
+      [
+        12.9784,
+        77.5684
+      ],
+      [
+        12.3167,
+        76.65
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      }
+    ]
+  },
+  {
+    "train_no": "20608",
+    "name": "Mysuru - MGR Chennai Central Vande Bharat",
+    "origin": "MYS",
+    "origin_name": "Mysuru Jn",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "13:05",
+    "arrival_time": "19:20",
+    "type": "Vande Bharat",
+    "division": "SWR",
+    "speed": 120,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "BWT",
+    "current_station_name": "Bangarapet",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 12.9942,
+    "lng": 78.2017,
+    "route_stations": [
+      "Mysuru Jn",
+      "KSR Bengaluru",
+      "Krishnarajapuram",
+      "Bangarapet",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "MYS",
+      "SBC",
+      "KJM",
+      "BWT",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        12.3167,
+        76.65
+      ],
+      [
+        12.9784,
+        77.5684
+      ],
+      [
+        12.994,
+        77.678
+      ],
+      [
+        12.9942,
+        78.2017
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      }
+    ]
+  },
+  {
+    "train_no": "12028",
+    "name": "Shatabdi Express",
+    "origin": "SBC",
+    "origin_name": "KSR Bengaluru",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "06:00",
+    "arrival_time": "11:00",
+    "type": "Shatabdi",
+    "division": "SWR",
+    "speed": 110,
+    "status": "Late by 11m",
+    "delay_minutes": 11,
+    "current_station": "BWT",
+    "current_station_name": "Bangarapet",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 12.9942,
+    "lng": 78.2017,
+    "route_stations": [
+      "KSR Bengaluru",
+      "Krishnarajapuram",
+      "Bangarapet",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "SBC",
+      "KJM",
+      "BWT",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        12.9784,
+        77.5684
+      ],
+      [
+        12.994,
+        77.678
+      ],
+      [
+        12.9942,
+        78.2017
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      }
+    ]
+  },
+  {
+    "train_no": "12027",
+    "name": "Shatabdi Express",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "SBC",
+    "destination_name": "KSR Bengaluru",
+    "departure_time": "17:30",
+    "arrival_time": "22:25",
+    "type": "Shatabdi",
+    "division": "MAS",
+    "speed": 110,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "KPD",
+    "current_station_name": "Katpadi Jn",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 12.9696,
+    "lng": 79.1362,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Bangarapet",
+      "Krishnarajapuram",
+      "KSR Bengaluru"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "BWT",
+      "KJM",
+      "SBC"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9942,
+        78.2017
+      ],
+      [
+        12.994,
+        77.678
+      ],
+      [
+        12.9784,
+        77.5684
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      }
+    ]
+  },
+  {
+    "train_no": "12609",
+    "name": "MGR Chennai Central - Mysuru SF Express",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "MYS",
+    "destination_name": "Mysuru Jn",
+    "departure_time": "13:35",
+    "arrival_time": "22:45",
+    "type": "Superfast",
+    "division": "MAS",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "JTJ",
+    "current_station_name": "Jolarpettai Jn",
+    "next_station": "BWT",
+    "next_station_name": "Bangarapet",
+    "lat": 12.5638,
+    "lng": 78.5802,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Bangarapet",
+      "Krishnarajapuram",
+      "KSR Bengaluru",
+      "Mysuru Jn"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "BWT",
+      "KJM",
+      "SBC",
+      "MYS"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9942,
+        78.2017
+      ],
+      [
+        12.994,
+        77.678
+      ],
+      [
+        12.9784,
+        77.5684
+      ],
+      [
+        12.3167,
+        76.65
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      }
+    ]
+  },
+  {
+    "train_no": "12639",
+    "name": "Brindavan Express",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "SBC",
+    "destination_name": "KSR Bengaluru",
+    "departure_time": "07:10",
+    "arrival_time": "13:40",
+    "type": "Superfast",
+    "division": "MAS",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "KPD",
+    "current_station_name": "Katpadi Jn",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 12.9696,
+    "lng": 79.1362,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Bangarapet",
+      "Krishnarajapuram",
+      "KSR Bengaluru"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "BWT",
+      "KJM",
+      "SBC"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9942,
+        78.2017
+      ],
+      [
+        12.994,
+        77.678
+      ],
+      [
+        12.9784,
+        77.5684
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      }
+    ]
+  },
+  {
+    "train_no": "12640",
+    "name": "Brindavan Express",
+    "origin": "SBC",
+    "origin_name": "KSR Bengaluru",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "15:10",
+    "arrival_time": "21:05",
+    "type": "Superfast",
+    "division": "SWR",
+    "speed": 95,
+    "status": "Late by 23m",
+    "delay_minutes": 23,
+    "current_station": "BWT",
+    "current_station_name": "Bangarapet",
+    "next_station": "JTJ",
+    "next_station_name": "Jolarpettai Jn",
+    "lat": 12.9942,
+    "lng": 78.2017,
+    "route_stations": [
+      "KSR Bengaluru",
+      "Krishnarajapuram",
+      "Bangarapet",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "SBC",
+      "KJM",
+      "BWT",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        12.9784,
+        77.5684
+      ],
+      [
+        12.994,
+        77.678
+      ],
+      [
+        12.9942,
+        78.2017
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      }
+    ]
+  },
+  {
+    "train_no": "12677",
+    "name": "KSR Bengaluru - Ernakulam InterCity SF Express",
+    "origin": "SBC",
+    "origin_name": "KSR Bengaluru",
+    "destination": "ERS",
+    "destination_name": "Ernakulam Jn",
+    "departure_time": "06:10",
+    "arrival_time": "16:55",
+    "type": "Superfast",
+    "division": "SWR",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "TUP",
+    "current_station_name": "Tiruppur",
+    "next_station": "CBE",
+    "next_station_name": "Coimbatore Jn",
+    "lat": 11.1085,
+    "lng": 77.3411,
+    "route_stations": [
+      "KSR Bengaluru",
+      "Salem Jn",
+      "Erode Jn",
+      "Tiruppur",
+      "Coimbatore Jn",
+      "Palakkad Jn",
+      "Thrissur",
+      "Aluva",
+      "Ernakulam Jn"
+    ],
+    "route_codes": [
+      "SBC",
+      "SA",
+      "ED",
+      "TUP",
+      "CBE",
+      "PGT",
+      "TCR",
+      "AWY",
+      "ERS"
+    ],
+    "route_coords": [
+      [
+        12.9784,
+        77.5684
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.108,
+        76.353
+      ],
+      [
+        9.9678,
+        76.2917
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12678",
+    "name": "Ernakulam - KSR Bengaluru InterCity SF Express",
+    "origin": "ERS",
+    "origin_name": "Ernakulam Jn",
+    "destination": "SBC",
+    "destination_name": "KSR Bengaluru",
+    "departure_time": "09:10",
+    "arrival_time": "19:50",
+    "type": "Superfast",
+    "division": "TVC",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "PGT",
+    "current_station_name": "Palakkad Jn",
+    "next_station": "CBE",
+    "next_station_name": "Coimbatore Jn",
+    "lat": 10.7867,
+    "lng": 76.6548,
+    "route_stations": [
+      "Ernakulam Jn",
+      "Aluva",
+      "Thrissur",
+      "Palakkad Jn",
+      "Coimbatore Jn",
+      "Tiruppur",
+      "Erode Jn",
+      "Salem Jn",
+      "KSR Bengaluru"
+    ],
+    "route_codes": [
+      "ERS",
+      "AWY",
+      "TCR",
+      "PGT",
+      "CBE",
+      "TUP",
+      "ED",
+      "SA",
+      "SBC"
+    ],
+    "route_coords": [
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        10.108,
+        76.353
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        12.9784,
+        77.5684
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "16526",
+    "name": "Kanyakumari - KSR Bengaluru Island Express",
+    "origin": "CAPE",
+    "origin_name": "Kanyakumari",
+    "destination": "SBC",
+    "destination_name": "KSR Bengaluru",
+    "departure_time": "17:15",
+    "arrival_time": "12:45",
+    "type": "Mail/Express",
+    "division": "TVC",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "KTYM",
+    "current_station_name": "Kottayam",
+    "next_station": "ERS",
+    "next_station_name": "Ernakulam Jn",
+    "lat": 9.5916,
+    "lng": 76.5222,
+    "route_stations": [
+      "Kanyakumari",
+      "Nagercoil Jn",
+      "Thiruvananthapuram Central",
+      "Kollam Jn",
+      "Kottayam",
+      "Ernakulam Jn",
+      "Thrissur",
+      "Palakkad Jn",
+      "Coimbatore Jn",
+      "Erode Jn",
+      "Salem Jn",
+      "KSR Bengaluru"
+    ],
+    "route_codes": [
+      "CAPE",
+      "NCJ",
+      "TVC",
+      "QLN",
+      "KTYM",
+      "ERS",
+      "TCR",
+      "PGT",
+      "CBE",
+      "ED",
+      "SA",
+      "SBC"
+    ],
+    "route_coords": [
+      [
+        8.0883,
+        77.5385
+      ],
+      [
+        8.18,
+        77.43
+      ],
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        9.5916,
+        76.5222
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        12.9784,
+        77.5684
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "16525",
+    "name": "KSR Bengaluru - Kanyakumari Island Express",
+    "origin": "SBC",
+    "origin_name": "KSR Bengaluru",
+    "destination": "CAPE",
+    "destination_name": "Kanyakumari",
+    "departure_time": "20:10",
+    "arrival_time": "16:40",
+    "type": "Mail/Express",
+    "division": "SWR",
+    "speed": 95,
+    "status": "Late by 10m",
+    "delay_minutes": 10,
+    "current_station": "PGT",
+    "current_station_name": "Palakkad Jn",
+    "next_station": "TCR",
+    "next_station_name": "Thrissur",
+    "lat": 10.7867,
+    "lng": 76.6548,
+    "route_stations": [
+      "KSR Bengaluru",
+      "Salem Jn",
+      "Erode Jn",
+      "Coimbatore Jn",
+      "Palakkad Jn",
+      "Thrissur",
+      "Ernakulam Jn",
+      "Kottayam",
+      "Kollam Jn",
+      "Thiruvananthapuram Central",
+      "Nagercoil Jn",
+      "Kanyakumari"
+    ],
+    "route_codes": [
+      "SBC",
+      "SA",
+      "ED",
+      "CBE",
+      "PGT",
+      "TCR",
+      "ERS",
+      "KTYM",
+      "QLN",
+      "TVC",
+      "NCJ",
+      "CAPE"
+    ],
+    "route_coords": [
+      [
+        12.9784,
+        77.5684
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        9.5916,
+        76.5222
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.18,
+        77.43
+      ],
+      [
+        8.0883,
+        77.5385
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12623",
+    "name": "MGR Chennai Central - Thiruvananthapuram Mail",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "TVC",
+    "destination_name": "Thiruvananthapuram Central",
+    "departure_time": "19:45",
+    "arrival_time": "11:30",
+    "type": "Superfast Mail",
+    "division": "MAS",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "ED",
+    "current_station_name": "Erode Jn",
+    "next_station": "CBE",
+    "next_station_name": "Coimbatore Jn",
+    "lat": 11.341,
+    "lng": 77.7172,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Coimbatore Jn",
+      "Palakkad Jn",
+      "Thrissur",
+      "Ernakulam Jn",
+      "Kottayam",
+      "Kollam Jn",
+      "Thiruvananthapuram Central"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "SA",
+      "ED",
+      "CBE",
+      "PGT",
+      "TCR",
+      "ERS",
+      "KTYM",
+      "QLN",
+      "TVC"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        9.5916,
+        76.5222
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        8.4875,
+        76.953
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12624",
+    "name": "Thiruvananthapuram - MGR Chennai Central Mail",
+    "origin": "TVC",
+    "origin_name": "Thiruvananthapuram Central",
+    "destination": "MAS",
+    "destination_name": "MGR Chennai Central",
+    "departure_time": "15:00",
+    "arrival_time": "07:45",
+    "type": "Superfast Mail",
+    "division": "TVC",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "PGT",
+    "current_station_name": "Palakkad Jn",
+    "next_station": "CBE",
+    "next_station_name": "Coimbatore Jn",
+    "lat": 10.7867,
+    "lng": 76.6548,
+    "route_stations": [
+      "Thiruvananthapuram Central",
+      "Kollam Jn",
+      "Kottayam",
+      "Ernakulam Jn",
+      "Thrissur",
+      "Palakkad Jn",
+      "Coimbatore Jn",
+      "Erode Jn",
+      "Salem Jn",
+      "Jolarpettai Jn",
+      "Katpadi Jn",
+      "Arakkonam Jn",
+      "MGR Chennai Central"
+    ],
+    "route_codes": [
+      "TVC",
+      "QLN",
+      "KTYM",
+      "ERS",
+      "TCR",
+      "PGT",
+      "CBE",
+      "ED",
+      "SA",
+      "JTJ",
+      "KPD",
+      "AJJ",
+      "MAS"
+    ],
+    "route_coords": [
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        9.5916,
+        76.5222
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        13.0827,
+        80.2707
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12695",
+    "name": "MGR Chennai Central - Thiruvananthapuram SF Exp",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "TVC",
+    "destination_name": "Thiruvananthapuram Central",
+    "departure_time": "15:20",
+    "arrival_time": "07:45",
+    "type": "Superfast",
+    "division": "MAS",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "ED",
+    "current_station_name": "Erode Jn",
+    "next_station": "CBE",
+    "next_station_name": "Coimbatore Jn",
+    "lat": 11.341,
+    "lng": 77.7172,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Coimbatore Jn",
+      "Palakkad Jn",
+      "Thrissur",
+      "Ernakulam Jn",
+      "Kottayam",
+      "Kollam Jn",
+      "Thiruvananthapuram Central"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "JTJ",
+      "SA",
+      "ED",
+      "CBE",
+      "PGT",
+      "TCR",
+      "ERS",
+      "KTYM",
+      "QLN",
+      "TVC"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        9.5916,
+        76.5222
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        8.4875,
+        76.953
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12685",
+    "name": "MGR Chennai Central - Mangaluru Central SF Exp",
+    "origin": "MAS",
+    "origin_name": "MGR Chennai Central",
+    "destination": "MAQ",
+    "destination_name": "Mangaluru Central",
+    "departure_time": "17:00",
+    "arrival_time": "09:05",
+    "type": "Superfast",
+    "division": "MAS",
+    "speed": 95,
+    "status": "Late by 22m",
+    "delay_minutes": 22,
+    "current_station": "PGT",
+    "current_station_name": "Palakkad Jn",
+    "next_station": "SRR",
+    "next_station_name": "Shoranur Jn",
+    "lat": 10.7867,
+    "lng": 76.6548,
+    "route_stations": [
+      "MGR Chennai Central",
+      "Arakkonam Jn",
+      "Katpadi Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Palakkad Jn",
+      "Shoranur Jn",
+      "Tirur",
+      "Kozhikode",
+      "Vadakara",
+      "Kannur",
+      "Kasaragod",
+      "Mangaluru Central"
+    ],
+    "route_codes": [
+      "MAS",
+      "AJJ",
+      "KPD",
+      "SA",
+      "ED",
+      "PGT",
+      "SRR",
+      "TIR",
+      "CLT",
+      "BDJ",
+      "CAN",
+      "KGQ",
+      "MAQ"
+    ],
+    "route_coords": [
+      [
+        13.0827,
+        80.2707
+      ],
+      [
+        13.0784,
+        79.6677
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        10.7602,
+        76.2736
+      ],
+      [
+        10.91,
+        75.92
+      ],
+      [
+        11.248,
+        75.7804
+      ],
+      [
+        11.6,
+        75.59
+      ],
+      [
+        11.8745,
+        75.3704
+      ],
+      [
+        12.5,
+        74.98
+      ],
+      [
+        12.8687,
+        74.8427
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "12635",
+    "name": "Vaigai Superfast Express",
+    "origin": "MS",
+    "origin_name": "Chennai Egmore",
+    "destination": "MDU",
+    "destination_name": "Madurai Jn",
+    "departure_time": "13:50",
+    "arrival_time": "21:15",
+    "type": "Superfast",
+    "division": "TPJ",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "VM",
+    "current_station_name": "Villupuram Jn",
+    "next_station": "VRI",
+    "next_station_name": "Vriddhachalam Jn",
+    "lat": 11.9401,
+    "lng": 79.4861,
+    "route_stations": [
+      "Chennai Egmore",
+      "Tambaram",
+      "Chengalpattu Jn",
+      "Villupuram Jn",
+      "Vriddhachalam Jn",
+      "Ariyalur",
+      "Tiruchirappalli Jn",
+      "Dindigul Jn",
+      "Madurai Jn"
+    ],
+    "route_codes": [
+      "MS",
+      "TBM",
+      "CGL",
+      "VM",
+      "VRI",
+      "ALU",
+      "TPJ",
+      "DG",
+      "MDU"
+    ],
+    "route_coords": [
+      [
+        13.0826,
+        80.2612
+      ],
+      [
+        12.925,
+        80.12
+      ],
+      [
+        12.6841,
+        79.9836
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        11.5333,
+        79.3333
+      ],
+      [
+        11.14,
+        79.08
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        9.9252,
+        78.1198
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "12636",
+    "name": "Vaigai Superfast Express",
+    "origin": "MDU",
+    "origin_name": "Madurai Jn",
+    "destination": "MS",
+    "destination_name": "Chennai Egmore",
+    "departure_time": "07:10",
+    "arrival_time": "14:30",
+    "type": "Superfast",
+    "division": "MDU",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "ALU",
+    "current_station_name": "Ariyalur",
+    "next_station": "VRI",
+    "next_station_name": "Vriddhachalam Jn",
+    "lat": 11.14,
+    "lng": 79.08,
+    "route_stations": [
+      "Madurai Jn",
+      "Dindigul Jn",
+      "Tiruchirappalli Jn",
+      "Ariyalur",
+      "Vriddhachalam Jn",
+      "Villupuram Jn",
+      "Chengalpattu Jn",
+      "Tambaram",
+      "Chennai Egmore"
+    ],
+    "route_codes": [
+      "MDU",
+      "DG",
+      "TPJ",
+      "ALU",
+      "VRI",
+      "VM",
+      "CGL",
+      "TBM",
+      "MS"
+    ],
+    "route_coords": [
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        11.14,
+        79.08
+      ],
+      [
+        11.5333,
+        79.3333
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        12.6841,
+        79.9836
+      ],
+      [
+        12.925,
+        80.12
+      ],
+      [
+        13.0826,
+        80.2612
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "12637",
+    "name": "Pandian Superfast Express",
+    "origin": "MS",
+    "origin_name": "Chennai Egmore",
+    "destination": "MDU",
+    "destination_name": "Madurai Jn",
+    "departure_time": "21:40",
+    "arrival_time": "05:35",
+    "type": "Superfast",
+    "division": "MDU",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "VM",
+    "current_station_name": "Villupuram Jn",
+    "next_station": "VRI",
+    "next_station_name": "Vriddhachalam Jn",
+    "lat": 11.9401,
+    "lng": 79.4861,
+    "route_stations": [
+      "Chennai Egmore",
+      "Tambaram",
+      "Chengalpattu Jn",
+      "Villupuram Jn",
+      "Vriddhachalam Jn",
+      "Ariyalur",
+      "Tiruchirappalli Jn",
+      "Dindigul Jn",
+      "Madurai Jn"
+    ],
+    "route_codes": [
+      "MS",
+      "TBM",
+      "CGL",
+      "VM",
+      "VRI",
+      "ALU",
+      "TPJ",
+      "DG",
+      "MDU"
+    ],
+    "route_coords": [
+      [
+        13.0826,
+        80.2612
+      ],
+      [
+        12.925,
+        80.12
+      ],
+      [
+        12.6841,
+        79.9836
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        11.5333,
+        79.3333
+      ],
+      [
+        11.14,
+        79.08
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        9.9252,
+        78.1198
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "12638",
+    "name": "Pandian Superfast Express",
+    "origin": "MDU",
+    "origin_name": "Madurai Jn",
+    "destination": "MS",
+    "destination_name": "Chennai Egmore",
+    "departure_time": "21:20",
+    "arrival_time": "05:15",
+    "type": "Superfast",
+    "division": "MDU",
+    "speed": 95,
+    "status": "Late by 9m",
+    "delay_minutes": 9,
+    "current_station": "ALU",
+    "current_station_name": "Ariyalur",
+    "next_station": "VRI",
+    "next_station_name": "Vriddhachalam Jn",
+    "lat": 11.14,
+    "lng": 79.08,
+    "route_stations": [
+      "Madurai Jn",
+      "Dindigul Jn",
+      "Tiruchirappalli Jn",
+      "Ariyalur",
+      "Vriddhachalam Jn",
+      "Villupuram Jn",
+      "Chengalpattu Jn",
+      "Tambaram",
+      "Chennai Egmore"
+    ],
+    "route_codes": [
+      "MDU",
+      "DG",
+      "TPJ",
+      "ALU",
+      "VRI",
+      "VM",
+      "CGL",
+      "TBM",
+      "MS"
+    ],
+    "route_coords": [
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        11.14,
+        79.08
+      ],
+      [
+        11.5333,
+        79.3333
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        12.6841,
+        79.9836
+      ],
+      [
+        12.925,
+        80.12
+      ],
+      [
+        13.0826,
+        80.2612
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "20635",
+    "name": "Ananthapuri Superfast Express",
+    "origin": "MS",
+    "origin_name": "Chennai Egmore",
+    "destination": "QLN",
+    "destination_name": "Kollam Jn",
+    "departure_time": "19:50",
+    "arrival_time": "06:15",
+    "type": "Superfast",
+    "division": "TVC",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "DG",
+    "current_station_name": "Dindigul Jn",
+    "next_station": "MDU",
+    "next_station_name": "Madurai Jn",
+    "lat": 10.3673,
+    "lng": 77.9803,
+    "route_stations": [
+      "Chennai Egmore",
+      "Tambaram",
+      "Villupuram Jn",
+      "Tiruchirappalli Jn",
+      "Dindigul Jn",
+      "Madurai Jn",
+      "Virudhunagar Jn",
+      "Kovilpatti",
+      "Tirunelveli Jn",
+      "Nagercoil Jn",
+      "Thiruvananthapuram Central",
+      "Kollam Jn"
+    ],
+    "route_codes": [
+      "MS",
+      "TBM",
+      "VM",
+      "TPJ",
+      "DG",
+      "MDU",
+      "VPT",
+      "CVP",
+      "TEN",
+      "NCJ",
+      "TVC",
+      "QLN"
+    ],
+    "route_coords": [
+      [
+        13.0826,
+        80.2612
+      ],
+      [
+        12.925,
+        80.12
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        9.5872,
+        77.9577
+      ],
+      [
+        9.17,
+        77.87
+      ],
+      [
+        8.7139,
+        77.7567
+      ],
+      [
+        8.18,
+        77.43
+      ],
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.887,
+        76.598
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "20636",
+    "name": "Ananthapuri Superfast Express",
+    "origin": "QLN",
+    "origin_name": "Kollam Jn",
+    "destination": "MS",
+    "destination_name": "Chennai Egmore",
+    "departure_time": "14:50",
+    "arrival_time": "06:05",
+    "type": "Superfast",
+    "division": "TVC",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "CVP",
+    "current_station_name": "Kovilpatti",
+    "next_station": "VPT",
+    "next_station_name": "Virudhunagar Jn",
+    "lat": 9.17,
+    "lng": 77.87,
+    "route_stations": [
+      "Kollam Jn",
+      "Thiruvananthapuram Central",
+      "Nagercoil Jn",
+      "Tirunelveli Jn",
+      "Kovilpatti",
+      "Virudhunagar Jn",
+      "Madurai Jn",
+      "Dindigul Jn",
+      "Tiruchirappalli Jn",
+      "Villupuram Jn",
+      "Tambaram",
+      "Chennai Egmore"
+    ],
+    "route_codes": [
+      "QLN",
+      "TVC",
+      "NCJ",
+      "TEN",
+      "CVP",
+      "VPT",
+      "MDU",
+      "DG",
+      "TPJ",
+      "VM",
+      "TBM",
+      "MS"
+    ],
+    "route_coords": [
+      [
+        8.887,
+        76.598
+      ],
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.18,
+        77.43
+      ],
+      [
+        8.7139,
+        77.7567
+      ],
+      [
+        9.17,
+        77.87
+      ],
+      [
+        9.5872,
+        77.9577
+      ],
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        12.925,
+        80.12
+      ],
+      [
+        13.0826,
+        80.2612
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "16127",
+    "name": "Chennai Egmore - Guruvayur Express",
+    "origin": "MS",
+    "origin_name": "Chennai Egmore",
+    "destination": "GUV",
+    "destination_name": "Guruvayur",
+    "departure_time": "09:00",
+    "arrival_time": "06:40",
+    "type": "Mail/Express",
+    "division": "MAS",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "MDU",
+    "current_station_name": "Madurai Jn",
+    "next_station": "TEN",
+    "next_station_name": "Tirunelveli Jn",
+    "lat": 9.9252,
+    "lng": 78.1198,
+    "route_stations": [
+      "Chennai Egmore",
+      "Villupuram Jn",
+      "Tiruchirappalli Jn",
+      "Dindigul Jn",
+      "Madurai Jn",
+      "Tirunelveli Jn",
+      "Thiruvananthapuram Central",
+      "Kollam Jn",
+      "Ernakulam Jn",
+      "Thrissur",
+      "Guruvayur"
+    ],
+    "route_codes": [
+      "MS",
+      "VM",
+      "TPJ",
+      "DG",
+      "MDU",
+      "TEN",
+      "TVC",
+      "QLN",
+      "ERS",
+      "TCR",
+      "GUV"
+    ],
+    "route_coords": [
+      [
+        13.0826,
+        80.2612
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        8.7139,
+        77.7567
+      ],
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.59,
+        76.04
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "16128",
+    "name": "Guruvayur - Chennai Egmore Express",
+    "origin": "GUV",
+    "origin_name": "Guruvayur",
+    "destination": "MS",
+    "destination_name": "Chennai Egmore",
+    "departure_time": "23:15",
+    "arrival_time": "20:35",
+    "type": "Mail/Express",
+    "division": "PGT",
+    "speed": 95,
+    "status": "Late by 21m",
+    "delay_minutes": 21,
+    "current_station": "TVC",
+    "current_station_name": "Thiruvananthapuram Central",
+    "next_station": "TEN",
+    "next_station_name": "Tirunelveli Jn",
+    "lat": 8.4875,
+    "lng": 76.953,
+    "route_stations": [
+      "Guruvayur",
+      "Thrissur",
+      "Ernakulam Jn",
+      "Kollam Jn",
+      "Thiruvananthapuram Central",
+      "Tirunelveli Jn",
+      "Madurai Jn",
+      "Dindigul Jn",
+      "Tiruchirappalli Jn",
+      "Villupuram Jn",
+      "Chennai Egmore"
+    ],
+    "route_codes": [
+      "GUV",
+      "TCR",
+      "ERS",
+      "QLN",
+      "TVC",
+      "TEN",
+      "MDU",
+      "DG",
+      "TPJ",
+      "VM",
+      "MS"
+    ],
+    "route_coords": [
+      [
+        10.59,
+        76.04
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.7139,
+        77.7567
+      ],
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        13.0826,
+        80.2612
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "20665",
+    "name": "Chennai Egmore - Tirunelveli Vande Bharat",
+    "origin": "MS",
+    "origin_name": "Chennai Egmore",
+    "destination": "TEN",
+    "destination_name": "Tirunelveli Jn",
+    "departure_time": "14:50",
+    "arrival_time": "22:40",
+    "type": "Vande Bharat",
+    "division": "TPJ",
+    "speed": 120,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "TPJ",
+    "current_station_name": "Tiruchirappalli Jn",
+    "next_station": "DG",
+    "next_station_name": "Dindigul Jn",
+    "lat": 10.7905,
+    "lng": 78.6865,
+    "route_stations": [
+      "Chennai Egmore",
+      "Tambaram",
+      "Villupuram Jn",
+      "Tiruchirappalli Jn",
+      "Dindigul Jn",
+      "Madurai Jn",
+      "Virudhunagar Jn",
+      "Kovilpatti",
+      "Tirunelveli Jn"
+    ],
+    "route_codes": [
+      "MS",
+      "TBM",
+      "VM",
+      "TPJ",
+      "DG",
+      "MDU",
+      "VPT",
+      "CVP",
+      "TEN"
+    ],
+    "route_coords": [
+      [
+        13.0826,
+        80.2612
+      ],
+      [
+        12.925,
+        80.12
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        9.5872,
+        77.9577
+      ],
+      [
+        9.17,
+        77.87
+      ],
+      [
+        8.7139,
+        77.7567
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "20666",
+    "name": "Tirunelveli - Chennai Egmore Vande Bharat",
+    "origin": "TEN",
+    "origin_name": "Tirunelveli Jn",
+    "destination": "MS",
+    "destination_name": "Chennai Egmore",
+    "departure_time": "06:00",
+    "arrival_time": "13:50",
+    "type": "Vande Bharat",
+    "division": "MDU",
+    "speed": 120,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "MDU",
+    "current_station_name": "Madurai Jn",
+    "next_station": "DG",
+    "next_station_name": "Dindigul Jn",
+    "lat": 9.9252,
+    "lng": 78.1198,
+    "route_stations": [
+      "Tirunelveli Jn",
+      "Kovilpatti",
+      "Virudhunagar Jn",
+      "Madurai Jn",
+      "Dindigul Jn",
+      "Tiruchirappalli Jn",
+      "Villupuram Jn",
+      "Tambaram",
+      "Chennai Egmore"
+    ],
+    "route_codes": [
+      "TEN",
+      "CVP",
+      "VPT",
+      "MDU",
+      "DG",
+      "TPJ",
+      "VM",
+      "TBM",
+      "MS"
+    ],
+    "route_coords": [
+      [
+        8.7139,
+        77.7567
+      ],
+      [
+        9.17,
+        77.87
+      ],
+      [
+        9.5872,
+        77.9577
+      ],
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        12.925,
+        80.12
+      ],
+      [
+        13.0826,
+        80.2612
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "16101",
+    "name": "Boat Mail / Chennai Egmore - Rameswaram Exp",
+    "origin": "MS",
+    "origin_name": "Chennai Egmore",
+    "destination": "RMM",
+    "destination_name": "Rameswaram",
+    "departure_time": "19:15",
+    "arrival_time": "07:10",
+    "type": "Mail/Express",
+    "division": "MDU",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "MV",
+    "current_station_name": "Mayiladuthurai Jn",
+    "next_station": "TJ",
+    "next_station_name": "Thanjavur Jn",
+    "lat": 11.1018,
+    "lng": 79.6522,
+    "route_stations": [
+      "Chennai Egmore",
+      "Chengalpattu Jn",
+      "Villupuram Jn",
+      "Cuddalore Port",
+      "Mayiladuthurai Jn",
+      "Thanjavur Jn",
+      "Tiruchirappalli Jn",
+      "Manamadurai Jn",
+      "Ramanathapuram",
+      "Mandapam",
+      "Rameswaram"
+    ],
+    "route_codes": [
+      "MS",
+      "CGL",
+      "VM",
+      "CUPJ",
+      "MV",
+      "TJ",
+      "TPJ",
+      "MNM",
+      "RMD",
+      "MMM",
+      "RMM"
+    ],
+    "route_coords": [
+      [
+        13.0826,
+        80.2612
+      ],
+      [
+        12.6841,
+        79.9836
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        11.748,
+        79.768
+      ],
+      [
+        11.1018,
+        79.6522
+      ],
+      [
+        10.787,
+        79.1378
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        9.7,
+        78.45
+      ],
+      [
+        9.3667,
+        78.8333
+      ],
+      [
+        9.2825,
+        79.12
+      ],
+      [
+        9.2876,
+        79.3129
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      },
+      {
+        "block_id": "BLK-BRG-MDU-01",
+        "section": "Mandapam \u2013 Pamban Sea Bridge (KM 2.06)",
+        "type": "Marine Scherzer Lift & Anemometer Monitoring",
+        "impact": "Wind Speed: 28 km/h (Permissible) \u2022 Speed capped at 30 km/h",
+        "clearance": "Electronic bridge interlocking signal clear"
+      }
+    ]
+  },
+  {
+    "train_no": "16102",
+    "name": "Rameswaram - Chennai Egmore Express",
+    "origin": "RMM",
+    "origin_name": "Rameswaram",
+    "destination": "MS",
+    "destination_name": "Chennai Egmore",
+    "departure_time": "19:00",
+    "arrival_time": "07:30",
+    "type": "Mail/Express",
+    "division": "MDU",
+    "speed": 95,
+    "status": "Late by 8m",
+    "delay_minutes": 8,
+    "current_station": "TPJ",
+    "current_station_name": "Tiruchirappalli Jn",
+    "next_station": "TJ",
+    "next_station_name": "Thanjavur Jn",
+    "lat": 10.7905,
+    "lng": 78.6865,
+    "route_stations": [
+      "Rameswaram",
+      "Mandapam",
+      "Ramanathapuram",
+      "Manamadurai Jn",
+      "Tiruchirappalli Jn",
+      "Thanjavur Jn",
+      "Mayiladuthurai Jn",
+      "Cuddalore Port",
+      "Villupuram Jn",
+      "Chengalpattu Jn",
+      "Chennai Egmore"
+    ],
+    "route_codes": [
+      "RMM",
+      "MMM",
+      "RMD",
+      "MNM",
+      "TPJ",
+      "TJ",
+      "MV",
+      "CUPJ",
+      "VM",
+      "CGL",
+      "MS"
+    ],
+    "route_coords": [
+      [
+        9.2876,
+        79.3129
+      ],
+      [
+        9.2825,
+        79.12
+      ],
+      [
+        9.3667,
+        78.8333
+      ],
+      [
+        9.7,
+        78.45
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.787,
+        79.1378
+      ],
+      [
+        11.1018,
+        79.6522
+      ],
+      [
+        11.748,
+        79.768
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        12.6841,
+        79.9836
+      ],
+      [
+        13.0826,
+        80.2612
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      },
+      {
+        "block_id": "BLK-BRG-MDU-01",
+        "section": "Mandapam \u2013 Pamban Sea Bridge (KM 2.06)",
+        "type": "Marine Scherzer Lift & Anemometer Monitoring",
+        "impact": "Wind Speed: 28 km/h (Permissible) \u2022 Speed capped at 30 km/h",
+        "clearance": "Electronic bridge interlocking signal clear"
+      }
+    ]
+  },
+  {
+    "train_no": "16105",
+    "name": "Tiruchendur Superfast Express",
+    "origin": "MS",
+    "origin_name": "Chennai Egmore",
+    "destination": "TCN",
+    "destination_name": "Tiruchendur",
+    "departure_time": "16:05",
+    "arrival_time": "06:50",
+    "type": "Superfast",
+    "division": "MDU",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "TPJ",
+    "current_station_name": "Tiruchirappalli Jn",
+    "next_station": "DG",
+    "next_station_name": "Dindigul Jn",
+    "lat": 10.7905,
+    "lng": 78.6865,
+    "route_stations": [
+      "Chennai Egmore",
+      "Villupuram Jn",
+      "Mayiladuthurai Jn",
+      "Thanjavur Jn",
+      "Tiruchirappalli Jn",
+      "Dindigul Jn",
+      "Madurai Jn",
+      "Virudhunagar Jn",
+      "Tirunelveli Jn",
+      "Tiruchendur"
+    ],
+    "route_codes": [
+      "MS",
+      "VM",
+      "MV",
+      "TJ",
+      "TPJ",
+      "DG",
+      "MDU",
+      "VPT",
+      "TEN",
+      "TCN"
+    ],
+    "route_coords": [
+      [
+        13.0826,
+        80.2612
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        11.1018,
+        79.6522
+      ],
+      [
+        10.787,
+        79.1378
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        9.5872,
+        77.9577
+      ],
+      [
+        8.7139,
+        77.7567
+      ],
+      [
+        8.49,
+        78.12
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "16106",
+    "name": "Tiruchendur Superfast Express",
+    "origin": "TCN",
+    "origin_name": "Tiruchendur",
+    "destination": "MS",
+    "destination_name": "Chennai Egmore",
+    "departure_time": "20:10",
+    "arrival_time": "10:25",
+    "type": "Superfast",
+    "division": "MDU",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "DG",
+    "current_station_name": "Dindigul Jn",
+    "next_station": "TPJ",
+    "next_station_name": "Tiruchirappalli Jn",
+    "lat": 10.3673,
+    "lng": 77.9803,
+    "route_stations": [
+      "Tiruchendur",
+      "Tirunelveli Jn",
+      "Virudhunagar Jn",
+      "Madurai Jn",
+      "Dindigul Jn",
+      "Tiruchirappalli Jn",
+      "Thanjavur Jn",
+      "Mayiladuthurai Jn",
+      "Villupuram Jn",
+      "Chennai Egmore"
+    ],
+    "route_codes": [
+      "TCN",
+      "TEN",
+      "VPT",
+      "MDU",
+      "DG",
+      "TPJ",
+      "TJ",
+      "MV",
+      "VM",
+      "MS"
+    ],
+    "route_coords": [
+      [
+        8.49,
+        78.12
+      ],
+      [
+        8.7139,
+        77.7567
+      ],
+      [
+        9.5872,
+        77.9577
+      ],
+      [
+        9.9252,
+        78.1198
+      ],
+      [
+        10.3673,
+        77.9803
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.787,
+        79.1378
+      ],
+      [
+        11.1018,
+        79.6522
+      ],
+      [
+        11.9401,
+        79.4861
+      ],
+      [
+        13.0826,
+        80.2612
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-MNT-TPJ-03",
+        "section": "Villupuram \u2013 Vriddhachalam (KM 118.0 - 124.0)",
+        "type": "USFD Ultrasonic Weld Joint Flaw Testing",
+        "impact": "TSR 45 km/h Caution Order \u2022 +4 mins buffer",
+        "clearance": "Digital flaw detector logged 0 critical defects"
+      }
+    ]
+  },
+  {
+    "train_no": "20631",
+    "name": "Kasaragod - Thiruvananthapuram Vande Bharat",
+    "origin": "KGQ",
+    "origin_name": "Kasaragod",
+    "destination": "TVC",
+    "destination_name": "Thiruvananthapuram Central",
+    "departure_time": "07:00",
+    "arrival_time": "15:05",
+    "type": "Vande Bharat",
+    "division": "PGT",
+    "speed": 120,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "TIR",
+    "current_station_name": "Tirur",
+    "next_station": "SRR",
+    "next_station_name": "Shoranur Jn",
+    "lat": 10.91,
+    "lng": 75.92,
+    "route_stations": [
+      "Kasaragod",
+      "Kannur",
+      "Vadakara",
+      "Kozhikode",
+      "Tirur",
+      "Shoranur Jn",
+      "Thrissur",
+      "Aluva",
+      "Ernakulam Jn",
+      "Alappuzha",
+      "Kollam Jn",
+      "Thiruvananthapuram Central"
+    ],
+    "route_codes": [
+      "KGQ",
+      "CAN",
+      "BDJ",
+      "CLT",
+      "TIR",
+      "SRR",
+      "TCR",
+      "AWY",
+      "ERS",
+      "ALLP",
+      "QLN",
+      "TVC"
+    ],
+    "route_coords": [
+      [
+        12.5,
+        74.98
+      ],
+      [
+        11.8745,
+        75.3704
+      ],
+      [
+        11.6,
+        75.59
+      ],
+      [
+        11.248,
+        75.7804
+      ],
+      [
+        10.91,
+        75.92
+      ],
+      [
+        10.7602,
+        76.2736
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.108,
+        76.353
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        9.4981,
+        76.3268
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        8.4875,
+        76.953
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-SEC-STD-01",
+        "section": "KGQ \u2013 TVC Main Trunk",
+        "type": "Preventive Track Maintenance",
+        "impact": "Nil delays \u2022 Clear block section",
+        "clearance": "Full Line Speed 110-130 km/h permitted"
+      }
+    ]
+  },
+  {
+    "train_no": "20632",
+    "name": "Thiruvananthapuram - Kasaragod Vande Bharat",
+    "origin": "TVC",
+    "origin_name": "Thiruvananthapuram Central",
+    "destination": "KGQ",
+    "destination_name": "Kasaragod",
+    "departure_time": "16:05",
+    "arrival_time": "23:55",
+    "type": "Vande Bharat",
+    "division": "TVC",
+    "speed": 120,
+    "status": "Late by 20m",
+    "delay_minutes": 20,
+    "current_station": "AWY",
+    "current_station_name": "Aluva",
+    "next_station": "TCR",
+    "next_station_name": "Thrissur",
+    "lat": 10.108,
+    "lng": 76.353,
+    "route_stations": [
+      "Thiruvananthapuram Central",
+      "Kollam Jn",
+      "Alappuzha",
+      "Ernakulam Jn",
+      "Aluva",
+      "Thrissur",
+      "Shoranur Jn",
+      "Tirur",
+      "Kozhikode",
+      "Vadakara",
+      "Kannur",
+      "Kasaragod"
+    ],
+    "route_codes": [
+      "TVC",
+      "QLN",
+      "ALLP",
+      "ERS",
+      "AWY",
+      "TCR",
+      "SRR",
+      "TIR",
+      "CLT",
+      "BDJ",
+      "CAN",
+      "KGQ"
+    ],
+    "route_coords": [
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        9.4981,
+        76.3268
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        10.108,
+        76.353
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.7602,
+        76.2736
+      ],
+      [
+        10.91,
+        75.92
+      ],
+      [
+        11.248,
+        75.7804
+      ],
+      [
+        11.6,
+        75.59
+      ],
+      [
+        11.8745,
+        75.3704
+      ],
+      [
+        12.5,
+        74.98
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-SEC-STD-01",
+        "section": "TVC \u2013 KGQ Main Trunk",
+        "type": "Preventive Track Maintenance",
+        "impact": "Nil delays \u2022 Clear block section",
+        "clearance": "Full Line Speed 110-130 km/h permitted"
+      }
+    ]
+  },
+  {
+    "train_no": "12075",
+    "name": "Kozhikode - Thiruvananthapuram Jan Shatabdi",
+    "origin": "CLT",
+    "origin_name": "Kozhikode",
+    "destination": "TVC",
+    "destination_name": "Thiruvananthapuram Central",
+    "departure_time": "13:45",
+    "arrival_time": "21:25",
+    "type": "Jan Shatabdi",
+    "division": "PGT",
+    "speed": 110,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "TCR",
+    "current_station_name": "Thrissur",
+    "next_station": "AWY",
+    "next_station_name": "Aluva",
+    "lat": 10.5276,
+    "lng": 76.2144,
+    "route_stations": [
+      "Kozhikode",
+      "Tirur",
+      "Shoranur Jn",
+      "Thrissur",
+      "Aluva",
+      "Ernakulam Jn",
+      "Alappuzha",
+      "Kollam Jn",
+      "Thiruvananthapuram Central"
+    ],
+    "route_codes": [
+      "CLT",
+      "TIR",
+      "SRR",
+      "TCR",
+      "AWY",
+      "ERS",
+      "ALLP",
+      "QLN",
+      "TVC"
+    ],
+    "route_coords": [
+      [
+        11.248,
+        75.7804
+      ],
+      [
+        10.91,
+        75.92
+      ],
+      [
+        10.7602,
+        76.2736
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.108,
+        76.353
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        9.4981,
+        76.3268
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        8.4875,
+        76.953
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-SEC-STD-01",
+        "section": "CLT \u2013 TVC Main Trunk",
+        "type": "Preventive Track Maintenance",
+        "impact": "Nil delays \u2022 Clear block section",
+        "clearance": "Full Line Speed 110-130 km/h permitted"
+      }
+    ]
+  },
+  {
+    "train_no": "12076",
+    "name": "Thiruvananthapuram - Kozhikode Jan Shatabdi",
+    "origin": "TVC",
+    "origin_name": "Thiruvananthapuram Central",
+    "destination": "CLT",
+    "destination_name": "Kozhikode",
+    "departure_time": "05:55",
+    "arrival_time": "13:15",
+    "type": "Jan Shatabdi",
+    "division": "TVC",
+    "speed": 110,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "ERS",
+    "current_station_name": "Ernakulam Jn",
+    "next_station": "AWY",
+    "next_station_name": "Aluva",
+    "lat": 9.9678,
+    "lng": 76.2917,
+    "route_stations": [
+      "Thiruvananthapuram Central",
+      "Kollam Jn",
+      "Alappuzha",
+      "Ernakulam Jn",
+      "Aluva",
+      "Thrissur",
+      "Shoranur Jn",
+      "Tirur",
+      "Kozhikode"
+    ],
+    "route_codes": [
+      "TVC",
+      "QLN",
+      "ALLP",
+      "ERS",
+      "AWY",
+      "TCR",
+      "SRR",
+      "TIR",
+      "CLT"
+    ],
+    "route_coords": [
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        9.4981,
+        76.3268
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        10.108,
+        76.353
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.7602,
+        76.2736
+      ],
+      [
+        10.91,
+        75.92
+      ],
+      [
+        11.248,
+        75.7804
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-SEC-STD-01",
+        "section": "TVC \u2013 CLT Main Trunk",
+        "type": "Preventive Track Maintenance",
+        "impact": "Nil delays \u2022 Clear block section",
+        "clearance": "Full Line Speed 110-130 km/h permitted"
+      }
+    ]
+  },
+  {
+    "train_no": "12081",
+    "name": "Kannur - Thiruvananthapuram Jan Shatabdi",
+    "origin": "CAN",
+    "origin_name": "Kannur",
+    "destination": "TVC",
+    "destination_name": "Thiruvananthapuram Central",
+    "departure_time": "04:50",
+    "arrival_time": "14:25",
+    "type": "Jan Shatabdi",
+    "division": "PGT",
+    "speed": 110,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "SRR",
+    "current_station_name": "Shoranur Jn",
+    "next_station": "TCR",
+    "next_station_name": "Thrissur",
+    "lat": 10.7602,
+    "lng": 76.2736,
+    "route_stations": [
+      "Kannur",
+      "Vadakara",
+      "Kozhikode",
+      "Tirur",
+      "Shoranur Jn",
+      "Thrissur",
+      "Aluva",
+      "Ernakulam Jn",
+      "Alappuzha",
+      "Kollam Jn",
+      "Thiruvananthapuram Central"
+    ],
+    "route_codes": [
+      "CAN",
+      "BDJ",
+      "CLT",
+      "TIR",
+      "SRR",
+      "TCR",
+      "AWY",
+      "ERS",
+      "ALLP",
+      "QLN",
+      "TVC"
+    ],
+    "route_coords": [
+      [
+        11.8745,
+        75.3704
+      ],
+      [
+        11.6,
+        75.59
+      ],
+      [
+        11.248,
+        75.7804
+      ],
+      [
+        10.91,
+        75.92
+      ],
+      [
+        10.7602,
+        76.2736
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.108,
+        76.353
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        9.4981,
+        76.3268
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        8.4875,
+        76.953
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-SEC-STD-01",
+        "section": "CAN \u2013 TVC Main Trunk",
+        "type": "Preventive Track Maintenance",
+        "impact": "Nil delays \u2022 Clear block section",
+        "clearance": "Full Line Speed 110-130 km/h permitted"
+      }
+    ]
+  },
+  {
+    "train_no": "12082",
+    "name": "Thiruvananthapuram - Kannur Jan Shatabdi",
+    "origin": "TVC",
+    "origin_name": "Thiruvananthapuram Central",
+    "destination": "CAN",
+    "destination_name": "Kannur",
+    "departure_time": "14:50",
+    "arrival_time": "00:25",
+    "type": "Jan Shatabdi",
+    "division": "TVC",
+    "speed": 110,
+    "status": "Late by 7m",
+    "delay_minutes": 7,
+    "current_station": "AWY",
+    "current_station_name": "Aluva",
+    "next_station": "TCR",
+    "next_station_name": "Thrissur",
+    "lat": 10.108,
+    "lng": 76.353,
+    "route_stations": [
+      "Thiruvananthapuram Central",
+      "Kollam Jn",
+      "Alappuzha",
+      "Ernakulam Jn",
+      "Aluva",
+      "Thrissur",
+      "Shoranur Jn",
+      "Tirur",
+      "Kozhikode",
+      "Vadakara",
+      "Kannur"
+    ],
+    "route_codes": [
+      "TVC",
+      "QLN",
+      "ALLP",
+      "ERS",
+      "AWY",
+      "TCR",
+      "SRR",
+      "TIR",
+      "CLT",
+      "BDJ",
+      "CAN"
+    ],
+    "route_coords": [
+      [
+        8.4875,
+        76.953
+      ],
+      [
+        8.887,
+        76.598
+      ],
+      [
+        9.4981,
+        76.3268
+      ],
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        10.108,
+        76.353
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.7602,
+        76.2736
+      ],
+      [
+        10.91,
+        75.92
+      ],
+      [
+        11.248,
+        75.7804
+      ],
+      [
+        11.6,
+        75.59
+      ],
+      [
+        11.8745,
+        75.3704
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-SEC-STD-01",
+        "section": "TVC \u2013 CAN Main Trunk",
+        "type": "Preventive Track Maintenance",
+        "impact": "Nil delays \u2022 Clear block section",
+        "clearance": "Full Line Speed 110-130 km/h permitted"
+      }
+    ]
+  },
+  {
+    "train_no": "16187",
+    "name": "Karaikkal - Ernakulam Tea Garden Express",
+    "origin": "KIK",
+    "origin_name": "Karaikkal",
+    "destination": "ERS",
+    "destination_name": "Ernakulam Jn",
+    "departure_time": "16:30",
+    "arrival_time": "07:00",
+    "type": "Mail/Express",
+    "division": "TPJ",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "KRR",
+    "current_station_name": "Karur Jn",
+    "next_station": "ED",
+    "next_station_name": "Erode Jn",
+    "lat": 10.96,
+    "lng": 78.08,
+    "route_stations": [
+      "Karaikkal",
+      "Tiruvarur Jn",
+      "Thanjavur Jn",
+      "Tiruchirappalli Jn",
+      "Karur Jn",
+      "Erode Jn",
+      "Tiruppur",
+      "Coimbatore Jn",
+      "Palakkad Jn",
+      "Thrissur",
+      "Ernakulam Jn"
+    ],
+    "route_codes": [
+      "KIK",
+      "TVR",
+      "TJ",
+      "TPJ",
+      "KRR",
+      "ED",
+      "TUP",
+      "CBE",
+      "PGT",
+      "TCR",
+      "ERS"
+    ],
+    "route_coords": [
+      [
+        10.92,
+        79.83
+      ],
+      [
+        10.77,
+        79.64
+      ],
+      [
+        10.787,
+        79.1378
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.96,
+        78.08
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        9.9678,
+        76.2917
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "16188",
+    "name": "Ernakulam - Karaikkal Tea Garden Express",
+    "origin": "ERS",
+    "origin_name": "Ernakulam Jn",
+    "destination": "KIK",
+    "destination_name": "Karaikkal",
+    "departure_time": "22:25",
+    "arrival_time": "11:55",
+    "type": "Mail/Express",
+    "division": "TVC",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "TUP",
+    "current_station_name": "Tiruppur",
+    "next_station": "ED",
+    "next_station_name": "Erode Jn",
+    "lat": 11.1085,
+    "lng": 77.3411,
+    "route_stations": [
+      "Ernakulam Jn",
+      "Thrissur",
+      "Palakkad Jn",
+      "Coimbatore Jn",
+      "Tiruppur",
+      "Erode Jn",
+      "Karur Jn",
+      "Tiruchirappalli Jn",
+      "Thanjavur Jn",
+      "Tiruvarur Jn",
+      "Karaikkal"
+    ],
+    "route_codes": [
+      "ERS",
+      "TCR",
+      "PGT",
+      "CBE",
+      "TUP",
+      "ED",
+      "KRR",
+      "TPJ",
+      "TJ",
+      "TVR",
+      "KIK"
+    ],
+    "route_coords": [
+      [
+        9.9678,
+        76.2917
+      ],
+      [
+        10.5276,
+        76.2144
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        11.0016,
+        76.9629
+      ],
+      [
+        11.1085,
+        77.3411
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        10.96,
+        78.08
+      ],
+      [
+        10.7905,
+        78.6865
+      ],
+      [
+        10.787,
+        79.1378
+      ],
+      [
+        10.77,
+        79.64
+      ],
+      [
+        10.92,
+        79.83
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  },
+  {
+    "train_no": "16791",
+    "name": "Punalur - Tirunelveli Palaruvi Express",
+    "origin": "PUU",
+    "origin_name": "Punalur",
+    "destination": "TEN",
+    "destination_name": "Tirunelveli Jn",
+    "departure_time": "03:15",
+    "arrival_time": "09:40",
+    "type": "Passenger/Exp",
+    "division": "MDU",
+    "speed": 95,
+    "status": "On Time",
+    "delay_minutes": 0,
+    "current_station": "SCT",
+    "current_station_name": "Sengottai",
+    "next_station": "TEN",
+    "next_station_name": "Tirunelveli Jn",
+    "lat": 8.98,
+    "lng": 77.26,
+    "route_stations": [
+      "Punalur",
+      "Sengottai",
+      "Tirunelveli Jn"
+    ],
+    "route_codes": [
+      "PUU",
+      "SCT",
+      "TEN"
+    ],
+    "route_coords": [
+      [
+        9.02,
+        76.93
+      ],
+      [
+        8.98,
+        77.26
+      ],
+      [
+        8.7139,
+        77.7567
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-SEC-STD-01",
+        "section": "PUU \u2013 TEN Main Trunk",
+        "type": "Preventive Track Maintenance",
+        "impact": "Nil delays \u2022 Clear block section",
+        "clearance": "Full Line Speed 110-130 km/h permitted"
+      }
+    ]
+  },
+  {
+    "train_no": "12789",
+    "name": "Kacheguda - Mangaluru Express via Renigunta",
+    "origin": "KCG",
+    "origin_name": "Kacheguda",
+    "destination": "MAQ",
+    "destination_name": "Mangaluru Central",
+    "departure_time": "06:05",
+    "arrival_time": "09:30",
+    "type": "Superfast",
+    "division": "PGT",
+    "speed": 95,
+    "status": "Late by 19m",
+    "delay_minutes": 19,
+    "current_station": "SA",
+    "current_station_name": "Salem Jn",
+    "next_station": "ED",
+    "next_station_name": "Erode Jn",
+    "lat": 11.6643,
+    "lng": 78.146,
+    "route_stations": [
+      "Kacheguda",
+      "Renigunta Jn",
+      "Katpadi Jn",
+      "Jolarpettai Jn",
+      "Salem Jn",
+      "Erode Jn",
+      "Palakkad Jn",
+      "Shoranur Jn",
+      "Kozhikode",
+      "Kannur",
+      "Mangaluru Central"
+    ],
+    "route_codes": [
+      "KCG",
+      "RU",
+      "KPD",
+      "JTJ",
+      "SA",
+      "ED",
+      "PGT",
+      "SRR",
+      "CLT",
+      "CAN",
+      "MAQ"
+    ],
+    "route_coords": [
+      [
+        17.385,
+        78.4867
+      ],
+      [
+        13.6288,
+        79.4192
+      ],
+      [
+        12.9696,
+        79.1362
+      ],
+      [
+        12.5638,
+        78.5802
+      ],
+      [
+        11.6643,
+        78.146
+      ],
+      [
+        11.341,
+        77.7172
+      ],
+      [
+        10.7867,
+        76.6548
+      ],
+      [
+        10.7602,
+        76.2736
+      ],
+      [
+        11.248,
+        75.7804
+      ],
+      [
+        11.8745,
+        75.3704
+      ],
+      [
+        12.8687,
+        74.8427
+      ]
+    ],
+    "route_blocks": [
+      {
+        "block_id": "BLK-ACT-MAS-01",
+        "section": "Katpadi Jn \u2013 Jolarpettai Jn (KM 142.5 - 148.0)",
+        "type": "CSM Dynamic Tamping & OHE Isolation",
+        "impact": "TSR 30 km/h Caution Order \u2022 +6 mins schedule buffer",
+        "clearance": "Priority Line 1 Clearance granted by Section Controller"
+      },
+      {
+        "block_id": "BLK-PLN-SA-02",
+        "section": "Salem Jn \u2013 Erode Jn (KM 268.0 - 272.5)",
+        "type": "Ballast Cleaning Machine (BCM) Window",
+        "impact": "Window 11:30 - 15:30 IST \u2022 No headway conflict detected",
+        "clearance": "Green corridor path allocated ahead of machine track occupancy"
+      }
+    ]
+  }
+]

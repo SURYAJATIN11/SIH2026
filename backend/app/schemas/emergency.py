@@ -1,14 +1,21 @@
-from typing import Optional
+from typing import Optional, Any
 from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel
-from app.schemas.block import BlockPlanResponse
+
 
 class EmergencyRequest(BaseModel):
-    section_id: UUID
-    timestamp: datetime
-    description: str
+    description: Optional[str] = "Emergency track defect requiring immediate block"
+    severity: Optional[str] = "CRITICAL"
+    section_id: Optional[UUID] = None
+    defect_id: Optional[UUID] = None
+    timestamp: Optional[datetime] = None
+
 
 class EmergencyResponse(BaseModel):
-    new_plan: BlockPlanResponse
-    affected_trains: int
+    status: str
+    emergency_defect_code: Optional[str] = None
+    emergency_task_id: Optional[str] = None
+    affected_plans: Optional[list] = None
+    affected_plans_count: Optional[int] = 0
+    reoptimized: bool = True

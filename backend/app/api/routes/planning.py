@@ -30,9 +30,10 @@ def create_weekly_plan(request: PlanRequest, db: Session = Depends(get_db)):
     9. Calculate baseline-vs-optimized metrics
     """
     service = PlanService(db)
+    sec_ids = request.section_ids or request.section_filters
     result = service.create_weekly_plan(
         start_date=request.start_date,
-        section_ids=request.section_ids,
+        section_ids=sec_ids,
     )
     return result
 
@@ -44,9 +45,10 @@ def create_monthly_plan(request: PlanRequest, db: Session = Depends(get_db)):
     Same pipeline as weekly but over a 30-day horizon.
     """
     service = PlanService(db)
+    sec_ids = request.section_ids or request.section_filters
     result = service.create_monthly_plan(
         start_date=request.start_date,
-        section_ids=request.section_ids,
+        section_ids=sec_ids,
     )
     return result
 

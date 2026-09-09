@@ -1,0 +1,3302 @@
+[
+  {
+    "train_no": "20608",
+    "name": "MYS Vande Bharat",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "05:50 AM",
+    "dest": "Mysuru Jn (MYS)",
+    "arr": "12:20 PM",
+    "runtime": "06h 30m",
+    "stops": "Katpadi, KSR Bengaluru City"
+  },
+  {
+    "train_no": "12675",
+    "name": "Kovai SF Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "06:10 AM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "02:05 PM",
+    "runtime": "07h 55m",
+    "stops": "Katpadi, Jolarpettai, Salem, Erode"
+  },
+  {
+    "train_no": "16057",
+    "name": "Sapthagiri Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "06:25 AM",
+    "dest": "Tirupati (TPTY)",
+    "arr": "09:40 AM",
+    "runtime": "03h 15m",
+    "stops": "Tiruvallur, Arakkonam, Renigunta"
+  },
+  {
+    "train_no": "12639",
+    "name": "Brindavan Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "07:40 AM",
+    "dest": "KSR Bengaluru (SBC)",
+    "arr": "02:00 PM",
+    "runtime": "06h 20m",
+    "stops": "Arakkonam, Katpadi, Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "22808",
+    "name": "MAS-SRC AC SF Exp",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "08:15 AM",
+    "dest": "Santragachi (SRC)",
+    "arr": "10:55 AM (Day 2)",
+    "runtime": "26h 40m",
+    "stops": "Vijayawada, Visakhapatnam, Bhubaneswar"
+  },
+  {
+    "train_no": "17314",
+    "name": "Chennai UBL Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "03:50 PM",
+    "dest": "Hubballi Jn (UBL)",
+    "arr": "07:05 AM (Day 2)",
+    "runtime": "15h 15m",
+    "stops": "Guntakal, Bellary, Hosapete"
+  },
+  {
+    "train_no": "12685",
+    "name": "Mangalore SF Exp",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "04:20 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:10 AM (Day 2)",
+    "runtime": "14h 50m",
+    "stops": "Salem, Erode, Podanur, Kozhikode"
+  },
+  {
+    "train_no": "12027",
+    "name": "Shatabdi Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "05:30 PM",
+    "dest": "KSR Bengaluru (SBC)",
+    "arr": "10:25 PM",
+    "runtime": "04h 55m",
+    "stops": "Katpadi Junction"
+  },
+  {
+    "train_no": "12615",
+    "name": "Grand Trunk Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "06:15 PM",
+    "dest": "New Delhi (NDLS)",
+    "arr": "06:20 AM (Day 3)",
+    "runtime": "36h 05m",
+    "stops": "Vijayawada, Warangal, Nagpur, Bhopal, Agra"
+  },
+  {
+    "train_no": "12164",
+    "name": "Chennai LTT Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "06:20 PM",
+    "dest": "Mumbai LTT (LTT)",
+    "arr": "04:30 PM (Day 2)",
+    "runtime": "22h 10m",
+    "stops": "Renigunta, Guntakal, Wadi, Pune"
+  },
+  {
+    "train_no": "12840",
+    "name": "Howrah Mail",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "07:00 PM",
+    "dest": "Howrah Jn (HWH)",
+    "arr": "11:55 PM (Day 2)",
+    "runtime": "28h 55m",
+    "stops": "Vijayawada, Visakhapatnam, Cuttack"
+  },
+  {
+    "train_no": "12623",
+    "name": "Trivandrum Mail",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "07:45 PM",
+    "dest": "Thiruvananthapuram",
+    "arr": "11:45 AM (Day 2)",
+    "runtime": "16h 00m",
+    "stops": "Katpadi, Salem, Palakkad, Ernakulam, Kottayam"
+  },
+  {
+    "train_no": "12601",
+    "name": "Mangalore Mail",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "08:10 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "12:10 PM (Day 2)",
+    "runtime": "16h 00m",
+    "stops": "Katpadi, Palakkad, Shoranur, Kannur"
+  },
+  {
+    "train_no": "22639",
+    "name": "Alleppey Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "08:55 PM",
+    "dest": "Alappuzha (ALLP)",
+    "arr": "10:40 AM (Day 2)",
+    "runtime": "13h 45m",
+    "stops": "Katpadi, Erode, Coimbatore, Ernakulam"
+  },
+  {
+    "train_no": "12671",
+    "name": "Nilagiri Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "09:05 PM",
+    "dest": "Mettupalayam (MTP)",
+    "arr": "06:15 AM (Day 2)",
+    "runtime": "09h 10m",
+    "stops": "Katpadi, Salem, Erode, Coimbatore"
+  },
+  {
+    "train_no": "12621",
+    "name": "Tamil Nadu Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "10:00 PM",
+    "dest": "New Delhi (NDLS)",
+    "arr": "06:30 AM (Day 3)",
+    "runtime": "32h 30m",
+    "stops": "Vijayawada, Warangal, Nagpur, Bhopal, Jhansi"
+  },
+  {
+    "train_no": "12673",
+    "name": "Cheran SF Express",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "10:10 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "07h 50m",
+    "stops": "Arakkonam, Jolarpettai, Salem, Erode"
+  },
+  {
+    "train_no": "12657",
+    "name": "Bangalore Mail",
+    "origin": "MGR Chennai Central (MAS)",
+    "dep": "10:50 PM",
+    "dest": "KSR Bengaluru (SBC)",
+    "arr": "04:30 AM (Day 2)",
+    "runtime": "05h 40m",
+    "stops": "Bangarapet, Bengaluru Cantt"
+  },
+  {
+    "train_no": "12605",
+    "name": "Pallavan SF Express",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "03:45 PM",
+    "dest": "Karaikkudi Jn (KKDI)",
+    "arr": "10:35 PM",
+    "runtime": "06h 50m",
+    "stops": "Tambaram, Villupuram, Tiruchirappalli (TPJ)"
+  },
+  {
+    "train_no": "12635",
+    "name": "Vaigai SF Express",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "01:15 PM",
+    "dest": "Madurai Jn (MDU)",
+    "arr": "08:35 PM",
+    "runtime": "07h 25m",
+    "stops": "Tambaram, Villupuram, Tiruchirappalli, Dindigul"
+  },
+  {
+    "train_no": "16115",
+    "name": "MS PDY Express",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "06:10 PM",
+    "dest": "Puducherry (PDY)",
+    "arr": "10:25 PM",
+    "runtime": "04h 15m",
+    "stops": "Chengalpattu, Tindivanam, Villupuram"
+  },
+  {
+    "train_no": "16159",
+    "name": "MS Mangalore Exp",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "11:15 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:15 PM (Day 2)",
+    "runtime": "20h 00m",
+    "stops": "Tiruchirappalli, Erode, Podanur, Kozhikode"
+  },
+  {
+    "train_no": "16127",
+    "name": "MS Guruvayur Exp",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "09:00 AM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "06:40 AM (Day 2)",
+    "runtime": "21h 40m",
+    "stops": "Villupuram, Tiruchirappalli, Madurai, Ernakulam"
+  },
+  {
+    "train_no": "19115",
+    "name": "Rameswaram Exp",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "07:15 PM",
+    "dest": "Rameswaram (RMM)",
+    "arr": "06:30 AM (Day 2)",
+    "runtime": "11h 15m",
+    "stops": "Chidambaram, Kumbakonam, Thanjavur, Karaikkudi"
+  },
+  {
+    "train_no": "12631",
+    "name": "Nellai SF Express",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "07:50 PM",
+    "dest": "Tirunelveli (TEN)",
+    "arr": "06:40 AM (Day 2)",
+    "runtime": "10h 50m",
+    "stops": "Villupuram, Tiruchirappalli, Madurai, Virudhunagar"
+  },
+  {
+    "train_no": "12633",
+    "name": "Kanyakumari Exp",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "05:20 PM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "05:55 AM (Day 2)",
+    "runtime": "12h 35m",
+    "stops": "Tambaram, Tiruchirappalli, Madurai, Nagercoil"
+  },
+  {
+    "train_no": "12693",
+    "name": "Pearl City SF Exp",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "07:30 PM",
+    "dest": "Tuticorin (TN)",
+    "arr": "06:35 AM (Day 2)",
+    "runtime": "11h 05m",
+    "stops": "Villupuram, Vriddhachalam, Kovilpatti"
+  },
+  {
+    "train_no": "22153",
+    "name": "MS Salem SF Exp",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "11:55 PM",
+    "dest": "Salem Jn (SA)",
+    "arr": "06:10 AM (Day 2)",
+    "runtime": "06h 15m",
+    "stops": "Tambaram, Villupuram, Vriddhachalam, Attur"
+  },
+  {
+    "train_no": "12653",
+    "name": "Rockfort SF Express",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "11:35 PM",
+    "dest": "Tiruchirappalli (TPJ)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "06h 25m",
+    "stops": "Tambaram, Chengalpattu, Villupuram"
+  },
+  {
+    "train_no": "16179",
+    "name": "Mannargudi Express",
+    "origin": "Chennai Egmore (MS)",
+    "dep": "09:20 PM",
+    "dest": "Mannargudi (MQ)",
+    "arr": "05:25 AM (Day 2)",
+    "runtime": "08h 05m",
+    "stops": "Chidambaram, Mayiladuthurai, Thanjavur"
+  },
+  {
+    "train_no": "12676",
+    "name": "Kovai SF Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "02:15 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "10:10 PM",
+    "runtime": "07h 55m",
+    "stops": "Erode, Salem, Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "12674",
+    "name": "Cheran SF Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "09:20 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "05:10 AM (Day 2)",
+    "runtime": "07h 50m",
+    "stops": "Erode, Salem, Jolarpettai, Arakkonam"
+  },
+  {
+    "train_no": "22630",
+    "name": "Kongu SF Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "05:15 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "12:15 PM",
+    "runtime": "07h 00m",
+    "stops": "Erode, Salem, Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "16232",
+    "name": "Coimbatore Mysuru Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "09:50 PM",
+    "dest": "Mysuru Jn (MYS)",
+    "arr": "06:35 AM (Day 2)",
+    "runtime": "08h 45m",
+    "stops": "Erode, Salem, KSR Bengaluru, Mandya"
+  },
+  {
+    "train_no": "22497",
+    "name": "CBE Bandra Terminus SF Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "11:00 PM",
+    "dest": "Bandra Terminus (BDTS)",
+    "arr": "05:30 AM (Day 3)",
+    "runtime": "30h 30m",
+    "stops": "Palakkad, Thrissur, Kalyan"
+  },
+  {
+    "train_no": "16606",
+    "name": "Kanniyakumari Intercity Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "06:00 AM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "01:45 PM",
+    "runtime": "07h 45m",
+    "stops": "Palakkad, Thrissur, Ernakulam, Kollam, Trivandrum"
+  },
+  {
+    "train_no": "12009",
+    "name": "Shatabdi-type CBE-SBC Intercity",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "06:10 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "11:40 AM",
+    "runtime": "05h 30m",
+    "stops": "Erode, Salem, Jolarpettai"
+  },
+  {
+    "train_no": "16234",
+    "name": "Coimbatore Ernakulam Intercity Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "06:30 AM",
+    "dest": "Ernakulam Jn (ERS)",
+    "arr": "11:20 AM",
+    "runtime": "04h 50m",
+    "stops": "Palakkad, Thrissur, Aluva"
+  },
+  {
+    "train_no": "12244",
+    "name": "Coimbatore Chennai Central SF Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "10:35 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "06:20 AM (Day 2)",
+    "runtime": "07h 45m",
+    "stops": "Erode, Salem, Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "16613",
+    "name": "Malabar Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "11:50 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "11:10 AM (Day 2)",
+    "runtime": "11h 20m",
+    "stops": "Palakkad, Shoranur, Kozhikode, Kannur"
+  },
+  {
+    "train_no": "12678",
+    "name": "Coimbatore Bangalore Intercity",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "02:40 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "09:20 PM",
+    "runtime": "06h 40m",
+    "stops": "Erode, Salem, Jolarpettai"
+  },
+  {
+    "train_no": "22641",
+    "name": "Coimbatore Nagercoil Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "07:20 PM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "05:10 AM (Day 2)",
+    "runtime": "09h 50m",
+    "stops": "Dindigul, Madurai, Tirunelveli"
+  },
+  {
+    "train_no": "16528",
+    "name": "Bangalore Kanyakumari Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "03:35 AM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "11:20 AM",
+    "runtime": "07h 45m",
+    "stops": "Palakkad, Trivandrum"
+  },
+  {
+    "train_no": "12683",
+    "name": "Coimbatore Trivandrum SF Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "01:10 PM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "07:40 PM",
+    "runtime": "06h 30m",
+    "stops": "Palakkad, Thrissur, Kollam"
+  },
+  {
+    "train_no": "56341",
+    "name": "Coimbatore Palakkad Passenger",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "07:05 AM",
+    "dest": "Palakkad Jn (PGT)",
+    "arr": "08:35 AM",
+    "runtime": "01h 30m",
+    "stops": "Podanur, Walayar"
+  },
+  {
+    "train_no": "56342",
+    "name": "Coimbatore Podanur Passenger",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "08:15 AM",
+    "dest": "Podanur Jn",
+    "arr": "08:40 AM",
+    "runtime": "00h 25m",
+    "stops": "Podanur"
+  },
+  {
+    "train_no": "16606A",
+    "name": "Coimbatore Salem Passenger",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "04:30 PM",
+    "dest": "Salem Jn (SA)",
+    "arr": "07:45 PM",
+    "runtime": "03h 15m",
+    "stops": "Erode"
+  },
+  {
+    "train_no": "12083",
+    "name": "Coimbatore Bangalore Jan Shatabdi",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "06:45 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "01:10 PM",
+    "runtime": "06h 25m",
+    "stops": "Erode, Salem, Jolarpettai"
+  },
+  {
+    "train_no": "16606B",
+    "name": "Coimbatore Erode Passenger",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "05:50 PM",
+    "dest": "Erode Jn",
+    "arr": "07:10 PM",
+    "runtime": "01h 20m",
+    "stops": "Tiruppur"
+  },
+  {
+    "train_no": "22643",
+    "name": "Coimbatore Madurai Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "06:15 AM",
+    "dest": "Madurai Jn (MDU)",
+    "arr": "10:45 AM",
+    "runtime": "04h 30m",
+    "stops": "Dindigul, Karur"
+  },
+  {
+    "train_no": "16309",
+    "name": "Coimbatore Okha Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "10:15 PM",
+    "dest": "Okha (OKHA)",
+    "arr": "06:10 AM (Day 4)",
+    "runtime": "55h 55m",
+    "stops": "Palakkad, Vadodara, Ahmedabad"
+  },
+  {
+    "train_no": "22851",
+    "name": "Coimbatore Howrah SF Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "06:50 AM",
+    "dest": "Howrah Jn (HWH)",
+    "arr": "04:30 PM (Day 2)",
+    "runtime": "33h 40m",
+    "stops": "Salem, Chennai, Vijayawada"
+  },
+  {
+    "train_no": "06231",
+    "name": "Coimbatore Mettupalayam Passenger",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "06:45 AM",
+    "dest": "Mettupalayam (MTP)",
+    "arr": "08:00 AM",
+    "runtime": "01h 15m",
+    "stops": "Perianaickenpalayam"
+  },
+  {
+    "train_no": "16607",
+    "name": "West Coast Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "07:40 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "06:50 AM (Day 2)",
+    "runtime": "11h 10m",
+    "stops": "Palakkad, Shoranur, Kozhikode"
+  },
+  {
+    "train_no": "22639A",
+    "name": "Coimbatore Alleppey Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "10:10 PM",
+    "dest": "Alappuzha (ALLP)",
+    "arr": "05:30 AM (Day 2)",
+    "runtime": "07h 20m",
+    "stops": "Palakkad, Thrissur, Ernakulam"
+  },
+  {
+    "train_no": "12246",
+    "name": "Coimbatore Yesvantpur Duronto Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "11:15 PM",
+    "dest": "Yesvantpur Jn (YPR)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "06h 45m",
+    "stops": "Erode, Salem, Jolarpettai"
+  },
+  {
+    "train_no": "16011",
+    "name": "Coimbatore Chennai Egmore Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "06:55 AM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "03:15 PM",
+    "runtime": "08h 20m",
+    "stops": "Erode, Salem, Tiruchirappalli"
+  },
+  {
+    "train_no": "56302",
+    "name": "Coimbatore Tiruppur Passenger",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "09:10 AM",
+    "dest": "Tiruppur",
+    "arr": "10:05 AM",
+    "runtime": "00h 55m",
+    "stops": "Somanur"
+  },
+  {
+    "train_no": "22684",
+    "name": "Coimbatore Karaikal Express",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "05:35 PM",
+    "dest": "Karaikal (KIK)",
+    "arr": "07:20 AM (Day 2)",
+    "runtime": "13h 45m",
+    "stops": "Erode, Salem, Villupuram"
+  },
+  {
+    "train_no": "16528A",
+    "name": "Coimbatore Shoranur Passenger",
+    "origin": "Coimbatore Jn (CBE)",
+    "dep": "01:30 PM",
+    "dest": "Shoranur Jn (SRR)",
+    "arr": "04:15 PM",
+    "runtime": "02h 45m",
+    "stops": "Palakkad"
+  },
+  {
+    "train_no": "12624",
+    "name": "Chennai Mail",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "06:30 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "10:30 AM (Day 2)",
+    "runtime": "16h 00m",
+    "stops": "Kollam, Ernakulam, Palakkad, Salem, Katpadi"
+  },
+  {
+    "train_no": "12626",
+    "name": "Kerala SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "11:15 AM",
+    "dest": "Nizamuddin (NZM)",
+    "arr": "06:40 AM (Day 3)",
+    "runtime": "43h 25m",
+    "stops": "Ernakulam, Kozhikode, Mangaluru, Vasco, Mumbai"
+  },
+  {
+    "train_no": "16382",
+    "name": "Trivandrum Kanyakumari Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "06:10 AM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "09:00 AM",
+    "runtime": "02h 50m",
+    "stops": "Nagercoil"
+  },
+  {
+    "train_no": "22643A",
+    "name": "Trivandrum Nagercoil Passenger",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "07:20 AM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "09:00 AM",
+    "runtime": "01h 40m",
+    "stops": "Neyyattinkara"
+  },
+  {
+    "train_no": "16341",
+    "name": "Trivandrum Nagercoil Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "01:35 PM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "03:20 PM",
+    "runtime": "01h 45m",
+    "stops": "Neyyattinkara, Parassala"
+  },
+  {
+    "train_no": "22625",
+    "name": "Trivandrum Chennai SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "03:45 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "06:15 AM (Day 2)",
+    "runtime": "14h 30m",
+    "stops": "Kollam, Ernakulam, Palakkad, Salem"
+  },
+  {
+    "train_no": "16336",
+    "name": "Trivandrum Bikaner Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "08:15 PM",
+    "dest": "Bikaner (BKN)",
+    "arr": "07:30 AM (Day 4)",
+    "runtime": "59h 15m",
+    "stops": "Ernakulam, Coimbatore, Vadodara, Jaipur"
+  },
+  {
+    "train_no": "12082",
+    "name": "Trivandrum Kollam Jan Shatabdi",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "06:00 AM",
+    "dest": "Kollam Jn (QLN)",
+    "arr": "07:10 AM",
+    "runtime": "01h 10m",
+    "stops": "Chirayinkeezhu"
+  },
+  {
+    "train_no": "16127A",
+    "name": "Trivandrum Guruvayur Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "09:20 PM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "06:10 AM (Day 2)",
+    "runtime": "08h 50m",
+    "stops": "Kollam, Ernakulam, Thrissur"
+  },
+  {
+    "train_no": "12283",
+    "name": "Trivandrum Nizamuddin Duronto Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "09:00 AM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "05:20 PM (Day 2)",
+    "runtime": "32h 20m",
+    "stops": "Ernakulam, Coimbatore, Bhopal"
+  },
+  {
+    "train_no": "22637",
+    "name": "West Coast SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "09:30 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "12:20 PM (Day 2)",
+    "runtime": "14h 50m",
+    "stops": "Kollam, Ernakulam, Kozhikode, Mangaluru"
+  },
+  {
+    "train_no": "16382A",
+    "name": "Trivandrum Alleppey Passenger",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "05:20 PM",
+    "dest": "Alappuzha (ALLP)",
+    "arr": "08:10 PM",
+    "runtime": "02h 50m",
+    "stops": "Kollam, Kayamkulam"
+  },
+  {
+    "train_no": "22660",
+    "name": "Trivandrum Bengaluru Cantt SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "06:15 PM",
+    "dest": "Bengaluru Cantt",
+    "arr": "10:15 AM (Day 2)",
+    "runtime": "16h 00m",
+    "stops": "Ernakulam, Coimbatore, Salem"
+  },
+  {
+    "train_no": "12695",
+    "name": "Trivandrum Chennai SF Express (Garib Rath)",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "07:15 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "09:15 AM (Day 2)",
+    "runtime": "14h 00m",
+    "stops": "Ernakulam, Coimbatore, Salem"
+  },
+  {
+    "train_no": "16346",
+    "name": "Trivandrum Netravati Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "11:15 AM",
+    "dest": "LTT Mumbai (LTT)",
+    "arr": "06:10 PM (Day 2)",
+    "runtime": "30h 55m",
+    "stops": "Kollam, Ernakulam, Kozhikode, Mangaluru, Ratnagiri"
+  },
+  {
+    "train_no": "06301",
+    "name": "Trivandrum Shoranur Passenger",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "05:45 AM",
+    "dest": "Shoranur Jn (SRR)",
+    "arr": "11:30 AM",
+    "runtime": "05h 45m",
+    "stops": "Kollam, Ernakulam, Thrissur"
+  },
+  {
+    "train_no": "12696",
+    "name": "Trivandrum Chennai Egmore SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "06:15 AM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "08:15 PM",
+    "runtime": "14h 00m",
+    "stops": "Kollam, Nagercoil, Tirunelveli, Madurai"
+  },
+  {
+    "train_no": "16650",
+    "name": "Parasuram Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "06:40 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:20 PM",
+    "runtime": "12h 40m",
+    "stops": "Kollam, Ernakulam, Kozhikode"
+  },
+  {
+    "train_no": "22638",
+    "name": "Trivandrum Yesvantpur SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "02:15 PM",
+    "dest": "Yesvantpur Jn (YPR)",
+    "arr": "06:30 AM (Day 2)",
+    "runtime": "16h 15m",
+    "stops": "Kollam, Ernakulam, Coimbatore, Salem"
+  },
+  {
+    "train_no": "16333",
+    "name": "Trivandrum Veraval Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "09:20 PM",
+    "dest": "Veraval (VRL)",
+    "arr": "03:40 AM (Day 4)",
+    "runtime": "54h 20m",
+    "stops": "Ernakulam, Coimbatore, Vadodara"
+  },
+  {
+    "train_no": "12977",
+    "name": "Trivandrum Ajmer SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "10:15 AM",
+    "dest": "Ajmer Jn (AII)",
+    "arr": "04:40 PM (Day 2)",
+    "runtime": "30h 25m",
+    "stops": "Ernakulam, Coimbatore, Vadodara, Ahmedabad"
+  },
+  {
+    "train_no": "16603",
+    "name": "Trivandrum Coimbatore Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "01:00 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "08:30 PM",
+    "runtime": "07h 30m",
+    "stops": "Kollam, Ernakulam, Thrissur, Palakkad"
+  },
+  {
+    "train_no": "22656",
+    "name": "Trivandrum Nagpur SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "08:20 AM",
+    "dest": "Nagpur (NGP)",
+    "arr": "06:30 PM (Day 2)",
+    "runtime": "34h 10m",
+    "stops": "Ernakulam, Coimbatore, Bengaluru, Wardha"
+  },
+  {
+    "train_no": "12643",
+    "name": "Trivandrum Hazrat Nizamuddin SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "03:00 PM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "09:50 PM (Day 2)",
+    "runtime": "30h 50m",
+    "stops": "Ernakulam, Coimbatore, Vijayawada, Nagpur"
+  },
+  {
+    "train_no": "16381",
+    "name": "Trivandrum Kanyakumari Passenger",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "04:50 PM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "07:35 PM",
+    "runtime": "02h 45m",
+    "stops": "Neyyattinkara, Nagercoil"
+  },
+  {
+    "train_no": "22661",
+    "name": "Trivandrum Chandigarh SF Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "10:10 PM",
+    "dest": "Chandigarh (CDG)",
+    "arr": "08:20 AM (Day 4)",
+    "runtime": "58h 10m",
+    "stops": "Ernakulam, Coimbatore, Delhi"
+  },
+  {
+    "train_no": "16649",
+    "name": "Malabar Express (TVC leg)",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "11:00 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "11:55 PM",
+    "runtime": "12h 55m",
+    "stops": "Kollam, Ernakulam, Kozhikode"
+  },
+  {
+    "train_no": "12432",
+    "name": "Trivandrum Nizamuddin Rajdhani Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "11:00 AM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "06:50 AM (Day 3)",
+    "runtime": "43h 50m",
+    "stops": "Ernakulam, Coimbatore, Vadodara"
+  },
+  {
+    "train_no": "16302",
+    "name": "Trivandrum Kochuveli Passenger",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "07:15 AM",
+    "dest": "Kochuveli (KCVL)",
+    "arr": "07:45 AM",
+    "runtime": "00h 30m",
+    "stops": "Pettah"
+  },
+  {
+    "train_no": "22630A",
+    "name": "Trivandrum Ernakulam Intercity Express",
+    "origin": "Thiruvananthapuram Central (TVC)",
+    "dep": "02:50 PM",
+    "dest": "Ernakulam Jn (ERS)",
+    "arr": "06:40 PM",
+    "runtime": "03h 50m",
+    "stops": "Kollam, Kayamkulam, Alappuzha"
+  },
+  {
+    "train_no": "12636",
+    "name": "Vaigai SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:35 AM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "01:55 PM",
+    "runtime": "07h 20m",
+    "stops": "Dindigul, Tiruchirappalli, Villupuram, Tambaram"
+  },
+  {
+    "train_no": "12632",
+    "name": "Nellai Madurai SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:15 AM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "02:10 PM",
+    "runtime": "07h 55m",
+    "stops": "Virudhunagar, Tiruchirappalli, Villupuram"
+  },
+  {
+    "train_no": "12695",
+    "name": "Trivandrum SF Express (via MDU)",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "01:00 AM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "09:15 AM",
+    "runtime": "08h 15m",
+    "stops": "Tiruchirappalli, Salem, Katpadi"
+  },
+  {
+    "train_no": "16780",
+    "name": "Madurai Tirupati Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "07:20 PM",
+    "dest": "Tirupati (TPTY)",
+    "arr": "07:40 AM (Day 2)",
+    "runtime": "12h 20m",
+    "stops": "Dindigul, Coimbatore, Katpadi"
+  },
+  {
+    "train_no": "16789",
+    "name": "Madurai Chennai Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "09:15 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "06:45 AM (Day 2)",
+    "runtime": "09h 30m",
+    "stops": "Dindigul, Karur, Tiruchirappalli, Villupuram"
+  },
+  {
+    "train_no": "16719",
+    "name": "Madurai Rameswaram Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "01:35 PM",
+    "dest": "Rameswaram (RMM)",
+    "arr": "06:10 PM",
+    "runtime": "04h 35m",
+    "stops": "Manamadurai, Ramanathapuram"
+  },
+  {
+    "train_no": "12634",
+    "name": "Madurai Kanyakumari SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "04:15 AM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "09:10 AM",
+    "runtime": "04h 55m",
+    "stops": "Virudhunagar, Tirunelveli, Nagercoil"
+  },
+  {
+    "train_no": "16125",
+    "name": "Guruvayur Madurai Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "01:30 PM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "10:40 PM",
+    "runtime": "09h 10m",
+    "stops": "Dindigul, Palakkad, Thrissur"
+  },
+  {
+    "train_no": "16853",
+    "name": "Madurai Mysuru Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "07:50 PM",
+    "dest": "Mysuru Jn (MYS)",
+    "arr": "08:30 AM (Day 2)",
+    "runtime": "12h 40m",
+    "stops": "Dindigul, Coimbatore, KSR Bengaluru"
+  },
+  {
+    "train_no": "22638A",
+    "name": "Madurai Bengaluru SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "08:40 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "06:30 AM (Day 2)",
+    "runtime": "09h 50m",
+    "stops": "Dindigul, Coimbatore, Salem"
+  },
+  {
+    "train_no": "12693A",
+    "name": "Madurai Tuticorin Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "02:15 PM",
+    "dest": "Tuticorin (TN)",
+    "arr": "06:00 PM",
+    "runtime": "03h 45m",
+    "stops": "Virudhunagar, Kovilpatti"
+  },
+  {
+    "train_no": "16116",
+    "name": "Madurai Mannargudi Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "05:35 AM",
+    "dest": "Mannargudi (MQ)",
+    "arr": "10:50 AM",
+    "runtime": "05h 15m",
+    "stops": "Tiruchirappalli, Thanjavur"
+  },
+  {
+    "train_no": "22662",
+    "name": "Madurai Coimbatore Intercity Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:00 AM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "10:35 AM",
+    "runtime": "04h 35m",
+    "stops": "Dindigul, Karur, Erode"
+  },
+  {
+    "train_no": "16847",
+    "name": "Sethu Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "10:35 PM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "07:00 AM (Day 2)",
+    "runtime": "08h 25m",
+    "stops": "Rameswaram jn, Villupuram"
+  },
+  {
+    "train_no": "22638B",
+    "name": "Madurai Coimbatore SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "05:50 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "09:55 PM",
+    "runtime": "04h 05m",
+    "stops": "Dindigul, Karur"
+  },
+  {
+    "train_no": "16714",
+    "name": "Pandyan Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "07:00 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "06:10 AM (Day 2)",
+    "runtime": "11h 10m",
+    "stops": "Tiruchirappalli, Thanjavur, Villupuram"
+  },
+  {
+    "train_no": "16702",
+    "name": "Madurai Nagercoil Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:30 AM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "10:20 AM",
+    "runtime": "03h 50m",
+    "stops": "Virudhunagar, Tirunelveli"
+  },
+  {
+    "train_no": "22661A",
+    "name": "Madurai Ernakulam SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "10:50 PM",
+    "dest": "Ernakulam Jn (ERS)",
+    "arr": "06:40 AM (Day 2)",
+    "runtime": "07h 50m",
+    "stops": "Dindigul, Coimbatore, Palakkad, Thrissur"
+  },
+  {
+    "train_no": "16101",
+    "name": "Madurai Chennai Egmore Passenger",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "05:00 AM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "04:15 PM",
+    "runtime": "11h 15m",
+    "stops": "Dindigul, Tiruchirappalli, Villupuram"
+  },
+  {
+    "train_no": "22665",
+    "name": "Madurai Puducherry SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:35 AM",
+    "dest": "Puducherry (PDY)",
+    "arr": "01:20 PM",
+    "runtime": "06h 45m",
+    "stops": "Tiruchirappalli, Villupuram"
+  },
+  {
+    "train_no": "16853A",
+    "name": "Madurai Salem Passenger",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:00 PM",
+    "dest": "Salem Jn (SA)",
+    "arr": "10:45 PM",
+    "runtime": "04h 45m",
+    "stops": "Dindigul, Karur, Erode"
+  },
+  {
+    "train_no": "16130",
+    "name": "Madurai Coimbatore Passenger",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "09:30 AM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "02:20 PM",
+    "runtime": "04h 50m",
+    "stops": "Dindigul, Karur, Erode"
+  },
+  {
+    "train_no": "22685",
+    "name": "Madurai Tirupati SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:10 PM",
+    "dest": "Tirupati (TPTY)",
+    "arr": "06:20 AM (Day 2)",
+    "runtime": "12h 10m",
+    "stops": "Dindigul, Coimbatore, Salem, Katpadi"
+  },
+  {
+    "train_no": "16781",
+    "name": "Madurai Tiruchirappalli Passenger",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:45 AM",
+    "dest": "Tiruchirappalli (TPJ)",
+    "arr": "09:00 AM",
+    "runtime": "02h 15m",
+    "stops": "Dindigul, Manaparai"
+  },
+  {
+    "train_no": "22687",
+    "name": "Madurai Bikaner SF Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "10:05 PM",
+    "dest": "Bikaner (BKN)",
+    "arr": "01:40 AM (Day 4)",
+    "runtime": "51h 35m",
+    "stops": "Coimbatore, Vadodara, Jaipur"
+  },
+  {
+    "train_no": "12633A",
+    "name": "Madurai Kanniyakumari Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "09:35 PM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "03:00 AM (Day 2)",
+    "runtime": "05h 25m",
+    "stops": "Tirunelveli, Nagercoil"
+  },
+  {
+    "train_no": "16797",
+    "name": "Madurai Villupuram Passenger",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "01:45 PM",
+    "dest": "Villupuram Jn (VM)",
+    "arr": "07:30 PM",
+    "runtime": "05h 45m",
+    "stops": "Tiruchirappalli, Ariyalur"
+  },
+  {
+    "train_no": "22688",
+    "name": "Madurai Coimbatore Guruvayur Express",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "04:10 AM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "01:30 PM",
+    "runtime": "09h 20m",
+    "stops": "Dindigul, Coimbatore, Palakkad, Thrissur"
+  },
+  {
+    "train_no": "16853B",
+    "name": "Madurai Rameswaram Passenger",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "06:20 AM",
+    "dest": "Rameswaram (RMM)",
+    "arr": "11:00 AM",
+    "runtime": "04h 40m",
+    "stops": "Manamadurai, Ramanathapuram"
+  },
+  {
+    "train_no": "22694",
+    "name": "Madurai Dindigul Passenger",
+    "origin": "Madurai Jn (MDU)",
+    "dep": "07:30 AM",
+    "dest": "Dindigul Jn",
+    "arr": "08:35 AM",
+    "runtime": "01h 05m",
+    "stops": "Vadipatti"
+  },
+  {
+    "train_no": "12634A",
+    "name": "Kanyakumari Madurai SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "04:35 AM",
+    "dest": "Madurai Jn (MDU)",
+    "arr": "09:10 AM",
+    "runtime": "04h 35m",
+    "stops": "Tirunelveli, Virudhunagar"
+  },
+  {
+    "train_no": "16382B",
+    "name": "Nagercoil Trivandrum Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "09:30 AM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "12:15 PM",
+    "runtime": "02h 45m",
+    "stops": "Parassala, Neyyattinkara"
+  },
+  {
+    "train_no": "12696A",
+    "name": "Nagercoil Chennai Egmore SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "04:50 AM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "06:35 PM",
+    "runtime": "13h 45m",
+    "stops": "Tirunelveli, Madurai, Tiruchirappalli"
+  },
+  {
+    "train_no": "16351",
+    "name": "Nagercoil Mumbai CSMT Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "05:15 PM",
+    "dest": "Mumbai CSMT (CSMT)",
+    "arr": "11:40 PM (Day 2)",
+    "runtime": "30h 25m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Pune"
+  },
+  {
+    "train_no": "22638C",
+    "name": "Nagercoil Bengaluru SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "07:10 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "10:20 AM (Day 2)",
+    "runtime": "15h 10m",
+    "stops": "Tirunelveli, Madurai, Coimbatore, Salem"
+  },
+  {
+    "train_no": "16360",
+    "name": "Nagercoil Guruvayur Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "01:15 PM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "11:20 PM",
+    "runtime": "10h 05m",
+    "stops": "Trivandrum, Kollam, Ernakulam, Thrissur"
+  },
+  {
+    "train_no": "16302A",
+    "name": "Nagercoil Kochuveli Passenger",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "06:20 AM",
+    "dest": "Kochuveli (KCVL)",
+    "arr": "08:40 AM",
+    "runtime": "02h 20m",
+    "stops": "Trivandrum, Kazhakkuttam"
+  },
+  {
+    "train_no": "22661B",
+    "name": "Nagercoil Chandigarh SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "07:55 PM",
+    "dest": "Chandigarh (CDG)",
+    "arr": "08:20 AM (Day 4)",
+    "runtime": "60h 25m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Delhi"
+  },
+  {
+    "train_no": "16336A",
+    "name": "Nagercoil Bikaner Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "06:35 PM",
+    "dest": "Bikaner (BKN)",
+    "arr": "07:30 AM (Day 4)",
+    "runtime": "60h 55m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Jaipur"
+  },
+  {
+    "train_no": "22660A",
+    "name": "Nagercoil Bengaluru Cantt SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "04:35 PM",
+    "dest": "Bengaluru Cantt",
+    "arr": "10:15 AM (Day 2)",
+    "runtime": "17h 40m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Salem"
+  },
+  {
+    "train_no": "16381A",
+    "name": "Nagercoil Trivandrum Passenger",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "06:10 AM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "09:00 AM",
+    "runtime": "02h 50m",
+    "stops": "Neyyattinkara, Balaramapuram"
+  },
+  {
+    "train_no": "12624A",
+    "name": "Nagercoil Chennai Mail",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "04:15 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "10:30 AM (Day 2)",
+    "runtime": "18h 15m",
+    "stops": "Tirunelveli, Madurai, Tiruchirappalli, Villupuram"
+  },
+  {
+    "train_no": "16702A",
+    "name": "Nagercoil Madurai Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "04:40 PM",
+    "dest": "Madurai Jn (MDU)",
+    "arr": "08:30 PM",
+    "runtime": "03h 50m",
+    "stops": "Tirunelveli, Virudhunagar"
+  },
+  {
+    "train_no": "22633",
+    "name": "Kanyakumari Chennai SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "05:10 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "12h 50m",
+    "stops": "Tirunelveli, Madurai, Tiruchirappalli"
+  },
+  {
+    "train_no": "16693",
+    "name": "Nagercoil Mangalore Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "08:00 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "10:50 PM",
+    "runtime": "14h 50m",
+    "stops": "Trivandrum, Kollam, Ernakulam, Kozhikode"
+  },
+  {
+    "train_no": "16333A",
+    "name": "Nagercoil Veraval Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "07:50 PM",
+    "dest": "Veraval (VRL)",
+    "arr": "03:40 AM (Day 4)",
+    "runtime": "55h 50m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Vadodara"
+  },
+  {
+    "train_no": "12977A",
+    "name": "Nagercoil Ajmer SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "08:55 AM",
+    "dest": "Ajmer Jn (AII)",
+    "arr": "04:40 PM (Day 2)",
+    "runtime": "31h 45m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Ahmedabad"
+  },
+  {
+    "train_no": "16846",
+    "name": "Nagercoil Chennai Egmore Passenger",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "06:00 AM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "09:45 PM",
+    "runtime": "15h 45m",
+    "stops": "Tirunelveli, Madurai, Villupuram"
+  },
+  {
+    "train_no": "06381",
+    "name": "Nagercoil Tirunelveli Passenger",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "08:15 AM",
+    "dest": "Tirunelveli Jn (TEN)",
+    "arr": "09:20 AM",
+    "runtime": "01h 05m",
+    "stops": "Valliyoor"
+  },
+  {
+    "train_no": "22641A",
+    "name": "Nagercoil Coimbatore Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "09:50 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "07:30 AM (Day 2)",
+    "runtime": "09h 40m",
+    "stops": "Tirunelveli, Madurai, Dindigul"
+  },
+  {
+    "train_no": "16649A",
+    "name": "Nagercoil Mangaluru Malabar Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "09:20 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "11:55 PM",
+    "runtime": "14h 35m",
+    "stops": "Trivandrum, Kollam, Ernakulam, Kozhikode"
+  },
+  {
+    "train_no": "22643B",
+    "name": "Nagercoil Nizamuddin SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "07:15 AM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "09:50 PM (Day 2)",
+    "runtime": "38h 35m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Nagpur"
+  },
+  {
+    "train_no": "16302B",
+    "name": "Nagercoil Kanyakumari Shuttle",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "10:20 AM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "10:45 AM",
+    "runtime": "00h 25m",
+    "stops": "Suchindram"
+  },
+  {
+    "train_no": "22656A",
+    "name": "Nagercoil Nagpur SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "06:05 AM",
+    "dest": "Nagpur (NGP)",
+    "arr": "06:30 PM (Day 2)",
+    "runtime": "36h 25m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Bengaluru"
+  },
+  {
+    "train_no": "16719A",
+    "name": "Nagercoil Rameswaram Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "10:15 AM",
+    "dest": "Rameswaram (RMM)",
+    "arr": "04:10 PM",
+    "runtime": "05h 55m",
+    "stops": "Tirunelveli, Madurai, Manamadurai"
+  },
+  {
+    "train_no": "12643A",
+    "name": "Nagercoil Delhi SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "01:10 PM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "09:50 PM (Day 2)",
+    "runtime": "32h 40m",
+    "stops": "Trivandrum, Ernakulam, Coimbatore, Vijayawada"
+  },
+  {
+    "train_no": "16351A",
+    "name": "Nagercoil Kanniyakumari Passenger",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "05:40 AM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "06:05 AM",
+    "runtime": "00h 25m",
+    "stops": "Suchindram Road"
+  },
+  {
+    "train_no": "22637A",
+    "name": "Nagercoil Bengaluru West Coast SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "07:35 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "12:20 PM (Day 2)",
+    "runtime": "16h 45m",
+    "stops": "Trivandrum, Kollam, Ernakulam, Kozhikode"
+  },
+  {
+    "train_no": "16693A",
+    "name": "Nagercoil Tiruchendur Passenger",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "02:20 PM",
+    "dest": "Tiruchendur",
+    "arr": "06:30 PM",
+    "runtime": "04h 10m",
+    "stops": "Tirunelveli, Tuticorin"
+  },
+  {
+    "train_no": "22665A",
+    "name": "Nagercoil Puducherry SF Express",
+    "origin": "Nagercoil Jn (NCJ)",
+    "dep": "05:30 AM",
+    "dest": "Puducherry (PDY)",
+    "arr": "03:20 PM",
+    "runtime": "09h 50m",
+    "stops": "Tirunelveli, Madurai, Villupuram"
+  },
+  {
+    "train_no": "22640",
+    "name": "Alleppey Chennai Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "06:30 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "08:15 AM (Day 2)",
+    "runtime": "13h 45m",
+    "stops": "Ernakulam, Coimbatore, Erode, Katpadi"
+  },
+  {
+    "train_no": "16382C",
+    "name": "Alleppey Trivandrum Passenger",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "06:10 AM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "08:55 AM",
+    "runtime": "02h 45m",
+    "stops": "Kayamkulam, Kollam"
+  },
+  {
+    "train_no": "16308",
+    "name": "Alleppey Okha Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "09:30 AM",
+    "dest": "Okha (OKHA)",
+    "arr": "05:20 PM (Day 3)",
+    "runtime": "55h 50m",
+    "stops": "Ernakulam, Coimbatore, Vadodara"
+  },
+  {
+    "train_no": "16332",
+    "name": "Alleppey Veraval Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "06:10 PM",
+    "dest": "Veraval (VRL)",
+    "arr": "03:40 AM (Day 4)",
+    "runtime": "57h 30m",
+    "stops": "Ernakulam, Coimbatore, Vadodara"
+  },
+  {
+    "train_no": "22638D",
+    "name": "Alleppey Bengaluru SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "07:20 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "10:15 AM (Day 2)",
+    "runtime": "14h 55m",
+    "stops": "Ernakulam, Thrissur, Coimbatore, Salem"
+  },
+  {
+    "train_no": "16650A",
+    "name": "Alleppey Mangaluru Parasuram Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "05:50 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:20 PM",
+    "runtime": "13h 30m",
+    "stops": "Ernakulam, Kozhikode, Kannur"
+  },
+  {
+    "train_no": "22630B",
+    "name": "Alleppey Ernakulam Intercity Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "07:00 AM",
+    "dest": "Ernakulam Jn (ERS)",
+    "arr": "08:45 AM",
+    "runtime": "01h 45m",
+    "stops": "Cherthala, Turavur"
+  },
+  {
+    "train_no": "16302C",
+    "name": "Alleppey Kochuveli Passenger",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "09:30 AM",
+    "dest": "Kochuveli (KCVL)",
+    "arr": "11:55 AM",
+    "runtime": "02h 25m",
+    "stops": "Kayamkulam, Trivandrum"
+  },
+  {
+    "train_no": "22643C",
+    "name": "Alleppey Nizamuddin SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "09:35 AM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "09:50 PM (Day 2)",
+    "runtime": "36h 15m",
+    "stops": "Ernakulam, Coimbatore, Nagpur"
+  },
+  {
+    "train_no": "16346A",
+    "name": "Alleppey Netravati Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "09:20 AM",
+    "dest": "LTT Mumbai (LTT)",
+    "arr": "06:10 PM (Day 2)",
+    "runtime": "32h 50m",
+    "stops": "Ernakulam, Kozhikode, Mangaluru, Ratnagiri"
+  },
+  {
+    "train_no": "22637B",
+    "name": "Alleppey West Coast SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "08:30 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "12:20 PM (Day 2)",
+    "runtime": "15h 50m",
+    "stops": "Ernakulam, Thrissur, Kozhikode, Mangaluru"
+  },
+  {
+    "train_no": "06302",
+    "name": "Alleppey Ernakulam Passenger",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "05:50 AM",
+    "dest": "Ernakulam Jn (ERS)",
+    "arr": "07:20 AM",
+    "runtime": "01h 30m",
+    "stops": "Cherthala"
+  },
+  {
+    "train_no": "16302D",
+    "name": "Alleppey Kollam Passenger",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "01:15 PM",
+    "dest": "Kollam Jn (QLN)",
+    "arr": "02:35 PM",
+    "runtime": "01h 20m",
+    "stops": "Kayamkulam, Karunagapally"
+  },
+  {
+    "train_no": "22661C",
+    "name": "Alleppey Chandigarh SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "08:50 PM",
+    "dest": "Chandigarh (CDG)",
+    "arr": "08:20 AM (Day 4)",
+    "runtime": "59h 30m",
+    "stops": "Ernakulam, Coimbatore, Delhi"
+  },
+  {
+    "train_no": "16336B",
+    "name": "Alleppey Bikaner Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "07:15 PM",
+    "dest": "Bikaner (BKN)",
+    "arr": "07:30 AM (Day 4)",
+    "runtime": "60h 15m",
+    "stops": "Ernakulam, Coimbatore, Jaipur"
+  },
+  {
+    "train_no": "16360A",
+    "name": "Alleppey Guruvayur Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "08:40 AM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "01:10 PM",
+    "runtime": "04h 30m",
+    "stops": "Ernakulam, Thrissur"
+  },
+  {
+    "train_no": "22656B",
+    "name": "Alleppey Nagpur SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "06:50 AM",
+    "dest": "Nagpur (NGP)",
+    "arr": "06:30 PM (Day 2)",
+    "runtime": "35h 40m",
+    "stops": "Ernakulam, Coimbatore, Bengaluru"
+  },
+  {
+    "train_no": "16351B",
+    "name": "Alleppey Mumbai CSMT Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "03:30 PM",
+    "dest": "Mumbai CSMT (CSMT)",
+    "arr": "11:40 PM (Day 2)",
+    "runtime": "32h 10m",
+    "stops": "Ernakulam, Coimbatore, Pune"
+  },
+  {
+    "train_no": "22660B",
+    "name": "Alleppey Bengaluru Cantt SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "04:50 PM",
+    "dest": "Bengaluru Cantt",
+    "arr": "10:15 AM (Day 2)",
+    "runtime": "17h 25m",
+    "stops": "Ernakulam, Coimbatore, Salem"
+  },
+  {
+    "train_no": "16333B",
+    "name": "Alleppey Kanyakumari Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "07:35 AM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "01:20 PM",
+    "runtime": "05h 45m",
+    "stops": "Kollam, Trivandrum, Nagercoil"
+  },
+  {
+    "train_no": "22641B",
+    "name": "Alleppey Coimbatore Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "06:45 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "01:10 AM (Day 2)",
+    "runtime": "06h 25m",
+    "stops": "Ernakulam, Thrissur, Palakkad"
+  },
+  {
+    "train_no": "16693B",
+    "name": "Alleppey Mangalore Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "06:10 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "10:50 PM",
+    "runtime": "16h 40m",
+    "stops": "Ernakulam, Kozhikode, Kannur"
+  },
+  {
+    "train_no": "22638E",
+    "name": "Alleppey Yesvantpur SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "01:30 PM",
+    "dest": "Yesvantpur Jn (YPR)",
+    "arr": "06:30 AM (Day 2)",
+    "runtime": "17h 00m",
+    "stops": "Ernakulam, Coimbatore, Salem"
+  },
+  {
+    "train_no": "16302E",
+    "name": "Alleppey Trivandrum Passenger (evening)",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "06:30 PM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "09:20 PM",
+    "runtime": "02h 50m",
+    "stops": "Kayamkulam, Kollam"
+  },
+  {
+    "train_no": "22977",
+    "name": "Alleppey Ajmer SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "08:30 AM",
+    "dest": "Ajmer Jn (AII)",
+    "arr": "04:40 PM (Day 2)",
+    "runtime": "32h 10m",
+    "stops": "Ernakulam, Coimbatore, Ahmedabad"
+  },
+  {
+    "train_no": "16606C",
+    "name": "Alleppey Karaikal Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "11:15 AM",
+    "dest": "Karaikal (KIK)",
+    "arr": "07:20 AM (Day 2)",
+    "runtime": "20h 05m",
+    "stops": "Ernakulam, Coimbatore, Erode, Villupuram"
+  },
+  {
+    "train_no": "22665B",
+    "name": "Alleppey Puducherry SF Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "05:15 AM",
+    "dest": "Puducherry (PDY)",
+    "arr": "03:20 PM",
+    "runtime": "10h 05m",
+    "stops": "Ernakulam, Coimbatore, Villupuram"
+  },
+  {
+    "train_no": "16351C",
+    "name": "Alleppey Chengannur Passenger",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "07:10 AM",
+    "dest": "Chengannur",
+    "arr": "08:15 AM",
+    "runtime": "01h 05m",
+    "stops": "Haripad, Mavelikara"
+  },
+  {
+    "train_no": "22637C",
+    "name": "Alleppey Kannur Express",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "10:20 AM",
+    "dest": "Kannur (CAN)",
+    "arr": "06:15 PM",
+    "runtime": "07h 55m",
+    "stops": "Ernakulam, Kozhikode"
+  },
+  {
+    "train_no": "16649B",
+    "name": "Alleppey Kayamkulam Passenger",
+    "origin": "Alappuzha (ALLP)",
+    "dep": "04:10 PM",
+    "dest": "Kayamkulam",
+    "arr": "04:55 PM",
+    "runtime": "00h 45m",
+    "stops": "Harippad"
+  },
+  {
+    "train_no": "12675A",
+    "name": "Salem Chennai Kovai Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "08:35 AM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "02:05 PM",
+    "runtime": "05h 30m",
+    "stops": "Jolarpettai, Katpadi, Arakkonam"
+  },
+  {
+    "train_no": "22154",
+    "name": "Salem Chennai Egmore SF Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "07:10 PM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "01:15 AM (Day 2)",
+    "runtime": "06h 05m",
+    "stops": "Villupuram, Vriddhachalam, Tambaram"
+  },
+  {
+    "train_no": "12630",
+    "name": "Salem Bengaluru SF Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "06:40 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "10:50 AM",
+    "runtime": "04h 10m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "16606D",
+    "name": "Salem Coimbatore Passenger",
+    "origin": "Salem Jn (SA)",
+    "dep": "08:00 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "11:15 PM",
+    "runtime": "03h 15m",
+    "stops": "Erode"
+  },
+  {
+    "train_no": "22630C",
+    "name": "Salem Mysuru Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "10:20 PM",
+    "dest": "Mysuru Jn (MYS)",
+    "arr": "06:35 AM (Day 2)",
+    "runtime": "08h 15m",
+    "stops": "Erode, Bengaluru, Mandya"
+  },
+  {
+    "train_no": "16853C",
+    "name": "Salem Madurai Passenger",
+    "origin": "Salem Jn (SA)",
+    "dep": "06:15 AM",
+    "dest": "Madurai Jn (MDU)",
+    "arr": "10:45 AM",
+    "runtime": "04h 30m",
+    "stops": "Erode, Karur, Dindigul"
+  },
+  {
+    "train_no": "22497A",
+    "name": "Salem Bandra Terminus SF Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "01:15 AM",
+    "dest": "Bandra Terminus (BDTS)",
+    "arr": "05:30 AM (Day 2)",
+    "runtime": "28h 15m",
+    "stops": "Erode, Coimbatore, Palakkad, Kalyan"
+  },
+  {
+    "train_no": "16011A",
+    "name": "Salem Chennai Egmore Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "01:10 PM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "09:20 PM",
+    "runtime": "08h 10m",
+    "stops": "Tiruchirappalli, Villupuram"
+  },
+  {
+    "train_no": "12083A",
+    "name": "Salem Bengaluru Jan Shatabdi",
+    "origin": "Salem Jn (SA)",
+    "dep": "08:20 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "01:10 PM",
+    "runtime": "04h 50m",
+    "stops": "Jolarpettai, Bangarapet, Whitefield"
+  },
+  {
+    "train_no": "22851A",
+    "name": "Salem Howrah SF Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "08:55 AM",
+    "dest": "Howrah Jn (HWH)",
+    "arr": "04:30 PM (Day 2)",
+    "runtime": "31h 35m",
+    "stops": "Chennai, Vijayawada, Bhubaneswar"
+  },
+  {
+    "train_no": "16612",
+    "name": "Salem Nagercoil Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "09:30 PM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "08h 30m",
+    "stops": "Erode, Madurai, Tirunelveli"
+  },
+  {
+    "train_no": "12669",
+    "name": "Ghatikachal Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "03:35 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "07:50 PM",
+    "runtime": "04h 15m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "16606E",
+    "name": "Salem Erode Passenger",
+    "origin": "Salem Jn (SA)",
+    "dep": "06:45 AM",
+    "dest": "Erode Jn",
+    "arr": "07:35 AM",
+    "runtime": "00h 50m",
+    "stops": "Sankagiri"
+  },
+  {
+    "train_no": "22684A",
+    "name": "Salem Karaikal Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "07:50 PM",
+    "dest": "Karaikal (KIK)",
+    "arr": "07:20 AM (Day 2)",
+    "runtime": "11h 30m",
+    "stops": "Erode, Villupuram, Chidambaram"
+  },
+  {
+    "train_no": "16606F",
+    "name": "Salem Namakkal Passenger",
+    "origin": "Salem Jn (SA)",
+    "dep": "09:10 AM",
+    "dest": "Namakkal",
+    "arr": "10:05 AM",
+    "runtime": "00h 55m",
+    "stops": "Sankari"
+  },
+  {
+    "train_no": "22630D",
+    "name": "Salem Yesvantpur SF Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "11:00 PM",
+    "dest": "Yesvantpur Jn (YPR)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "07h 00m",
+    "stops": "Jolarpettai, Bangarapet, Bengaluru"
+  },
+  {
+    "train_no": "12639A",
+    "name": "Salem Brindavan Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "10:20 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "02:00 PM",
+    "runtime": "03h 40m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "16607A",
+    "name": "West Coast Express (Salem leg)",
+    "origin": "Salem Jn (SA)",
+    "dep": "10:40 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "06:50 AM (Day 2)",
+    "runtime": "08h 10m",
+    "stops": "Erode, Coimbatore, Palakkad, Kozhikode"
+  },
+  {
+    "train_no": "22641C",
+    "name": "Salem Coimbatore Nagercoil Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "06:00 PM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "07:30 AM (Day 2)",
+    "runtime": "13h 30m",
+    "stops": "Erode, Coimbatore, Madurai, Tirunelveli"
+  },
+  {
+    "train_no": "16613A",
+    "name": "Malabar Express (Salem leg)",
+    "origin": "Salem Jn (SA)",
+    "dep": "01:00 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "11:10 AM",
+    "runtime": "10h 10m",
+    "stops": "Erode, Coimbatore, Palakkad, Kozhikode"
+  },
+  {
+    "train_no": "22638F",
+    "name": "Salem Bengaluru Chamundi Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "06:50 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "11:00 AM",
+    "runtime": "04h 10m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "16309A",
+    "name": "Salem Okha Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "01:30 AM",
+    "dest": "Okha (OKHA)",
+    "arr": "06:10 AM (Day 3)",
+    "runtime": "52h 40m",
+    "stops": "Erode, Coimbatore, Vadodara"
+  },
+  {
+    "train_no": "22685A",
+    "name": "Salem Tirupati SF Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "12:10 AM",
+    "dest": "Tirupati (TPTY)",
+    "arr": "06:20 AM",
+    "runtime": "06h 10m",
+    "stops": "Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "16853D",
+    "name": "Salem Rameswaram Passenger",
+    "origin": "Salem Jn (SA)",
+    "dep": "06:35 AM",
+    "dest": "Rameswaram (RMM)",
+    "arr": "04:10 PM",
+    "runtime": "09h 35m",
+    "stops": "Erode, Madurai, Manamadurai"
+  },
+  {
+    "train_no": "22687A",
+    "name": "Salem Bikaner SF Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "02:35 AM",
+    "dest": "Bikaner (BKN)",
+    "arr": "01:40 AM (Day 3)",
+    "runtime": "47h 05m",
+    "stops": "Erode, Coimbatore, Jaipur"
+  },
+  {
+    "train_no": "12246A",
+    "name": "Salem Yesvantpur Duronto Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "01:05 AM",
+    "dest": "Yesvantpur Jn (YPR)",
+    "arr": "06:00 AM",
+    "runtime": "04h 55m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "16606G",
+    "name": "Salem Attur Passenger",
+    "origin": "Salem Jn (SA)",
+    "dep": "11:20 AM",
+    "dest": "Attur",
+    "arr": "12:10 PM",
+    "runtime": "00h 50m",
+    "stops": "Omalur"
+  },
+  {
+    "train_no": "22688A",
+    "name": "Salem Guruvayur Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "07:35 AM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "01:30 PM",
+    "runtime": "05h 55m",
+    "stops": "Erode, Coimbatore, Palakkad, Thrissur"
+  },
+  {
+    "train_no": "16612A",
+    "name": "Salem Tiruchirappalli Passenger",
+    "origin": "Salem Jn (SA)",
+    "dep": "03:10 PM",
+    "dest": "Tiruchirappalli (TPJ)",
+    "arr": "06:30 PM",
+    "runtime": "03h 20m",
+    "stops": "Erode, Karur"
+  },
+  {
+    "train_no": "22656C",
+    "name": "Salem Nagpur SF Express",
+    "origin": "Salem Jn (SA)",
+    "dep": "09:35 AM",
+    "dest": "Nagpur (NGP)",
+    "arr": "06:30 PM (Day 2)",
+    "runtime": "32h 55m",
+    "stops": "Erode, Coimbatore, Bengaluru, Wardha"
+  },
+  {
+    "train_no": "12639B",
+    "name": "Brindavan Express",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "08:50 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "02:00 PM",
+    "runtime": "05h 10m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "12027A",
+    "name": "Chennai Bengaluru Shatabdi Express",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "06:45 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "10:25 PM",
+    "runtime": "03h 40m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "20608A",
+    "name": "MYS Vande Bharat Express",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "06:55 AM",
+    "dest": "Mysuru Jn (MYS)",
+    "arr": "12:20 PM",
+    "runtime": "05h 25m",
+    "stops": "KSR Bengaluru City, Mandya"
+  },
+  {
+    "train_no": "12657A",
+    "name": "Bangalore Mail",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "12:05 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "04:30 AM",
+    "runtime": "04h 25m",
+    "stops": "Bangarapet, Bengaluru Cantt"
+  },
+  {
+    "train_no": "16057A",
+    "name": "Sapthagiri Express",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:35 AM",
+    "dest": "Tirupati (TPTY)",
+    "arr": "09:40 AM",
+    "runtime": "02h 05m",
+    "stops": "Arakkonam, Renigunta"
+  },
+  {
+    "train_no": "12675B",
+    "name": "Kovai SF Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:20 AM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "02:05 PM",
+    "runtime": "06h 45m",
+    "stops": "Jolarpettai, Salem, Erode"
+  },
+  {
+    "train_no": "12673A",
+    "name": "Cheran SF Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "11:20 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "06h 40m",
+    "stops": "Jolarpettai, Salem, Erode"
+  },
+  {
+    "train_no": "12623A",
+    "name": "Trivandrum Mail (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "09:00 PM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "11:45 AM (Day 2)",
+    "runtime": "14h 45m",
+    "stops": "Salem, Palakkad, Ernakulam, Kottayam"
+  },
+  {
+    "train_no": "12601A",
+    "name": "Mangalore Mail (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "09:25 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "12:10 PM (Day 2)",
+    "runtime": "14h 45m",
+    "stops": "Palakkad, Shoranur, Kannur"
+  },
+  {
+    "train_no": "22639B",
+    "name": "Alleppey Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "10:10 PM",
+    "dest": "Alappuzha (ALLP)",
+    "arr": "10:40 AM (Day 2)",
+    "runtime": "12h 30m",
+    "stops": "Erode, Coimbatore, Ernakulam"
+  },
+  {
+    "train_no": "12671A",
+    "name": "Nilagiri Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "10:20 PM",
+    "dest": "Mettupalayam (MTP)",
+    "arr": "06:15 AM (Day 2)",
+    "runtime": "07h 55m",
+    "stops": "Salem, Erode, Coimbatore"
+  },
+  {
+    "train_no": "12615A",
+    "name": "Grand Trunk Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:35 PM",
+    "dest": "New Delhi (NDLS)",
+    "arr": "06:20 AM (Day 3)",
+    "runtime": "34h 45m",
+    "stops": "Vijayawada, Warangal, Nagpur"
+  },
+  {
+    "train_no": "12164A",
+    "name": "Chennai LTT Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:40 PM",
+    "dest": "Mumbai LTT (LTT)",
+    "arr": "04:30 PM (Day 2)",
+    "runtime": "20h 50m",
+    "stops": "Renigunta, Guntakal, Pune"
+  },
+  {
+    "train_no": "17314A",
+    "name": "Chennai UBL Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "05:10 PM",
+    "dest": "Hubballi Jn (UBL)",
+    "arr": "07:05 AM (Day 2)",
+    "runtime": "13h 55m",
+    "stops": "Guntakal, Bellary"
+  },
+  {
+    "train_no": "12685A",
+    "name": "Mangalore SF Exp (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "05:35 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:10 AM (Day 2)",
+    "runtime": "13h 35m",
+    "stops": "Salem, Erode, Kozhikode"
+  },
+  {
+    "train_no": "22808A",
+    "name": "MAS-SRC AC SF Exp (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "09:30 AM",
+    "dest": "Santragachi (SRC)",
+    "arr": "10:55 AM (Day 2)",
+    "runtime": "25h 25m",
+    "stops": "Vijayawada, Visakhapatnam"
+  },
+  {
+    "train_no": "12840A",
+    "name": "Howrah Mail (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "08:15 PM",
+    "dest": "Howrah Jn (HWH)",
+    "arr": "11:55 PM (Day 2)",
+    "runtime": "27h 40m",
+    "stops": "Vijayawada, Visakhapatnam"
+  },
+  {
+    "train_no": "12621A",
+    "name": "Tamil Nadu Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "11:15 PM",
+    "dest": "New Delhi (NDLS)",
+    "arr": "06:30 AM (Day 3)",
+    "runtime": "31h 15m",
+    "stops": "Vijayawada, Warangal, Nagpur"
+  },
+  {
+    "train_no": "06232",
+    "name": "Katpadi Jolarpettai Passenger",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "06:20 AM",
+    "dest": "Jolarpettai Jn",
+    "arr": "07:30 AM",
+    "runtime": "01h 10m",
+    "stops": "Ambur"
+  },
+  {
+    "train_no": "56812",
+    "name": "Katpadi Tirupati Passenger",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "06:00 AM",
+    "dest": "Tirupati (TPTY)",
+    "arr": "08:40 AM",
+    "runtime": "02h 40m",
+    "stops": "Arakkonam, Renigunta"
+  },
+  {
+    "train_no": "22660C",
+    "name": "Katpadi Bengaluru Cantt SF Express",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:50 PM",
+    "dest": "Bengaluru Cantt",
+    "arr": "10:15 AM (Day 2)",
+    "runtime": "14h 25m",
+    "stops": "Salem, Erode, Coimbatore"
+  },
+  {
+    "train_no": "12683A",
+    "name": "Coimbatore Trivandrum SF Express (KPD)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:55 AM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "07:40 PM",
+    "runtime": "11h 45m",
+    "stops": "Salem, Coimbatore, Palakkad, Kollam"
+  },
+  {
+    "train_no": "56813",
+    "name": "Katpadi Vellore Town Shuttle",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:00 AM",
+    "dest": "Vellore Town",
+    "arr": "07:20 AM",
+    "runtime": "00h 20m",
+    "stops": "Vellore Cantt"
+  },
+  {
+    "train_no": "22630E",
+    "name": "Katpadi Bengaluru Kongu Express",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:50 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "12:15 PM",
+    "runtime": "04h 25m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "12009A",
+    "name": "CBE Bengaluru Shatabdi (KPD)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "09:25 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "11:40 AM",
+    "runtime": "02h 15m",
+    "stops": "Jolarpettai, Bangarapet"
+  },
+  {
+    "train_no": "12693B",
+    "name": "Pearl City SF Exp (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "09:50 PM",
+    "dest": "Tuticorin (TN)",
+    "arr": "06:35 AM (Day 2)",
+    "runtime": "08h 45m",
+    "stops": "Villupuram, Vriddhachalam"
+  },
+  {
+    "train_no": "16159A",
+    "name": "MS Mangalore Exp (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "01:30 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:15 PM",
+    "runtime": "17h 45m",
+    "stops": "Tiruchirappalli, Erode, Kozhikode"
+  },
+  {
+    "train_no": "12631A",
+    "name": "Nellai SF Express (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "09:55 PM",
+    "dest": "Tirunelveli (TEN)",
+    "arr": "06:40 AM (Day 2)",
+    "runtime": "08h 45m",
+    "stops": "Villupuram, Tiruchirappalli, Madurai"
+  },
+  {
+    "train_no": "22153A",
+    "name": "MS Salem SF Exp (KPD leg)",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "01:35 AM",
+    "dest": "Salem Jn (SA)",
+    "arr": "06:10 AM",
+    "runtime": "04h 35m",
+    "stops": "Villupuram, Vriddhachalam, Attur"
+  },
+  {
+    "train_no": "12085",
+    "name": "Katpadi Chennai Jan Shatabdi",
+    "origin": "Katpadi Jn (KPD)",
+    "dep": "07:10 AM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "09:45 AM",
+    "runtime": "02h 35m",
+    "stops": "Arakkonam, Perambur"
+  },
+  {
+    "train_no": "12028",
+    "name": "Bengaluru Chennai Shatabdi Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "06:00 AM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "11:00 AM",
+    "runtime": "05h 00m",
+    "stops": "Bangarapet, Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "12640",
+    "name": "Brindavan Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "02:30 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "09:15 PM",
+    "runtime": "06h 45m",
+    "stops": "Bangarapet, Jolarpettai, Katpadi, Arakkonam"
+  },
+  {
+    "train_no": "12658",
+    "name": "Bangalore Mail",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "10:00 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "05:15 AM (Day 2)",
+    "runtime": "07h 15m",
+    "stops": "Bangarapet, Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "12007",
+    "name": "Chennai Bengaluru Shatabdi (morning)",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "04:20 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "09:15 PM",
+    "runtime": "04h 55m",
+    "stops": "Bangarapet, Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "22691",
+    "name": "Bengaluru Yesvantpur Rajdhani Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "08:00 PM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "06:20 AM (Day 3)",
+    "runtime": "34h 20m",
+    "stops": "Guntakal, Bhopal, Agra"
+  },
+  {
+    "train_no": "16022",
+    "name": "Kaveri Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "09:15 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "06:15 AM (Day 2)",
+    "runtime": "09h 00m",
+    "stops": "Bangarapet, Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "12245",
+    "name": "Yesvantpur Duronto Express",
+    "origin": "Yesvantpur Jn (YPR)",
+    "dep": "06:20 AM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "01:10 PM",
+    "runtime": "06h 50m",
+    "stops": "Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "16232A",
+    "name": "Bengaluru Coimbatore Mysuru Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "10:30 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "06:35 AM (Day 2)",
+    "runtime": "08h 05m",
+    "stops": "Salem, Erode"
+  },
+  {
+    "train_no": "12079",
+    "name": "Bengaluru Chennai Jan Shatabdi",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "01:20 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "06:30 PM",
+    "runtime": "05h 10m",
+    "stops": "Bangarapet, Jolarpettai, Katpadi"
+  },
+  {
+    "train_no": "22625A",
+    "name": "Bengaluru Trivandrum SF Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "06:20 PM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "09:20 AM (Day 2)",
+    "runtime": "15h 00m",
+    "stops": "Salem, Coimbatore, Kollam"
+  },
+  {
+    "train_no": "12609",
+    "name": "Bengaluru Chennai Egmore Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "09:35 PM",
+    "dest": "Chennai Egmore (MS)",
+    "arr": "05:45 AM (Day 2)",
+    "runtime": "08h 10m",
+    "stops": "Jolarpettai, Katpadi, Tambaram"
+  },
+  {
+    "train_no": "16536",
+    "name": "Gol Gumbaz Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "07:30 PM",
+    "dest": "Solapur (SUR)",
+    "arr": "07:10 AM (Day 2)",
+    "runtime": "11h 40m",
+    "stops": "Guntakal, Bijapur"
+  },
+  {
+    "train_no": "12785",
+    "name": "Kacheguda Express",
+    "origin": "Yesvantpur Jn (YPR)",
+    "dep": "06:30 AM",
+    "dest": "Kacheguda (KCG)",
+    "arr": "09:25 PM",
+    "runtime": "14h 55m",
+    "stops": "Guntakal, Raichur, Wadi"
+  },
+  {
+    "train_no": "16536A",
+    "name": "Bengaluru Solapur Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "06:15 PM",
+    "dest": "Solapur (SUR)",
+    "arr": "07:10 AM (Day 2)",
+    "runtime": "12h 55m",
+    "stops": "Guntakal, Bijapur"
+  },
+  {
+    "train_no": "22693",
+    "name": "Bengaluru Howrah SF Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "07:00 AM",
+    "dest": "Howrah Jn (HWH)",
+    "arr": "04:30 PM (Day 2)",
+    "runtime": "33h 30m",
+    "stops": "Chennai, Vijayawada, Bhubaneswar"
+  },
+  {
+    "train_no": "12649",
+    "name": "KSR Bengaluru Sampark Kranti Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "06:00 PM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "10:35 PM (Day 2)",
+    "runtime": "28h 35m",
+    "stops": "Guntakal, Bhopal"
+  },
+  {
+    "train_no": "16536B",
+    "name": "Bengaluru Kanyakumari Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "09:30 PM",
+    "dest": "Kanniyakumari (CAPE)",
+    "arr": "11:20 AM (Day 2)",
+    "runtime": "13h 50m",
+    "stops": "Salem, Coimbatore, Trivandrum"
+  },
+  {
+    "train_no": "12678A",
+    "name": "Bengaluru Coimbatore Intercity",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "03:10 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "09:20 PM",
+    "runtime": "06h 10m",
+    "stops": "Salem, Jolarpettai"
+  },
+  {
+    "train_no": "22637D",
+    "name": "West Coast SF Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "09:30 PM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "12:20 PM (Day 2)",
+    "runtime": "14h 50m",
+    "stops": "Kozhikode, Ernakulam, Kollam"
+  },
+  {
+    "train_no": "16515",
+    "name": "Bengaluru Jaipur Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "08:15 AM",
+    "dest": "Jaipur (JP)",
+    "arr": "04:20 PM (Day 2)",
+    "runtime": "32h 05m",
+    "stops": "Guntakal, Vadodara"
+  },
+  {
+    "train_no": "22638G",
+    "name": "Yesvantpur Alleppey SF Express",
+    "origin": "Yesvantpur Jn (YPR)",
+    "dep": "06:30 AM",
+    "dest": "Alappuzha (ALLP)",
+    "arr": "06:30 AM (Day 2)",
+    "runtime": "24h 00m",
+    "stops": "Salem, Coimbatore, Ernakulam"
+  },
+  {
+    "train_no": "16536C",
+    "name": "Bengaluru Mysuru Passenger",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "07:15 AM",
+    "dest": "Mysuru Jn (MYS)",
+    "arr": "09:50 AM",
+    "runtime": "02h 35m",
+    "stops": "Mandya, Srirangapatna"
+  },
+  {
+    "train_no": "22691A",
+    "name": "Bengaluru Nizamuddin Sampark Kranti",
+    "origin": "Yesvantpur Jn (YPR)",
+    "dep": "10:15 AM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "01:50 PM (Day 2)",
+    "runtime": "27h 35m",
+    "stops": "Guntakal, Bhopal"
+  },
+  {
+    "train_no": "12245A",
+    "name": "Bengaluru Howrah Duronto Express",
+    "origin": "Yesvantpur Jn (YPR)",
+    "dep": "11:20 AM",
+    "dest": "Howrah Jn (HWH)",
+    "arr": "06:40 PM (Day 2)",
+    "runtime": "31h 20m",
+    "stops": "Chennai, Vijayawada"
+  },
+  {
+    "train_no": "16536D",
+    "name": "Bengaluru Bijapur Passenger",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "10:00 AM",
+    "dest": "Vijayapura (BJP)",
+    "arr": "09:10 PM",
+    "runtime": "11h 10m",
+    "stops": "Guntakal, Bagalkot"
+  },
+  {
+    "train_no": "16649C",
+    "name": "Bengaluru Mangaluru Malabar Express",
+    "origin": "Yesvantpur Jn (YPR)",
+    "dep": "09:00 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:50 AM (Day 2)",
+    "runtime": "10h 50m",
+    "stops": "Hassan, Sakleshpur"
+  },
+  {
+    "train_no": "22638H",
+    "name": "Bengaluru Coimbatore Kongu Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "05:45 PM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "12:15 AM (Day 2)",
+    "runtime": "06h 30m",
+    "stops": "Salem, Erode"
+  },
+  {
+    "train_no": "12683B",
+    "name": "Bengaluru Trivandrum SF Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "03:15 AM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "07:40 PM",
+    "runtime": "16h 25m",
+    "stops": "Salem, Coimbatore, Kollam"
+  },
+  {
+    "train_no": "16536E",
+    "name": "Bengaluru Hubballi Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "09:40 PM",
+    "dest": "Hubballi Jn (UBL)",
+    "arr": "07:05 AM (Day 2)",
+    "runtime": "09h 25m",
+    "stops": "Davangere, Hosapete"
+  },
+  {
+    "train_no": "22660D",
+    "name": "Bengaluru Nagercoil SF Express",
+    "origin": "KSR Bengaluru City (SBC)",
+    "dep": "10:15 AM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "04:35 AM (Day 2)",
+    "runtime": "18h 20m",
+    "stops": "Salem, Coimbatore, Trivandrum"
+  },
+  {
+    "train_no": "12683C",
+    "name": "Palakkad Trivandrum SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "03:20 PM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "07:40 PM",
+    "runtime": "04h 20m",
+    "stops": "Thrissur, Ernakulam, Kollam"
+  },
+  {
+    "train_no": "16606H",
+    "name": "Palakkad Coimbatore Passenger",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "08:50 AM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "10:15 AM",
+    "runtime": "01h 25m",
+    "stops": "Walayar, Podanur"
+  },
+  {
+    "train_no": "22497B",
+    "name": "Palakkad Bandra Terminus SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "12:35 AM",
+    "dest": "Bandra Terminus (BDTS)",
+    "arr": "05:30 AM (Day 2)",
+    "runtime": "28h 55m",
+    "stops": "Coimbatore, Kalyan"
+  },
+  {
+    "train_no": "16234A",
+    "name": "Palakkad Ernakulam Intercity Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "07:15 AM",
+    "dest": "Ernakulam Jn (ERS)",
+    "arr": "09:20 AM",
+    "runtime": "02h 05m",
+    "stops": "Thrissur, Aluva"
+  },
+  {
+    "train_no": "16232B",
+    "name": "Palakkad Mysuru Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "11:15 PM",
+    "dest": "Mysuru Jn (MYS)",
+    "arr": "06:35 AM (Day 2)",
+    "runtime": "07h 20m",
+    "stops": "Coimbatore, Salem, Bengaluru"
+  },
+  {
+    "train_no": "16613B",
+    "name": "Malabar Express (PGT leg)",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "01:20 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "11:10 AM",
+    "runtime": "09h 50m",
+    "stops": "Shoranur, Kozhikode, Kannur"
+  },
+  {
+    "train_no": "22630F",
+    "name": "Palakkad Bengaluru SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "09:20 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "08h 40m",
+    "stops": "Coimbatore, Salem, Jolarpettai"
+  },
+  {
+    "train_no": "22638I",
+    "name": "Palakkad Chennai SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "01:35 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "09:15 PM",
+    "runtime": "07h 40m",
+    "stops": "Coimbatore, Salem, Katpadi"
+  },
+  {
+    "train_no": "12623B",
+    "name": "Trivandrum Mail (PGT leg)",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "01:10 AM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "11:45 AM",
+    "runtime": "10h 35m",
+    "stops": "Thrissur, Ernakulam, Kottayam"
+  },
+  {
+    "train_no": "12601B",
+    "name": "Mangalore Mail (PGT leg)",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "01:30 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "12:10 PM",
+    "runtime": "10h 40m",
+    "stops": "Shoranur, Kozhikode, Kannur"
+  },
+  {
+    "train_no": "16607B",
+    "name": "West Coast Express (PGT leg)",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "03:15 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "06:50 AM",
+    "runtime": "03h 35m",
+    "stops": "Shoranur, Kozhikode"
+  },
+  {
+    "train_no": "22639C",
+    "name": "Alleppey Express (PGT leg)",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "02:20 AM",
+    "dest": "Alappuzha (ALLP)",
+    "arr": "10:40 AM",
+    "runtime": "08h 20m",
+    "stops": "Thrissur, Ernakulam, Kayamkulam"
+  },
+  {
+    "train_no": "16606I",
+    "name": "Palakkad Shoranur Passenger",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "06:35 AM",
+    "dest": "Shoranur Jn (SRR)",
+    "arr": "07:20 AM",
+    "runtime": "00h 45m",
+    "stops": "Kanjikode"
+  },
+  {
+    "train_no": "06301A",
+    "name": "Palakkad Trivandrum Passenger",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "09:15 AM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "03:00 PM",
+    "runtime": "05h 45m",
+    "stops": "Thrissur, Ernakulam, Kollam"
+  },
+  {
+    "train_no": "16650B",
+    "name": "Parasuram Express (PGT leg)",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "09:40 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:20 PM",
+    "runtime": "09h 40m",
+    "stops": "Shoranur, Kozhikode, Kannur"
+  },
+  {
+    "train_no": "22643D",
+    "name": "Palakkad Nizamuddin SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "12:45 AM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "09:50 PM (Day 2)",
+    "runtime": "33h 05m",
+    "stops": "Coimbatore, Bhopal"
+  },
+  {
+    "train_no": "16309B",
+    "name": "Palakkad Okha Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "01:15 AM",
+    "dest": "Okha (OKHA)",
+    "arr": "06:10 AM (Day 3)",
+    "runtime": "52h 55m",
+    "stops": "Coimbatore, Vadodara"
+  },
+  {
+    "train_no": "22656D",
+    "name": "Palakkad Nagpur SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "10:15 AM",
+    "dest": "Nagpur (NGP)",
+    "arr": "06:30 PM (Day 2)",
+    "runtime": "32h 15m",
+    "stops": "Coimbatore, Bengaluru, Wardha"
+  },
+  {
+    "train_no": "16336C",
+    "name": "Palakkad Bikaner Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "11:15 PM",
+    "dest": "Bikaner (BKN)",
+    "arr": "07:30 AM (Day 4)",
+    "runtime": "56h 15m",
+    "stops": "Coimbatore, Jaipur"
+  },
+  {
+    "train_no": "22637E",
+    "name": "Palakkad Bengaluru West Coast SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "12:00 AM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "12:20 PM",
+    "runtime": "12h 20m",
+    "stops": "Thrissur, Kozhikode, Mangaluru"
+  },
+  {
+    "train_no": "16360B",
+    "name": "Palakkad Guruvayur Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "10:20 AM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "12:40 PM",
+    "runtime": "02h 20m",
+    "stops": "Thrissur"
+  },
+  {
+    "train_no": "12977B",
+    "name": "Palakkad Ajmer SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "12:10 PM",
+    "dest": "Ajmer Jn (AII)",
+    "arr": "04:40 PM (Day 2)",
+    "runtime": "28h 30m",
+    "stops": "Coimbatore, Ahmedabad"
+  },
+  {
+    "train_no": "22660E",
+    "name": "Palakkad Bengaluru Cantt SF Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "08:15 PM",
+    "dest": "Bengaluru Cantt",
+    "arr": "10:15 AM (Day 2)",
+    "runtime": "14h 00m",
+    "stops": "Coimbatore, Salem"
+  },
+  {
+    "train_no": "16693C",
+    "name": "Palakkad Mangalore Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "10:20 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "10:50 PM",
+    "runtime": "12h 30m",
+    "stops": "Shoranur, Kozhikode"
+  },
+  {
+    "train_no": "16606J",
+    "name": "Palakkad Pattambi Passenger",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "03:00 PM",
+    "dest": "Pattambi",
+    "arr": "03:50 PM",
+    "runtime": "00h 50m",
+    "stops": "Kanjikode"
+  },
+  {
+    "train_no": "22684B",
+    "name": "Palakkad Karaikal Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "09:50 PM",
+    "dest": "Karaikal (KIK)",
+    "arr": "07:20 AM (Day 2)",
+    "runtime": "09h 30m",
+    "stops": "Coimbatore, Villupuram"
+  },
+  {
+    "train_no": "16346B",
+    "name": "Palakkad Netravati Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "01:10 PM",
+    "dest": "LTT Mumbai (LTT)",
+    "arr": "06:10 PM (Day 2)",
+    "runtime": "29h 00m",
+    "stops": "Ernakulam, Kozhikode, Mangaluru"
+  },
+  {
+    "train_no": "22688B",
+    "name": "Palakkad Madurai Guruvayur Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "10:40 AM",
+    "dest": "Madurai Jn (MDU)",
+    "arr": "01:30 PM",
+    "runtime": "02h 50m",
+    "stops": "Coimbatore, Dindigul"
+  },
+  {
+    "train_no": "16234B",
+    "name": "Palakkad Thrissur Passenger",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "05:20 PM",
+    "dest": "Thrissur",
+    "arr": "06:15 PM",
+    "runtime": "00h 55m",
+    "stops": "Ottapalam"
+  },
+  {
+    "train_no": "22641D",
+    "name": "Palakkad Nagercoil Express",
+    "origin": "Palakkad Jn (PGT)",
+    "dep": "01:50 AM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "07:30 AM",
+    "runtime": "05h 40m",
+    "stops": "Coimbatore, Madurai, Tirunelveli"
+  },
+  {
+    "train_no": "16606K",
+    "name": "Ernakulam Coimbatore Intercity Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "07:40 AM",
+    "dest": "Coimbatore Jn (CBE)",
+    "arr": "11:20 AM",
+    "runtime": "03h 40m",
+    "stops": "Thrissur, Palakkad"
+  },
+  {
+    "train_no": "22638J",
+    "name": "Ernakulam Bengaluru SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "03:35 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "06:00 AM (Day 2)",
+    "runtime": "14h 25m",
+    "stops": "Thrissur, Coimbatore, Salem"
+  },
+  {
+    "train_no": "12625",
+    "name": "Kerala SF Express (ERS leg)",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "03:15 PM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "06:40 AM (Day 3)",
+    "runtime": "39h 25m",
+    "stops": "Kozhikode, Mangaluru, Vasco"
+  },
+  {
+    "train_no": "22643E",
+    "name": "Ernakulam Nizamuddin SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "01:15 PM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "09:50 PM (Day 2)",
+    "runtime": "32h 35m",
+    "stops": "Coimbatore, Nagpur"
+  },
+  {
+    "train_no": "16346C",
+    "name": "Ernakulam Netravati Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "03:45 PM",
+    "dest": "LTT Mumbai (LTT)",
+    "arr": "06:10 PM (Day 2)",
+    "runtime": "26h 25m",
+    "stops": "Kozhikode, Mangaluru, Ratnagiri"
+  },
+  {
+    "train_no": "12695A",
+    "name": "Ernakulam Chennai SF Express (Garib Rath)",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "10:15 PM",
+    "dest": "MGR Chennai Central (MAS)",
+    "arr": "09:15 AM (Day 2)",
+    "runtime": "11h 00m",
+    "stops": "Coimbatore, Salem, Katpadi"
+  },
+  {
+    "train_no": "22637F",
+    "name": "West Coast SF Express (ERS)",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "11:30 PM",
+    "dest": "KSR Bengaluru City (SBC)",
+    "arr": "12:20 PM (Day 2)",
+    "runtime": "12h 50m",
+    "stops": "Thrissur, Kozhikode, Mangaluru"
+  },
+  {
+    "train_no": "16650C",
+    "name": "Parasuram Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "09:10 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "07:20 PM",
+    "runtime": "10h 10m",
+    "stops": "Thrissur, Kozhikode, Kannur"
+  },
+  {
+    "train_no": "16693D",
+    "name": "Malabar-connect Mangalore Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "11:35 AM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "10:50 PM",
+    "runtime": "11h 15m",
+    "stops": "Thrissur, Kozhikode, Kannur"
+  },
+  {
+    "train_no": "22660F",
+    "name": "Ernakulam Bengaluru Cantt SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "10:20 PM",
+    "dest": "Bengaluru Cantt",
+    "arr": "10:15 AM (Day 2)",
+    "runtime": "11h 55m",
+    "stops": "Coimbatore, Salem"
+  },
+  {
+    "train_no": "16309C",
+    "name": "Ernakulam Okha Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "07:00 AM",
+    "dest": "Okha (OKHA)",
+    "arr": "06:10 AM (Day 3)",
+    "runtime": "47h 10m",
+    "stops": "Coimbatore, Vadodara"
+  },
+  {
+    "train_no": "12977C",
+    "name": "Ernakulam Ajmer SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "03:35 PM",
+    "dest": "Ajmer Jn (AII)",
+    "arr": "04:40 PM (Day 2)",
+    "runtime": "25h 05m",
+    "stops": "Coimbatore, Ahmedabad"
+  },
+  {
+    "train_no": "22656E",
+    "name": "Ernakulam Nagpur SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "01:20 PM",
+    "dest": "Nagpur (NGP)",
+    "arr": "06:30 PM (Day 2)",
+    "runtime": "29h 10m",
+    "stops": "Coimbatore, Bengaluru, Wardha"
+  },
+  {
+    "train_no": "16336D",
+    "name": "Ernakulam Bikaner Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "12:15 AM",
+    "dest": "Bikaner (BKN)",
+    "arr": "07:30 AM (Day 4)",
+    "runtime": "55h 15m",
+    "stops": "Coimbatore, Jaipur"
+  },
+  {
+    "train_no": "22661D",
+    "name": "Ernakulam Chandigarh SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "01:20 AM",
+    "dest": "Chandigarh (CDG)",
+    "arr": "08:20 AM (Day 3)",
+    "runtime": "55h 00m",
+    "stops": "Coimbatore, Delhi"
+  },
+  {
+    "train_no": "16351D",
+    "name": "Ernakulam Mumbai CSMT Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "09:15 PM",
+    "dest": "Mumbai CSMT (CSMT)",
+    "arr": "11:40 PM (Day 2)",
+    "runtime": "26h 25m",
+    "stops": "Coimbatore, Pune"
+  },
+  {
+    "train_no": "16360C",
+    "name": "Ernakulam Guruvayur Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "06:20 AM",
+    "dest": "Guruvayur (GUV)",
+    "arr": "08:40 AM",
+    "runtime": "02h 20m",
+    "stops": "Thrissur"
+  },
+  {
+    "train_no": "16606L",
+    "name": "Ernakulam Thrissur Passenger",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "07:10 AM",
+    "dest": "Thrissur",
+    "arr": "08:20 AM",
+    "runtime": "01h 10m",
+    "stops": "Aluva, Angamaly"
+  },
+  {
+    "train_no": "22684C",
+    "name": "Ernakulam Karaikal Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "03:20 PM",
+    "dest": "Karaikal (KIK)",
+    "arr": "07:20 AM (Day 2)",
+    "runtime": "16h 00m",
+    "stops": "Coimbatore, Erode, Villupuram"
+  },
+  {
+    "train_no": "06303",
+    "name": "Ernakulam Alappuzha Passenger",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "09:10 AM",
+    "dest": "Alappuzha (ALLP)",
+    "arr": "10:55 AM",
+    "runtime": "01h 45m",
+    "stops": "Cherthala"
+  },
+  {
+    "train_no": "22638K",
+    "name": "Ernakulam Yesvantpur SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "09:35 PM",
+    "dest": "Yesvantpur Jn (YPR)",
+    "arr": "06:30 AM (Day 2)",
+    "runtime": "08h 55m",
+    "stops": "Coimbatore, Salem"
+  },
+  {
+    "train_no": "16382D",
+    "name": "Ernakulam Trivandrum Intercity Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "02:15 PM",
+    "dest": "Thiruvananthapuram Central (TVC)",
+    "arr": "04:50 PM",
+    "runtime": "02h 35m",
+    "stops": "Kottayam, Kollam"
+  },
+  {
+    "train_no": "22641E",
+    "name": "Ernakulam Nagercoil Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "11:30 PM",
+    "dest": "Nagercoil Jn (NCJ)",
+    "arr": "07:30 AM (Day 2)",
+    "runtime": "08h 00m",
+    "stops": "Kollam, Trivandrum"
+  },
+  {
+    "train_no": "22665C",
+    "name": "Ernakulam Puducherry SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "09:45 AM",
+    "dest": "Puducherry (PDY)",
+    "arr": "03:20 PM",
+    "runtime": "05h 35m",
+    "stops": "Coimbatore, Villupuram"
+  },
+  {
+    "train_no": "16649D",
+    "name": "Ernakulam Mangaluru Malabar Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "01:35 PM",
+    "dest": "Mangaluru Ctl (MAQ)",
+    "arr": "11:55 PM",
+    "runtime": "10h 20m",
+    "stops": "Thrissur, Kozhikode"
+  },
+  {
+    "train_no": "22688C",
+    "name": "Ernakulam Madurai Guruvayur Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "09:10 AM",
+    "dest": "Madurai Jn (MDU)",
+    "arr": "01:30 PM",
+    "runtime": "04h 20m",
+    "stops": "Thrissur, Coimbatore, Dindigul"
+  },
+  {
+    "train_no": "16234C",
+    "name": "Ernakulam Palakkad Intercity Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "05:35 PM",
+    "dest": "Palakkad Jn (PGT)",
+    "arr": "07:40 PM",
+    "runtime": "02h 05m",
+    "stops": "Thrissur"
+  },
+  {
+    "train_no": "22637G",
+    "name": "Ernakulam Kannur Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "07:20 AM",
+    "dest": "Kannur (CAN)",
+    "arr": "01:15 PM",
+    "runtime": "05h 55m",
+    "stops": "Thrissur, Kozhikode"
+  },
+  {
+    "train_no": "06304",
+    "name": "Ernakulam Kottayam Passenger",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "06:30 PM",
+    "dest": "Kottayam",
+    "arr": "07:50 PM",
+    "runtime": "01h 20m",
+    "stops": "Piravom Road"
+  },
+  {
+    "train_no": "22643F",
+    "name": "Ernakulam Delhi SF Express",
+    "origin": "Ernakulam Jn (ERS)",
+    "dep": "07:15 AM",
+    "dest": "Hazrat Nizamuddin (NZM)",
+    "arr": "09:50 PM (Day 2)",
+    "runtime": "38h 35m",
+    "stops": "Coimbatore, Vijayawada, Nagpur"
+  }
+]

@@ -51,3 +51,34 @@ def list_movements(
     items = repo.get_all(skip=skip, limit=limit, **filters)
     total = repo.count(**filters)
     return {"items": items, "total": total, "skip": skip, "limit": limit}
+
+
+@router.get("/trains/timetable")
+def get_chennai_timetable(
+    station: Optional[str] = None,
+    q: Optional[str] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500),
+):
+    """Retrieve full Southern Railway timetable data (330 trains from Excel)."""
+    import json
+    import os
+
+    json_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "southern-railway-block-planner-frontend", "src", "timetable_rows.json")
+    if not os.path.exists(json_path):
+        return {"items": [], "total": 0}
+
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if station and station != "ALL":
+        data = [t for t in data if station.lower() in t.get("stn", "").lower() or station.lower() in t.get("src", "").lower() or station.lower() in t.get("dst", "").lower() or station.lower() in t.get("stops", "").lower()]
+
+    if q:
+        query = q.lower().strip()
+        data = [t for t in data if query in t.get("no", "").lower() or query in t.get("name", "").lower() or query in t.get("src", "").lower() or query in t.get("dst", "").lower() or query in t.get("stops", "").lower()]
+
+    total = len(data)
+    items = data[skip : skip + limit]
+    return {"items": items, "total": total, "skip": skip, "limit": limit}
+

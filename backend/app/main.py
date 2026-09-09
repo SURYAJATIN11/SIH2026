@@ -23,6 +23,10 @@ from app.api.routes import (
     emergencies,
     decisions,
     metrics,
+    weather_incidents,
+    resources,
+    auth,
+    train_tracking,
 )
 
 
@@ -39,7 +43,7 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
     )
 
-    # CORS middleware — frontend (M5) will call these APIs
+    # CORS middleware — allows frontend to connect from any local port
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -56,25 +60,42 @@ def create_app() -> FastAPI:
             content={"error": exc.message, "status_code": exc.status_code},
         )
 
-    # Register all routers
-    prefix = settings.API_V1_PREFIX
+    # Root health endpoint for quick health probes
+    @app.get("/health", tags=["Health"])
+    def root_health():
+        return {
+            "status": "healthy",
+            "app_name": settings.APP_NAME,
+            "version": settings.APP_VERSION,
+        }
 
-    app.include_router(health.router, prefix=prefix, tags=["Health"])
-    app.include_router(stations.router, prefix=prefix, tags=["Stations"])
-    app.include_router(corridors.router, prefix=prefix, tags=["Corridors"])
-    app.include_router(sections.router, prefix=prefix, tags=["Track Sections"])
-    app.include_router(assets.router, prefix=prefix, tags=["Assets"])
-    app.include_router(defects.router, prefix=prefix, tags=["Defects"])
-    app.include_router(maintenance.router, prefix=prefix, tags=["Maintenance"])
-    app.include_router(trains.router, prefix=prefix, tags=["Trains"])
-    app.include_router(forecasts.router, prefix=prefix, tags=["Goods Forecasts"])
-    app.include_router(blocks.router, prefix=prefix, tags=["Block Windows & Plans"])
-    app.include_router(priority.router, prefix=prefix, tags=["Priority"])
-    app.include_router(synergy.router, prefix=prefix, tags=["Synergy"])
-    app.include_router(planning.router, prefix=prefix, tags=["Planning"])
-    app.include_router(emergencies.router, prefix=prefix, tags=["Emergencies"])
-    app.include_router(decisions.router, prefix=prefix, tags=["Decisions"])
-    app.include_router(metrics.router, prefix=prefix, tags=["Metrics"])
+    # Register routers for both `/api/v1` and `/api` prefixes for full compatibility
+    routers = [
+        (health.router, "Health"),
+        (stations.router, "Stations"),
+        (corridors.router, "Corridors"),
+        (sections.router, "Track Sections"),
+        (assets.router, "Assets"),
+        (defects.router, "Defects"),
+        (maintenance.router, "Maintenance"),
+        (trains.router, "Trains"),
+        (forecasts.router, "Goods Forecasts"),
+        (blocks.router, "Block Windows & Plans"),
+        (priority.router, "Priority"),
+        (synergy.router, "Synergy"),
+        (planning.router, "Planning"),
+        (emergencies.router, "Emergencies"),
+        (decisions.router, "Decisions"),
+        (metrics.router, "Metrics"),
+        (weather_incidents.router, "Weather & Incidents"),
+        (resources.router, "Resources & Machines"),
+        (auth.router, "Authentication"),
+        (train_tracking.router, "RTIS Live Train Tracking"),
+    ]
+
+    for prefix in [settings.API_V1_PREFIX, "/api"]:
+        for router, tag in routers:
+            app.include_router(router, prefix=prefix, tags=[tag])
 
     return app
 

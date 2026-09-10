@@ -1,11 +1,11 @@
-const DEFAULT_BASE = localStorage.getItem("sr_api_base") || "http://127.0.0.1:8000";
+const DEFAULT_BASE = localStorage.getItem("sr_api_base") || "https://sih2026-hrnz.onrender.com";
 
 export const api = {
   get baseUrl() {
     return localStorage.getItem("sr_api_base") || DEFAULT_BASE;
   },
   setBaseUrl(url) {
-    const cleaned = url ? url.trim().replace(/\/$/, "") : "http://127.0.0.1:8000";
+    const cleaned = url ? url.trim().replace(/\/$/, "") : "https://sih2026-hrnz.onrender.com";
     localStorage.setItem("sr_api_base", cleaned);
   },
   async request(path, options = {}) {

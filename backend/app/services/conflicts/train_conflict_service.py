@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import date, datetime, timedelta, timezone
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -12,16 +12,26 @@ from app.models.goods_forecast import GoodsTrainForecast
 from app.models.enums import MovementType
 
 
+def to_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
 class TrainConflictService:
     def __init__(self, db: Session):
         self.db = db
 
     def detect_conflicts(self, section_id: uuid.UUID, proposed_start: datetime, proposed_end: datetime) -> list[dict]:
         """Find train movements that overlap with a proposed block window."""
+        p_start = to_utc(proposed_start)
+        p_end = to_utc(proposed_end)
         stmt = select(TrainMovement).where(
             TrainMovement.track_section_id == section_id,
-            TrainMovement.scheduled_entry < proposed_end,
-            TrainMovement.scheduled_exit > proposed_start,
+            TrainMovement.scheduled_entry < p_end,
+            TrainMovement.scheduled_exit > p_start,
             TrainMovement.movement_type != MovementType.FORECAST
         )
         movements = self.db.scalars(stmt).all()
@@ -29,13 +39,13 @@ class TrainConflictService:
         conflicts = []
         for mv in movements:
             # Handle overnight trains just in case exit is before entry (data issue) or valid logic
-            entry = mv.scheduled_entry
-            exit_time = mv.scheduled_exit
+            entry = to_utc(mv.scheduled_entry)
+            exit_time = to_utc(mv.scheduled_exit)
             if exit_time < entry:
                 exit_time = exit_time + timedelta(days=1)
                 
-            overlap_start = max(entry, proposed_start)
-            overlap_end = min(exit_time, proposed_end)
+            overlap_start = max(entry, p_start)
+            overlap_end = min(exit_time, p_end)
             
             if overlap_end > overlap_start:
                 overlap_duration = (overlap_end - overlap_start).total_seconds() / 60.0
@@ -100,8 +110,8 @@ class TrainConflictService:
 
         occupied = []
         for mv in movements:
-            entry = mv.scheduled_entry
-            exit_time = mv.scheduled_exit
+            entry = to_utc(mv.scheduled_entry)
+            exit_time = to_utc(mv.scheduled_exit)
             if exit_time < entry:
                 exit_time = exit_time + timedelta(days=1)
                 

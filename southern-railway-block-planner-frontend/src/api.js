@@ -1,4 +1,6 @@
-const DEFAULT_BASE = localStorage.getItem("sr_api_base") || "http://127.0.0.1:8000";
+const DEFAULT_BASE = (typeof window !== "undefined" && window.location.origin && window.location.origin.startsWith("http")) 
+  ? window.location.origin 
+  : (localStorage.getItem("sr_api_base") || "http://127.0.0.1:8000");
 
 export const api = {
   get baseUrl() {

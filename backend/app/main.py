@@ -27,6 +27,8 @@ from app.api.routes import (
     resources,
     auth,
     train_tracking,
+    simulation,
+    autonomous,
 )
 
 
@@ -46,7 +48,7 @@ def create_app() -> FastAPI:
     # CORS middleware — allows frontend to connect from any local port
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origin_regex=r"^https?://.*$",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -91,11 +93,22 @@ def create_app() -> FastAPI:
         (resources.router, "Resources & Machines"),
         (auth.router, "Authentication"),
         (train_tracking.router, "RTIS Live Train Tracking"),
+        (simulation.router, "Simulation"),
+        (autonomous.router, "Autonomous AI Auto-Pilot"),
     ]
 
     for prefix in [settings.API_V1_PREFIX, "/api"]:
         for router, tag in routers:
             app.include_router(router, prefix=prefix, tags=[tag])
+
+    # Mount frontend static files if dist exists for unified single-port viewing
+    import os
+    frontend_dist = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../../southern-railway-block-planner-frontend/dist")
+    )
+    if os.path.isdir(frontend_dist):
+        from fastapi.staticfiles import StaticFiles
+        app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
 
     return app
 

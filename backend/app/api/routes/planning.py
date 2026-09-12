@@ -66,3 +66,13 @@ def reoptimize_plan(
     service = PlanService(db)
     result = service.reoptimize(plan_id=plan_id, reason=reason)
     return result
+
+
+@router.get("/planning/plan")
+def get_plans_alias(db: Session = Depends(get_db)):
+    """Frontend compatibility alias for listing plans."""
+    from app.repositories.block_repo import BlockPlanRepository
+    repo = BlockPlanRepository(db)
+    items = repo.get_all(skip=0, limit=50)
+    total = repo.count()
+    return {"items": items, "total": total}

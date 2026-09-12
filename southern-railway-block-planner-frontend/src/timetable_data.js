@@ -191,7 +191,7 @@ export const OFFICIAL_STATIONS_37 = [
   },
   {
     "code": "ALLP",
-    "name": "Alappuzha",
+    "name": "Alappuzha (Alapuzha)",
     "div": "TVC",
     "lat": 9.4981,
     "lng": 76.3268,
@@ -201,7 +201,7 @@ export const OFFICIAL_STATIONS_37 = [
   },
   {
     "code": "KTYM",
-    "name": "Kottayam",
+    "name": "Kottayam (Kottyam)",
     "div": "TVC",
     "lat": 9.5916,
     "lng": 76.5222,
@@ -241,7 +241,7 @@ export const OFFICIAL_STATIONS_37 = [
   },
   {
     "code": "TPJ",
-    "name": "Tiruchirappalli Junction",
+    "name": "Tiruchirappalli (Tiruchirapalli)",
     "div": "TPJ",
     "lat": 10.7905,
     "lng": 78.6865,
@@ -351,7 +351,7 @@ export const OFFICIAL_STATIONS_37 = [
   },
   {
     "code": "RMM",
-    "name": "Rameswaram",
+    "name": "Rameswaram (Rameshwaram)",
     "div": "MDU",
     "lat": 9.2876,
     "lng": 79.3129,
@@ -368,10 +368,171 @@ export const OFFICIAL_STATIONS_37 = [
     "platforms": 10,
     "dailyTrains": 120,
     "hub": true
+  },
+  {
+    "code": "SRR",
+    "name": "Shoranur Junction",
+    "div": "PGT",
+    "lat": 10.7600,
+    "lng": 76.2753,
+    "platforms": 7,
+    "dailyTrains": 88,
+    "hub": true
+  },
+  {
+    "code": "CLT",
+    "name": "Kozhikode Main",
+    "div": "PGT",
+    "lat": 11.2464,
+    "lng": 75.7804,
+    "platforms": 4,
+    "dailyTrains": 76,
+    "hub": true
+  },
+  {
+    "code": "KRR",
+    "name": "Karur Junction",
+    "div": "SA",
+    "lat": 10.9570,
+    "lng": 78.0772,
+    "platforms": 5,
+    "dailyTrains": 46,
+    "hub": true
+  },
+  {
+    "code": "NMKL",
+    "name": "Namakkal",
+    "div": "SA",
+    "lat": 11.2189,
+    "lng": 78.1674,
+    "platforms": 3,
+    "dailyTrains": 28,
+    "hub": false
+  },
+  {
+    "code": "SCT",
+    "name": "Sengottai",
+    "div": "MDU",
+    "lat": 8.9800,
+    "lng": 77.2400,
+    "platforms": 3,
+    "dailyTrains": 24,
+    "hub": true
+  },
+  {
+    "code": "TN",
+    "name": "Thoothukudi",
+    "div": "MDU",
+    "lat": 8.7997,
+    "lng": 78.1460,
+    "platforms": 3,
+    "dailyTrains": 30,
+    "hub": false
+  },
+  {
+    "code": "TEN",
+    "name": "Tirunelveli Junction",
+    "div": "MDU",
+    "lat": 8.7289,
+    "lng": 77.7286,
+    "platforms": 5,
+    "dailyTrains": 65,
+    "hub": true
+  },
+  {
+    "code": "KKDI",
+    "name": "Karaikkudi Junction",
+    "div": "MDU",
+    "lat": 10.0673,
+    "lng": 78.7845,
+    "platforms": 3,
+    "dailyTrains": 32,
+    "hub": true
+  },
+  {
+    "code": "PDKT",
+    "name": "Pudukkottai (Pudukottai)",
+    "div": "TPJ",
+    "lat": 10.3797,
+    "lng": 78.8208,
+    "platforms": 3,
+    "dailyTrains": 26,
+    "hub": false
+  },
+  {
+    "code": "KMU",
+    "name": "Kumbakonam",
+    "div": "TPJ",
+    "lat": 10.9602,
+    "lng": 79.3845,
+    "platforms": 3,
+    "dailyTrains": 38,
+    "hub": false
+  },
+  {
+    "code": "TVR",
+    "name": "Thiruvarur Junction",
+    "div": "TPJ",
+    "lat": 10.7766,
+    "lng": 79.6416,
+    "platforms": 4,
+    "dailyTrains": 30,
+    "hub": true
+  },
+  {
+    "code": "VLNK",
+    "name": "Velankanni (Velankani)",
+    "div": "TPJ",
+    "lat": 10.6800,
+    "lng": 79.8300,
+    "platforms": 3,
+    "dailyTrains": 18,
+    "hub": false
+  },
+  {
+    "code": "PDY",
+    "name": "Puducherry",
+    "div": "TPJ",
+    "lat": 11.9333,
+    "lng": 79.8300,
+    "platforms": 3,
+    "dailyTrains": 22,
+    "hub": false
+  },
+  {
+    "code": "CUPJ",
+    "name": "Cuddalore Port Junction",
+    "div": "TPJ",
+    "lat": 11.7500,
+    "lng": 79.7600,
+    "platforms": 3,
+    "dailyTrains": 28,
+    "hub": true
+  },
+  {
+    "code": "CDM",
+    "name": "Chidambaram",
+    "div": "TPJ",
+    "lat": 11.3992,
+    "lng": 79.6936,
+    "platforms": 3,
+    "dailyTrains": 34,
+    "hub": false
+  },
+  {
+    "code": "VRI",
+    "name": "Vriddhachalam Junction",
+    "div": "TPJ",
+    "lat": 11.5200,
+    "lng": 79.3200,
+    "platforms": 5,
+    "dailyTrains": 42,
+    "hub": true
   }
 ];
 
-export const REAL_STATIONS_30 = OFFICIAL_STATIONS_37;
+export const OFFICIAL_STATIONS_53 = OFFICIAL_STATIONS_37;
+export const REAL_STATIONS_30 = OFFICIAL_STATIONS_53;
 
 export const CHENNAI_TIMETABLE_330 = [
   {

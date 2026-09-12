@@ -98,11 +98,12 @@ class SynergyService:
 
     def find_synergy_groups(self, task_ids: List[uuid.UUID]) -> List[Dict[str, Any]]:
         """Find groups of tasks that can potentially share blocks."""
+        import itertools
         tasks = self._get_tasks(task_ids)
         if not tasks:
             return []
             
-        # Group by track section roughly
+        # Group by track section
         section_groups = {}
         for t in tasks:
             sid = t.track_section_id
@@ -114,16 +115,42 @@ class SynergyService:
         for sid, gtasks in section_groups.items():
             if len(gtasks) < 2:
                 continue
-            
-            # Very naive clustering for now: group them all and check
-            g_task_ids = [t.id for t in gtasks]
-            analysis = self.analyze_synergy(g_task_ids)
-            if analysis['can_share_block']:
-                groups.append(analysis)
+
+            # 1. Try all together if fits
+            all_t_ids = [t.id for t in gtasks]
+            total_dur = sum(t.duration_minutes for t in gtasks if t.duration_minutes)
+            if total_dur <= 360:
+                analysis = self.analyze_synergy(all_t_ids)
+                if analysis['can_share_block']:
+                    groups.append(analysis)
+                    continue
+
+            # 2. Otherwise find maximal subsets (pairs and triplets) that fit nicely
+            tested_subsets = set()
+            for size in (3, 2):
+                if len(gtasks) >= size:
+                    for subset in itertools.combinations(gtasks, size):
+                        sub_ids = tuple(sorted(str(t.id) for t in subset))
+                        if sub_ids in tested_subsets:
+                            continue
+                        tested_subsets.add(sub_ids)
+                        
+                        dur = sum(t.duration_minutes for t in subset if t.duration_minutes)
+                        if dur <= 360:
+                            sub_analysis = self.analyze_synergy([t.id for t in subset])
+                            if sub_analysis['can_share_block']:
+                                groups.append(sub_analysis)
                 
-        # Sort by synergy score desc
-        groups.sort(key=lambda x: x['synergy_score'], reverse=True)
-        return groups
+        # Sort by synergy score desc and remove duplicate sets
+        unique_groups = []
+        seen_sets = set()
+        for g in sorted(groups, key=lambda x: x['synergy_score'], reverse=True):
+            s_key = tuple(sorted(str(tid) for tid in g['task_ids']))
+            if s_key not in seen_sets:
+                seen_sets.add(s_key)
+                unique_groups.append(g)
+
+        return unique_groups
 
     def _get_tasks(self, task_ids: List[uuid.UUID]) -> List[MaintenanceTask]:
         if not task_ids:

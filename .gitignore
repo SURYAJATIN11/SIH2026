@@ -67,3 +67,4 @@ __pycache__/
 # macOS metadata
 ._*
 .DS_Store
+push_to_github.sh

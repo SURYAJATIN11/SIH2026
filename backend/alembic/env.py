@@ -9,6 +9,7 @@ import os
 # Add project root to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+from app.core.config import settings
 from app.database.base import Base
 from app.models import *  # noqa: F401,F403 — Import all models for autogenerate
 
@@ -21,7 +22,9 @@ target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
-    url = config.get_main_option("sqlalchemy.url")
+    url = settings.DATABASE_URL or config.get_main_option("sqlalchemy.url")
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -34,12 +37,8 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
-    with connectable.connect() as connection:
+    from app.database.session import engine
+    with engine.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
             context.run_migrations()

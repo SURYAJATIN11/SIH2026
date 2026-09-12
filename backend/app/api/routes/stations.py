@@ -16,6 +16,7 @@ router = APIRouter()
 
 
 @router.get("/stations", response_model=StationList)
+@router.get("/stations/", response_model=StationList, include_in_schema=False)
 def list_stations(
     division: Optional[str] = None,
     status: Optional[str] = None,
@@ -36,6 +37,7 @@ def list_stations(
 
 
 @router.post("/stations", response_model=StationResponse, status_code=201)
+@router.post("/stations/", response_model=StationResponse, status_code=201, include_in_schema=False)
 def create_station(data: StationCreate, db: Session = Depends(get_db)):
     """Create a new station."""
     repo = StationRepository(db)

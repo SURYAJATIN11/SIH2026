@@ -1351,7 +1351,7 @@ export function openStationReportDraftModal(prefillStation = "") {
       () => {
         window.executeGenerateStationReport();
       },
-      isHi ? "⚡ आधिकारिक रिपोर्ट तैयार करें" : "⚡ Generate Official Report & Print PDF"
+      isHi ? "आधिकारिक रिपोर्ट तैयार करें" : "Generate Official Report & Print PDF"
     );
   }
 }

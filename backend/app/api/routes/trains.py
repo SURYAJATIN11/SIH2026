@@ -61,15 +61,22 @@ def get_chennai_timetable(
     limit: int = Query(100, ge=1, le=500),
 ):
     """Retrieve full Southern Railway timetable data (330 trains from Excel)."""
-    import json
-    import os
-
-    json_path = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "southern-railway-block-planner-frontend", "src", "timetable_rows.json")
-    if not os.path.exists(json_path):
-        return {"items": [], "total": 0}
-
-    with open(json_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    json_paths = [
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "data", "timetable_rows.json"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "timetable_rows.json"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "southern-railway-block-planner-frontend", "src", "timetable_rows.json"),
+        "/data/timetable_rows.json"
+    ]
+    data = []
+    for jp in json_paths:
+        if os.path.exists(jp):
+            try:
+                with open(jp, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if data:
+                    break
+            except Exception:
+                pass
 
     if station and station != "ALL":
         data = [t for t in data if station.lower() in t.get("stn", "").lower() or station.lower() in t.get("src", "").lower() or station.lower() in t.get("dst", "").lower() or station.lower() in t.get("stops", "").lower()]

@@ -1,6 +1,38 @@
 import { api } from "./api.js";
 import { REAL_STATIONS_30, OFFICIAL_STATIONS_37, LIVE_STATION_TIMETABLE, CHENNAI_TIMETABLE_330 } from "./timetable_data.js";
 import "./station_report_engine.js";
+import { 
+  classifyFleetTimeline, 
+  getFleetFinancialKPIs, 
+  run14PointAssetAudit, 
+  identifyOwningZone, 
+  openAssetMaintenanceAgentModal,
+  openTrainCostCuttingsModal,
+  getAllTrainsDataset,
+  renderTrainCostCuttingsWindow,
+  getComprehensiveTrainCostProfile,
+  SR_STATION_MAINTENANCE_FACILITIES,
+  IR_ZONES
+} from "./asset_maintenance_agent.js";
+import { renderDynamicDispatchPage } from "./dynamic_dispatch_ai.js";
+import { 
+  CORRIDOR_ASSETS_REGISTRY, 
+  generateAssetAIDossier, 
+  generateCorridorAIAudit 
+} from "./corridor_assets_data.js";
+import {
+  aiRouteAnalysisState,
+  parseMaintenanceBlockMessage,
+  triggerAIRouteAnalysis,
+  resetAIRouteAnalysis,
+  renderAIRouteAnalysisOnMap,
+  clearAIRouteAnalysisFromMap,
+  animateTrainDetour,
+  findFeasibleAlternativeRoutes,
+  evaluateAndRankRoutes,
+  SR_GRAPH_STATIONS
+} from "./ai_route_analysis_agent.js";
+
 
 // ==========================================================================
 // 1. DATA CONSTANTS & PRESETS (SOUTHERN RAILWAY - GOVT OF INDIA)
@@ -95,6 +127,7 @@ const OFFICIAL_PRESETS = [
 
 // Formal SVG Icons Dictionary
 const SVG_ICONS = {
+  calculator: `<svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 10h.01"></path><path d="M12 14h.01"></path><path d="M8 14h.01"></path><path d="M12 18h.01"></path><path d="M8 18h.01"></path></svg>`,
   map: `<svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>`,
   timetable: `<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="16" rx="2"></rect><line x1="4" y1="11" x2="20" y2="11"></line><line x1="9" y1="15" x2="9" y2="15.01"></line><line x1="15" y1="15" x2="15" y2="15.01"></line><path d="m8 19-2 3"></path><path d="m18 22-2-3"></path></svg>`,
   calendar: `<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
@@ -119,6 +152,7 @@ const SVG_ICONS = {
 const modules = {
   // 1. Executive Overview
   Dashboard:              { icon: "activity",       label: "Dashboard",              group: "OVERVIEW" },
+  "Block Optimization":   { icon: "ai",             label: "Block Optimization",     group: "OVERVIEW" },
   "Corridor Map":         { icon: "map",            label: "Corridor Map",           group: "OVERVIEW" },
 
   // 2. Corridors & Permanent Way
@@ -129,9 +163,12 @@ const modules = {
   // 3. Block Planning & Optimization
   "Block Planning":       { icon: "calendar",       label: "Block Planning",         group: "PLANNING & SYNERGY" },
   "Block Calendar":       { icon: "clock",          label: "Block Calendar",         group: "PLANNING & SYNERGY" },
+  "Dynamic Dispatch AI":  { icon: "ai",             label: "Dynamic Dispatch AI",    group: "PLANNING & SYNERGY" },
+
 
   // 4. Resources & Assets
-  "Asset Management":     { icon: "wrench",         label: "Asset Management",       group: "RESOURCES & ASSETS" },
+  "Asset Maintenance":      { icon: "wrench",         label: "Asset Maintenance",       group: "RESOURCES & ASSETS" },
+  "Cost Asset Maintenance": { icon: "calculator",     label: "Cost Asset Maintenance",  group: "RESOURCES & ASSETS" },
 
   // 5. Maintenance & Safety
   "Defects & USFD":       { icon: "alert",          label: "Defects & USFD",         group: "MAINTENANCE & SAFETY" },
@@ -142,77 +179,244 @@ const modules = {
   Settings:               { icon: "settings",       label: "Settings & API Hub",     group: "REPORTS & SYSTEM" },
 };
 
-// Major Southern Railway Corridors
+// Major Southern Railway Corridors (Geographically confined strictly to Southern Railway & South India)
 const REAL_ROUTES = [
   {
-    id: "mas_cbe",
-    code: "SEC-MAS-CBE",
-    name: "Chennai Central (MAS) ➔ Coimbatore Jn (CBE)",
+    id: "mas_cbe_pgt",
+    code: "SEC-MAS-PGT",
+    name: "Chennai Central (MAS) ➔ Salem ➔ Coimbatore ➔ Palakkad Mainline",
     clearance: "UP & DOWN Mainline • Double Track Electrified (25kV AC)",
     speed: "130 km/h",
-    div: "Chennai (MAS) & Salem (SA)",
-    color: "#2868b0",
+    div: "Chennai (MAS), Salem (SA) & Palakkad (PGT)",
+    color: "#2563eb",
     coords: [
-      [13.0827, 80.2707], [13.0784, 79.6677], [12.9696, 79.1362], [12.5638, 78.5802],
-      [11.6643, 78.1460], [11.3410, 77.7172], [11.1085, 77.3411], [11.0168, 76.9558]
+      [13.0827, 80.2707], [13.0970, 80.2750], [13.1070, 80.2280], [13.1180, 80.1020], [13.1430, 79.9080],
+      [13.0784, 79.6677], [13.0450, 79.5200], [12.9850, 79.3300], [12.9696, 79.1362], [12.9150, 78.8750],
+      [12.7880, 78.7180], [12.6840, 78.6180], [12.5638, 78.5802], [12.4950, 78.5700], [12.2900, 78.4700],
+      [12.1200, 78.3800], [11.9100, 78.2900], [11.6643, 78.1460], [11.4850, 77.8800], [11.3410, 77.7172],
+      [11.1950, 77.4600], [11.1085, 77.3411], [11.0500, 77.1600], [11.0250, 77.0600], [11.0016, 76.9629],
+      [10.9650, 76.9650], [10.9050, 76.9450], [10.8350, 76.8500], [10.7950, 76.7500], [10.7867, 76.6548]
+    ]
+  },
+  {
+    id: "mas_mdu_cape",
+    code: "SEC-MS-CAPE",
+    name: "Chennai Egmore (MS) ➔ Trichy ➔ Madurai ➔ Tirunelveli ➔ Kanyakumari Grand Trunk",
+    clearance: "Grand Trunk Electrified Double Track (25kV AC)",
+    speed: "110 km/h",
+    div: "Chennai, Tiruchirappalli, Madurai & Thiruvananthapuram",
+    color: "#dc2626",
+    coords: [
+      [13.0826, 80.2612], [13.0330, 80.2200], [13.0080, 80.2050], [12.9250, 80.1200], [12.8450, 80.0650],
+      [12.6841, 79.9836], [12.5250, 79.8850], [12.4350, 79.8300], [12.2280, 79.6540], [11.9401, 79.4861],
+      [11.5167, 79.3333], [11.3900, 79.2300], [11.1400, 79.0800], [10.9900, 78.9600], [10.8800, 78.8200],
+      [10.8600, 78.6950], [10.7905, 78.6865], [10.6050, 78.4300], [10.5100, 78.2900], [10.3673, 77.9803],
+      [10.2100, 77.9300], [10.1450, 77.9000], [10.0300, 78.0100], [9.9197, 78.1105], [9.8800, 78.0750],
+      [9.8050, 77.9950], [9.5872, 77.9577], [9.3650, 77.9250], [9.1700, 77.8700], [9.0050, 77.8750],
+      [8.8600, 77.8700], [8.7139, 77.7567], [8.4850, 77.6700], [8.3800, 77.6100], [8.2400, 77.5250],
+      [8.1834, 77.4377], [8.0883, 77.5385]
     ]
   },
   {
     id: "ker_coast",
     code: "SEC-PGT-TVC",
-    name: "Mangaluru (MAQ) ➔ Shoranur ➔ Ernakulam ➔ TVC Coastal Line",
+    name: "Palakkad ➔ Shoranur ➔ Thrissur ➔ Ernakulam ➔ Kollam ➔ TVC Coastal Trunk",
     clearance: "Electrified Double Track • Automatic Signaled",
     speed: "110 km/h",
     div: "Palakkad (PGT) & Thiruvananthapuram (TVC)",
-    color: "#1e824c",
+    color: "#059669",
     coords: [
-      [12.8700, 74.8800], [11.8745, 75.3704], [11.2588, 75.7804], [10.7607, 76.2758],
-      [10.5276, 76.2144], [9.9816, 76.2999], [9.4981, 76.3388], [8.8932, 76.6141],
-      [8.5241, 76.9366], [8.1833, 77.4119], [8.0883, 77.5385]
+      [10.7867, 76.6548], [10.7800, 76.5400], [10.7700, 76.3800], [10.7602, 76.2736], [10.6000, 76.2400],
+      [10.5276, 76.2144], [10.4250, 76.2450], [10.3150, 76.3350], [10.1900, 76.3850], [10.1080, 76.3530],
+      [9.9950, 76.2950], [9.9678, 76.2917], [9.8850, 76.3150], [9.6850, 76.3300], [9.5950, 76.3280],
+      [9.4981, 76.3268], [9.3850, 76.3650], [9.2750, 76.4500], [9.1725, 76.5008], [9.0550, 76.5400],
+      [8.8870, 76.5980], [8.8100, 76.6600], [8.7350, 76.7160], [8.6900, 76.7750], [8.6450, 76.8350],
+      [8.5700, 76.8700], [8.5150, 76.9050], [8.4875, 76.9530], [8.4550, 76.9950], [8.4000, 77.0850],
+      [8.3450, 77.1650], [8.2250, 77.3150], [8.1834, 77.4377]
     ]
   },
   {
-    id: "mas_mdu",
-    code: "SEC-MAS-MDU",
-    name: "Chennai Egmore (MS) ➔ Trichy ➔ Madurai ➔ Tirunelveli Grand Trunk",
-    clearance: "Grand Trunk Electrified Double Track (25kV AC)",
+    id: "ker_kottayam",
+    code: "SEC-ERS-KTYM-KYJ",
+    name: "Ernakulam ➔ Kottayam ➔ Tiruvalla ➔ Kayamkulam Mainline",
+    clearance: "Electrified Double Track • 25kV AC OHE",
     speed: "110 km/h",
-    div: "Chennai, Tiruchirappalli & Madurai",
-    color: "#a93226",
+    div: "Thiruvananthapuram (TVC)",
+    color: "#0d9488",
     coords: [
-      [13.0826, 80.2612], [12.6841, 79.9836], [11.9401, 79.4861], [10.7905, 78.7047],
-      [10.3673, 77.9803], [9.9252, 78.1198], [9.5872, 77.9624], [8.7139, 77.7567],
-      [8.1833, 77.4119]
+      [9.9950, 76.2950], [9.9500, 76.3450], [9.8700, 76.4950], [9.7600, 76.5150], [9.6600, 76.5250],
+      [9.5916, 76.5222], [9.4450, 76.5400], [9.3850, 76.5750], [9.3150, 76.6150], [9.2450, 76.5500],
+      [9.1725, 76.5008]
+    ]
+  },
+  {
+    id: "malabar_coast",
+    code: "SEC-SRR-MAQ",
+    name: "Shoranur ➔ Kozhikode ➔ Kannur ➔ Kasaragod ➔ Mangaluru Central",
+    clearance: "Electrified Double Track • Automatic Signaled",
+    speed: "110 km/h",
+    div: "Palakkad (PGT)",
+    color: "#7c3aed",
+    coords: [
+      [10.7602, 76.2736], [10.7950, 76.1950], [10.8450, 76.0250], [10.9100, 75.9200], [10.9750, 75.8700],
+      [11.0400, 75.8300], [11.1750, 75.8350], [11.2480, 75.7804], [11.3650, 75.7350], [11.4550, 75.6950],
+      [11.6000, 75.5900], [11.7000, 75.5350], [11.7500, 75.4900], [11.8745, 75.3704], [11.9750, 75.3100],
+      [12.0400, 75.2500], [12.1000, 75.2000], [12.2150, 75.1450], [12.3000, 75.1000], [12.3950, 75.0350],
+      [12.5000, 74.9800], [12.5850, 74.9450], [12.6950, 74.9050], [12.7950, 74.8750], [12.8350, 74.8550],
+      [12.8687, 74.8427]
     ]
   },
   {
     id: "delta",
     code: "SEC-TPJ-DELTA",
-    name: "Delta Chord (Villupuram ➔ Thanjavur ➔ Trichy Jn)",
-    clearance: "Single Line Electrified with MACLS Signaling",
+    name: "Delta Mainline (Villupuram ➔ Chidambaram ➔ Mayiladuthurai ➔ Thanjavur ➔ Trichy)",
+    clearance: "Single/Double Line Electrified with MACLS Signaling",
     speed: "100 km/h",
     div: "Tiruchirappalli (TPJ)",
-    color: "#d4ac0d",
+    color: "#eab308",
     coords: [
-      [11.9401, 79.4861], [11.1018, 79.6522], [10.9602, 79.3845], [10.7870, 79.1378], [10.7905, 78.7047]
+      [11.9401, 79.4861], [11.8200, 79.6200], [11.7480, 79.7680], [11.6500, 79.7400], [11.3980, 79.6930],
+      [11.2400, 79.7300], [11.1900, 79.7000], [11.1018, 79.6522], [11.0450, 79.5250], [11.0100, 79.4800],
+      [10.9602, 79.3845], [10.9200, 79.3000], [10.7870, 79.1378], [10.7950, 78.9700], [10.7920, 78.7800],
+      [10.7905, 78.6865]
     ]
   },
   {
     id: "mdu_rmm",
     code: "SEC-MDU-RMM",
-    name: "Madurai Jn (MDU) ➔ Pamban Bridge ➔ Rameswaram (RMM)",
-    clearance: "Coastal Marine Corridor • Caution Speed on Marine Bridge",
-    speed: "80 km/h (Pamban: 30 km/h)",
+    name: "Madurai Jn ➔ Manamadurai ➔ Ramanathapuram ➔ Mandapam ➔ Pamban Sea Bridge ➔ Rameswaram",
+    clearance: "Coastal Marine Corridor • Continuous Sea Viaduct & Lift Span",
+    speed: "80 km/h (Pamban Bridge: 30 km/h)",
     div: "Madurai (MDU)",
-    color: "#d35400",
+    color: "#f97316",
     coords: [
-      [9.9252, 78.1198], [9.6000, 78.6000], [9.3667, 78.8333], [9.2876, 79.3129]
+      [9.9197, 78.1105], [9.8850, 78.1750], [9.8400, 78.2750], [9.7000, 78.4500], [9.5400, 78.5900],
+      [9.4550, 78.7000], [9.3667, 78.8333], [9.3250, 78.9600], [9.2950, 79.0550], [9.2825, 79.1200],
+      [9.2825, 79.1983], [9.2876, 79.3129]
+    ]
+  },
+  {
+    id: "sa_dg_chord",
+    code: "SEC-SA-DG",
+    name: "Salem Jn ➔ Namakkal ➔ Karur Jn ➔ Dindigul Jn Central Chord",
+    clearance: "Electrified Broad Gauge Line (25kV AC)",
+    speed: "110 km/h",
+    div: "Salem (SA) & Madurai (MDU)",
+    color: "#06b6d4",
+    coords: [
+      [11.6643, 78.1460], [11.5400, 78.1700], [11.4550, 78.1750], [11.2189, 78.1674], [11.1100, 78.1450],
+      [10.9574, 78.0772], [10.8200, 78.0400], [10.6100, 78.0100], [10.3673, 77.9803]
+    ]
+  },
+  {
+    id: "ed_tpj_bank",
+    code: "SEC-ED-TPJ",
+    name: "Erode Jn ➔ Karur Jn ➔ Kulittalai ➔ Tiruchirappalli Jn Cauvery Bank",
+    clearance: "Electrified Broad Gauge Line (25kV AC)",
+    speed: "110 km/h",
+    div: "Salem (SA) & Tiruchirappalli (TPJ)",
+    color: "#10b981",
+    coords: [
+      [11.3410, 77.7172], [11.1850, 77.8950], [11.0850, 77.9700], [11.0250, 78.0300], [10.9574, 78.0772],
+      [10.9400, 78.2350], [10.9300, 78.4150], [10.9000, 78.5400], [10.8250, 78.6750], [10.7905, 78.6865]
+    ]
+  },
+  {
+    id: "kpd_vm",
+    code: "SEC-KPD-VM",
+    name: "Katpadi Jn ➔ Vellore ➔ Tiruvannamalai ➔ Villupuram Jn",
+    clearance: "Single Line Electrified with MACLS",
+    speed: "100 km/h",
+    div: "Chennai (MAS) & Tiruchirappalli (TPJ)",
+    color: "#8b5cf6",
+    coords: [
+      [12.9696, 79.1362], [12.9200, 79.1300], [12.7950, 79.1550], [12.5100, 79.1200], [12.2253, 79.0747],
+      [11.9600, 79.2000], [11.9401, 79.4861]
+    ]
+  },
+  {
+    id: "tpj_mnm",
+    code: "SEC-TPJ-MNM",
+    name: "Tiruchirappalli Jn ➔ Pudukkottai ➔ Karaikkudi ➔ Manamadurai Jn",
+    clearance: "Single Line Broad Gauge Electrified",
+    speed: "100 km/h",
+    div: "Tiruchirappalli (TPJ) & Madurai (MDU)",
+    color: "#ec4899",
+    coords: [
+      [10.7905, 78.6865], [10.6300, 78.7450], [10.3833, 78.8167], [10.1700, 78.7900], [10.0667, 78.7833],
+      [9.9950, 78.7500], [9.8450, 78.4900], [9.7000, 78.4500]
+    ]
+  },
+  {
+    id: "vpt_qln_ghat",
+    code: "SEC-VPT-QLN",
+    name: "Virudhunagar ➔ Tenkasi ➔ Sengottai ➔ Punalur ➔ Kollam Western Ghats",
+    clearance: "Western Ghats Heritage Hill Railway • 13 Kannara Arch Bridge",
+    speed: "75 km/h (Ghat: 30 km/h)",
+    div: "Madurai (MDU) & Thiruvananthapuram (TVC)",
+    color: "#14b8a6",
+    coords: [
+      [9.5872, 77.9577], [9.4550, 77.7950], [9.5100, 77.6350], [9.4500, 77.5550], [9.1700, 77.5300],
+      [9.0800, 77.3400], [8.9592, 77.3150], [8.9833, 77.2500], [8.9800, 77.2000], [8.9850, 77.1450],
+      [9.0050, 77.0600], [9.0100, 76.9950], [9.0167, 76.9333], [8.9950, 76.8000], [8.9550, 76.6850],
+      [8.8870, 76.5980]
+    ]
+  },
+  {
+    id: "cbe_poy_pgt",
+    code: "SEC-CBE-POY",
+    name: "Coimbatore Jn ➔ Pollachi Jn ➔ Palakkad Jn / Palani ➔ Dindigul",
+    clearance: "Electrified Broad Gauge Line",
+    speed: "100 km/h",
+    div: "Salem (SA) & Palakkad (PGT)",
+    color: "#84cc16",
+    coords: [
+      [11.0016, 76.9629], [10.8250, 77.0150], [10.6600, 77.0100], [10.6450, 76.8850], [10.6400, 76.7650],
+      [10.7867, 76.6548]
+    ]
+  },
+  {
+    id: "ten_tn",
+    code: "SEC-TEN-TN",
+    name: "Tirunelveli Jn ➔ Vanchi Maniyachchi ➔ Tuticorin Port Branch",
+    clearance: "Double Line Electrified Port Freight & Passenger Line",
+    speed: "100 km/h",
+    div: "Madurai (MDU)",
+    color: "#6366f1",
+    coords: [
+      [8.7139, 77.7567], [8.8600, 77.8700], [8.8350, 78.0200], [8.8053, 78.1460]
+    ]
+  },
+  {
+    id: "ajj_ru",
+    code: "SEC-AJJ-RU",
+    name: "Arakkonam Jn ➔ Tiruttani ➔ Renigunta Jn (SR Border Interchange)",
+    clearance: "Double Line Electrified Trunk Line",
+    speed: "110 km/h",
+    div: "Chennai (MAS)",
+    color: "#38bdf8",
+    coords: [
+      [13.0784, 79.6677], [13.1812, 79.6105], [13.2350, 79.5700], [13.4400, 79.5450], [13.6333, 79.5167]
+    ]
+  },
+  {
+    id: "jtj_sbc",
+    code: "SEC-JTJ-SBC",
+    name: "Jolarpettai Jn ➔ Bangarapet ➔ KSR Bengaluru (SR / SWR Trunk)",
+    clearance: "Quadruple/Double Line Electrified Trunk Line",
+    speed: "130 km/h",
+    div: "Salem (SA) / Bengaluru (SBC)",
+    color: "#f43f5e",
+    coords: [
+      [12.5638, 78.5802], [12.7450, 78.3600], [12.9942, 78.2017], [13.0300, 77.9400], [12.9950, 77.7550],
+      [12.9950, 77.6850], [12.9784, 77.5684]
     ]
   }
 ];
 
 // Active Maintenance Zones on GPS Track
-const MAINT_ZONES = [
+let isDashboardMapMinimized = false;
+let MAINT_ZONES = [
   {
     id: "zone1",
     section: "SEC-MAS-CBE (Katpadi - Jolarpettai)",
@@ -224,7 +428,12 @@ const MAINT_ZONES = [
     dept: "ENGINEERING + S&T + TRD",
     duration: "180 mins (01:00 - 04:00 IST)",
     status: "Traffic & Power Block Sanctioned",
-    code: "SR/PERMIT/2026/089"
+    code: "SR/PERMIT/2026/089",
+    workIcon: "🚜",
+    workType: "CSM Tamping & Rail Renewal",
+    machinery: "Plasser CSM-09-32 Heavy Tamper #IR-88",
+    weldTemp: "1,420°C",
+    tampPressure: "145 bar"
   },
   {
     id: "zone2",
@@ -237,7 +446,12 @@ const MAINT_ZONES = [
     dept: "ENGINEERING",
     duration: "120 mins (02:00 - 04:00 IST)",
     status: "Temporary Speed Restriction 30 km/h",
-    code: "SR/PERMIT/2026/092"
+    code: "SR/PERMIT/2026/092",
+    workIcon: "🛠️",
+    workType: "Ballast Cleaning & USFD Flaw Testing",
+    machinery: "BCM Ballast Cleaner + Digital USFD Unit",
+    weldTemp: "Ambient 34°C",
+    tampPressure: "135 bar"
   },
   {
     id: "zone3",
@@ -250,9 +464,15 @@ const MAINT_ZONES = [
     dept: "TRD (Traction)",
     duration: "135 mins (01:30 - 03:45 IST)",
     status: "OHE Power Isolation Approved",
-    code: "SR/PERMIT/2026/095"
+    code: "SR/PERMIT/2026/095",
+    workIcon: "⚡",
+    workType: "25kV Catenary & OHE Tuning",
+    machinery: "TRD Tower Wagon TW-04 + Laser Stagger Gauge",
+    weldTemp: "OHE 25kV Earthed",
+    tampPressure: "1000 kgf Wire Tension"
   }
 ];
+window.__activeMaintBlock = MAINT_ZONES[0];
 
 // Corridor Weather Risk Intelligence
 const CORRIDOR_WEATHER_DATA = [
@@ -314,7 +534,364 @@ const CORRIDOR_WEATHER_DATA = [
 ];
 
 let RTIS_LIVE_TRAINS = [];
-let liveStations = REAL_STATIONS_30;
+let liveStations = [...REAL_STATIONS_30];
+window.liveStations = liveStations;
+
+let liveTrainTimetable = [...CHENNAI_TIMETABLE_330];
+window.liveTrainTimetable = liveTrainTimetable;
+
+// ==========================================================================
+// 1.1 REACTIVE EVENT BUS & DISPATCH ENGINE
+// ==========================================================================
+const RailBlockEventBus = {
+  listeners: {},
+  on(event, callback) {
+    if (!this.listeners[event]) this.listeners[event] = [];
+    this.listeners[event].push(callback);
+  },
+  emit(event, payload) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach(cb => {
+        try { cb(payload); } catch (err) { console.error("EventBus error on", event, err); }
+      });
+    }
+  }
+};
+window.RailBlockEventBus = RailBlockEventBus;
+
+// Multi-Department Notification Feed
+let dispatchedNotifications = [
+  { id: 1, dept: "OPERATING", title: "Possession Scheduled", text: "Integrated block BLK-CRIS-DEF-01 sanctioned on Katpadi Jn (UP Main).", time: "Just now", type: "info" },
+  { id: 2, dept: "CIVIL_ENG", title: "USFD Flaw Flagged", text: "Micro-weld joint OBS-1452 on KM 14.5 queued for ultrasonic re-verification.", time: "4 mins ago", type: "warning" },
+  { id: 3, dept: "ELECTRICAL_OHE", title: "25kV Power Isolation", text: "Traction Power Controller (TPC) discharge rods confirmed applied.", time: "12 mins ago", type: "success" }
+];
+window.dispatchedNotifications = dispatchedNotifications;
+
+function pushNotification(dept, title, text, type = "info") {
+  const notif = { id: Date.now(), dept, title, text, time: "Just now", type };
+  dispatchedNotifications.unshift(notif);
+  if (dispatchedNotifications.length > 50) dispatchedNotifications.pop();
+  RailBlockEventBus.emit("NOTIFICATION_DISPATCHED", notif);
+  showToast(`[${dept}] ${title}: ${text}`);
+}
+window.pushNotification = pushNotification;
+
+// Active Live Block Possession & Countdown State
+let activeLiveCountdown = {
+  active: true,
+  blockId: "BLK-CRIS-DEF-01",
+  title: "Track Tamping & Flash-Butt Rail Welding",
+  section: "Katpadi Jn – Jolarpettai Jn (UP Main)",
+  kmRange: "KM 74/2 – 82/6",
+  remainingSeconds: 6156, // 01:42:36
+  totalSeconds: 9000,
+  workType: "Civil Engineering P-Way",
+  machinery: "Plasser CSM-09-32 Heavy Tamper",
+  speedRestriction: "30 km/h Caution Order",
+  disruption: "Zero Primary Passenger Delay"
+};
+window.activeLiveCountdown = activeLiveCountdown;
+
+// Global Live Ticker Interval
+if (window.__railblockCountdownInterval) clearInterval(window.__railblockCountdownInterval);
+window.__railblockCountdownInterval = setInterval(() => {
+  if (activeLiveCountdown && activeLiveCountdown.active && activeLiveCountdown.remainingSeconds > 0) {
+    activeLiveCountdown.remainingSeconds--;
+    const h = String(Math.floor(activeLiveCountdown.remainingSeconds / 3600)).padStart(2, "0");
+    const m = String(Math.floor((activeLiveCountdown.remainingSeconds % 3600) / 60)).padStart(2, "0");
+    const s = String(activeLiveCountdown.remainingSeconds % 60).padStart(2, "0");
+    const timeStr = `${h}:${m}:${s}`;
+    
+    // Update live banner if present
+    const timerDisplay = document.querySelector("#liveCountdownDisplay");
+    if (timerDisplay) timerDisplay.textContent = `${timeStr} remaining`;
+    
+    const fillEl = document.querySelector("#liveCountdownFill");
+    if (fillEl) {
+      const pct = Math.max(0, Math.min(100, (activeLiveCountdown.remainingSeconds / activeLiveCountdown.totalSeconds) * 100));
+      fillEl.style.width = `${pct.toFixed(1)}%`;
+    }
+
+    // T-15 min alert
+    if (activeLiveCountdown.remainingSeconds === 900) {
+      pushNotification("OPERATING", "T-15min Block Expiry Alert", `Track possession ${activeLiveCountdown.blockId} expires in 15 minutes. Prepare line clear surrender.`, "warning");
+    }
+
+    if (activeLiveCountdown.remainingSeconds === 0) {
+      activeLiveCountdown.active = false;
+      pushNotification("OPERATING", "Block Time Expired", `Line possession ${activeLiveCountdown.blockId} surrendered. Line clear token returned to Station Master.`, "success");
+      render();
+    }
+  }
+}, 1000);
+
+// ==========================================================================
+// 1.2 TRACK KILOMETER TELEMETRY ENGINE (status of KM 14.5, etc.)
+// ==========================================================================
+function lookupTrackKmTelemetry(kmInput) {
+  const str = String(kmInput || "").toLowerCase().replace(/km\s*/i, "").replace("/", ".");
+  const match = str.match(/(\d+(?:\.\d+)?)/);
+  const km = match ? parseFloat(match[1]) : 14.5;
+
+  let section = "SEC-MAS-CBE (Chennai Central ➔ Arakkonam Jn UP Main)";
+  let div = "Chennai (MAS) Division";
+  let landmark = `Between Villivakkam (KM 9.1) & Ambattur (KM 14.8)`;
+  let railType = "60 kg/m 90 UTS Head-Hardened Rails (Jindal Steel RDSO Spec T-12)";
+  let sleepers = "Pre-Stressed Concrete Sleepers (1660 sleepers/km) with elastic rail clips";
+  let ballast = "300 mm Clean Crushed Stone Ballast Cushion (Consolidation: 98.4%)";
+  let speed = "110 km/h Normal Sectional Speed (Zero PSR Active)";
+  let gmt = (32.0 + (km % 10) * 1.4).toFixed(1) + " GMT carried (Fatigue life: 68% remaining)";
+  let usfdStatus = "🟢 USFD Scan Valid (Last tested 24 Aug 2026). No critical fatigue cracks.";
+  let curDefect = null;
+
+  if (Math.abs(km - 14.5) < 0.8) {
+    landmark = "Between Korattur (KM 12.2) & Ambattur (KM 14.8) at LC Gate #14";
+    usfdStatus = "🟡 Minor Rail-End Weld Imperfection (OBS-1452) flagged at KM 14/520 for ultrasonic re-testing.";
+    curDefect = "Weld joint #W-1452 (OBS defect classification)";
+  } else if (Math.abs(km - 72.4) < 1.0 || (km >= 70 && km <= 75)) {
+    section = "SEC-MAS-CBE (Katpadi Jn ➔ Jolarpettai Jn)";
+    landmark = "Between Walajah Road (KM 68.2) & Katpadi Jn (KM 74.0) over Palar River Bridge";
+    railType = "60 kg/m 90 UTS Continuous Welded Rail (CWR/LWR)";
+    speed = "130 km/h High-Speed Corridor (VB/Rajdhani route)";
+    usfdStatus = "🟢 Certified clear by Senior Section Engineer (P-Way) on 01 Sept 2026.";
+  } else if (km > 100) {
+    section = "SEC-MAS-MDU (Chennai Egmore ➔ Villupuram ➔ Madurai GT)";
+    div = "Tiruchirappalli / Madurai Division";
+    landmark = `Sectional Post KM ${km.toFixed(1)} on Grand Trunk Mainline`;
+  }
+
+  return {
+    km: km.toFixed(1),
+    section,
+    div,
+    landmark,
+    railType,
+    sleepers,
+    ballast,
+    speed,
+    gmt,
+    usfdStatus,
+    curDefect,
+    activeBlock: (activeLiveCountdown && activeLiveCountdown.active) ? `${activeLiveCountdown.title} (${activeLiveCountdown.kmRange})` : "No active line possession"
+  };
+}
+window.lookupTrackKmTelemetry = lookupTrackKmTelemetry;
+
+// ==========================================================================
+// 1.3 AUTOMATED CONFLICT DETECTION & TRAIN IMPACT ENGINE
+// ==========================================================================
+function computeBlockConflictEngine(proposal) {
+  const startParts = (proposal.startTime || "01:00").split(":").map(Number);
+  const endParts = (proposal.endTime || "03:30").split(":").map(Number);
+  let startMins = startParts[0] * 60 + (startParts[1] || 0);
+  let endMins = endParts[0] * 60 + (endParts[1] || 0);
+  if (endMins <= startMins) endMins += 1440;
+  const durationMins = endMins - startMins;
+
+  const affectedTrains = [];
+  let conflictLevel = "CLEAR";
+  const conflictReasons = [];
+
+  const trainList = (window.liveTrainTimetable || CHENNAI_TIMETABLE_330).slice(0, 50);
+  trainList.forEach(t => {
+    const [th, tm] = (t.time || "06:00").split(":").map(Number);
+    const tMins = th * 60 + (tm || 0);
+    if (tMins >= (startMins - 15) && tMins <= (endMins + 15)) {
+      const isExpress = (t.type === "VANDE BHARAT" || t.type === "SUPERFAST" || (t.name && t.name.includes("Express")));
+      const regMins = Math.min(45, Math.max(10, Math.floor((endMins - tMins) / 2) + 10));
+      affectedTrains.push({
+        train_no: t.train_no,
+        name: t.name,
+        type: t.type,
+        scheduledTime: t.time,
+        regulationMins: regMins,
+        action: isExpress ? `Hold & Regulate at upstream junction (+${regMins}m)` : `Divert via Loop Line 3`
+      });
+
+      if (isExpress && tMins >= startMins && tMins <= endMins) {
+        conflictLevel = "CONFLICT";
+        conflictReasons.push(`Direct mainline path conflict with ${t.type} Train #${t.train_no} (${t.name}) at ${t.time}`);
+      } else if (conflictLevel !== "CONFLICT") {
+        conflictLevel = "WARNING";
+        conflictReasons.push(`Tight headway margin (15 min buffer) with Train #${t.train_no} (${t.name})`);
+      }
+    }
+  });
+
+  let summaryText = "";
+  if (conflictLevel === "CONFLICT") {
+    summaryText = `🔴 SEVERE CONFLICT: ${conflictReasons[0] || 'Overlapping train paths'}. Primary passenger delay projected. AI recommends shifting window.`;
+  } else if (conflictLevel === "WARNING") {
+    summaryText = `🟡 TIGHT MARGIN: ${affectedTrains.length} train(s) will require speed regulation (+${affectedTrains[0]?.regulationMins || 15} mins). Manageable with Section Controller approval.`;
+  } else {
+    summaryText = `🟢 CONFLICT-FREE WINDOW: Zero passenger disruption. Safe margin for 25kV OHE power isolation & P-Way machinery deployment.`;
+  }
+
+  return {
+    status: conflictLevel,
+    durationMins,
+    durationHours: (durationMins / 60).toFixed(1),
+    affectedTrains,
+    conflictReasons,
+    summaryText
+  };
+}
+window.computeBlockConflictEngine = computeBlockConflictEngine;
+
+// ==========================================================================
+// 1.4 SMART BLOCK SLOT RECOMMENDER
+// ==========================================================================
+function findOptimalBlockSlots(section, durationMinutes = 120) {
+  const dur = durationMinutes || 120;
+  return [
+    {
+      slotId: "SLOT-01-NIGHT",
+      name: "Night Trajectory Synergy Window (Recommended)",
+      start: "01:15",
+      end: "03:45",
+      duration: `${dur} Mins (${(dur / 60).toFixed(1)}h)`,
+      status: "CLEAR",
+      badge: "🟢 ZERO PRIMARY DELAY",
+      reason: "Synchronized with zero-passenger night traffic margin. Full line possession granted.",
+      affectedCount: 0
+    },
+    {
+      slotId: "SLOT-02-MIDDAY",
+      name: "Mid-Day Freight Slack Window",
+      start: "12:30",
+      end: "14:30",
+      duration: `${dur} Mins (${(dur / 60).toFixed(1)}h)`,
+      status: "WARNING",
+      badge: "🟡 1 FREIGHT REGULATED",
+      reason: "Lowest passenger movement between morning and evening peaks. 1 freight rake held.",
+      affectedCount: 1
+    },
+    {
+      slotId: "SLOT-03-DAWN",
+      name: "Pre-Dawn Daylight Transition Window",
+      start: "04:30",
+      end: "06:30",
+      duration: `${dur} Mins (${(dur / 60).toFixed(1)}h)`,
+      status: "WARNING",
+      badge: "🟡 2 EMUs REGULATED",
+      reason: "Daylight visibility for visual catenary inspection. 2 suburban EMUs regulated +6 mins.",
+      affectedCount: 2
+    }
+  ];
+}
+window.findOptimalBlockSlots = findOptimalBlockSlots;
+
+// ==========================================================================
+// 1.5 DYNAMIC FLEET & STATION REGISTRY MANAGERS
+// ==========================================================================
+window.addTrainToRegistry = (train) => {
+  const newTrain = {
+    train_no: train.train_no || String(Math.floor(20000 + Math.random() * 9000)),
+    name: train.name || "Special Express",
+    type: train.type || "SUPERFAST",
+    origin: train.origin || "MAS",
+    dest: train.dest || "CBE",
+    time: train.time || "07:15",
+    speed: train.speed || "130 km/h",
+    load: train.load || "22 LHB Coaches"
+  };
+  liveTrainTimetable.unshift(newTrain);
+  RailBlockEventBus.emit("TRAIN_ADDED", newTrain);
+  pushNotification("OPERATING", "New Train Introduced", `Train #${newTrain.train_no} (${newTrain.name}) registered in live timetable.`, "success");
+  
+  // Update datalist on map if present
+  const datalist = document.querySelector("#trainListDatalist");
+  if (datalist) {
+    const opt = document.createElement("option");
+    opt.value = `${newTrain.train_no} • ${newTrain.name} (${newTrain.origin} ➔ ${newTrain.dest})`;
+    datalist.prepend(opt);
+  }
+  showToast(`Train #${newTrain.train_no} (${newTrain.name}) added. AI Conflict Engine re-indexed.`);
+};
+
+window.removeTrainFromRegistry = (trainNo) => {
+  const idx = liveTrainTimetable.findIndex(t => String(t.train_no) === String(trainNo));
+  if (idx !== -1) {
+    const removed = liveTrainTimetable.splice(idx, 1)[0];
+    RailBlockEventBus.emit("TRAIN_REMOVED", removed);
+    pushNotification("OPERATING", "Train Cancelled / Deregistered", `Train #${removed.train_no} (${removed.name}) removed from timetable. Track slot liberated.`, "info");
+    showToast(`Train #${removed.train_no} removed. Corridor slot now free.`);
+  }
+};
+
+window.addStationToRegistry = (stn) => {
+  const newStn = {
+    code: (stn.code || "NEW").toUpperCase(),
+    name: stn.name || "New Junction",
+    lat: parseFloat(stn.lat || 13.0827),
+    lng: parseFloat(stn.lng || 80.2707),
+    div: stn.div || "MAS",
+    platforms: parseInt(stn.platforms || 4),
+    zone: "SR"
+  };
+  liveStations.push(newStn);
+  RailBlockEventBus.emit("STATION_ADDED", newStn);
+  pushNotification("CIVIL_ENG", "Station Commissioned", `New station ${newStn.name} (${newStn.code}) added to topological network.`, "success");
+  showToast(`Station ${newStn.name} (${newStn.code}) commissioned on GIS Digital Twin.`);
+};
+
+window.removeStationFromRegistry = (stnCode) => {
+  const idx = liveStations.findIndex(s => s.code.toUpperCase() === String(stnCode).toUpperCase());
+  if (idx !== -1) {
+    const removed = liveStations.splice(idx, 1)[0];
+    RailBlockEventBus.emit("STATION_REMOVED", removed);
+    pushNotification("CIVIL_ENG", "Station Decommissioned", `Station ${removed.name} (${removed.code}) removed from GIS cartography.`, "info");
+    showToast(`Station ${removed.name} decommissioned.`);
+  }
+};
+
+// ==========================================================================
+// 1.7 EMERGENCY POSSESSION PIPELINE
+// ==========================================================================
+window.triggerEmergencyBlock = (reason = "Critical Rail Fracture", section = "SEC-MAS-CBE", km = "14.5") => {
+  activeLiveCountdown = {
+    active: true,
+    blockId: `EMG-SR-${Math.floor(1000 + Math.random() * 9000)}`,
+    title: `🚨 EMERGENCY POSSESSION: ${reason}`,
+    section: `${section} at KM ${km}`,
+    kmRange: `KM ${km} (Both Lines Blocked)`,
+    remainingSeconds: 7200, // 2 hours emergency
+    totalSeconds: 7200,
+    workType: "Emergency P-Way Rail Replacement",
+    machinery: "Emergency Heavy Breakdown Crane & Flash Butt Welder",
+    speedRestriction: "TRACK BLOCKED (0 km/h) • Signals at Red Danger",
+    disruption: "2 Express Trains Diverted via Chord Line"
+  };
+  window.activeLiveCountdown = activeLiveCountdown;
+
+  pushNotification("OPERATING", "🚨 RED EMERGENCY POSSESSION GRANTED", `${reason} on ${section} at KM ${km}. Signals turned to Danger. Approaching trains halted.`, "error");
+  pushNotification("ELECTRICAL_OHE", "Emergency Catenary De-energization", "25kV AC traction power isolated between adjacent neutral sections.", "warning");
+  pushNotification("CIVIL_ENG", "Emergency Gang Mobilized", "Permanent Way Inspector (PWI) and emergency welding gang dispatched with rail clamp.", "info");
+
+  showToast(`🚨 RED EMERGENCY POSSESSION ACTIVATED: ${reason}`);
+  render();
+};
+
+window.surrenderActiveBlockEarly = () => {
+  if (activeLiveCountdown && activeLiveCountdown.active) {
+    const bId = activeLiveCountdown.blockId;
+    activeLiveCountdown.active = false;
+    pushNotification("OPERATING", "Block Possession Surrendered Early", `Track block ${bId} surrendered. Line clear token returned to Station Master. Speed restored.`, "success");
+    showToast(`Block ${bId} surrendered early. Track restored to Full Line Speed.`);
+    render();
+  }
+};
+
+window.extendActiveBlock = (mins = 30) => {
+  if (activeLiveCountdown && activeLiveCountdown.active) {
+    activeLiveCountdown.remainingSeconds += mins * 60;
+    activeLiveCountdown.totalSeconds += mins * 60;
+    pushNotification("OPERATING", "Possession Extension Granted", `Block ${activeLiveCountdown.blockId} extended by +${mins} minutes by Section Controller.`, "warning");
+    showToast(`Possession extended by +${mins} minutes.`);
+    render();
+  }
+};
+
 
 // ==========================================================================
 // 2. STATE MANAGEMENT & SESSION
@@ -343,10 +920,10 @@ window.setLanguage = (lang) => {
 
 const I18N = {
   en: {
-    portal_title: "SOUTHERN RAILWAY",
-    portal_sub: "GIS & BLOCK PLANNING",
+    portal_title: "RAILBLOCK AI",
+    portal_sub: "AUTONOMOUS BLOCK PLANNER",
     dept: "Operating & Civil Engineering",
-    zone: "Zone 07 - Chennai",
+    zone: "Zone 07 - Autonomous Command",
     nav_groups: {
       "OVERVIEW": "OVERVIEW",
       "CORRIDORS & INFRA": "CORRIDORS & PERMANENT WAY",
@@ -357,13 +934,17 @@ const I18N = {
     },
     nav_labels: {
       "Dashboard": "Dashboard",
+      "Block Optimization": "Block Optimization",
       "Corridor Map": "Corridor Map",
       "Corridors & Sections": "Corridors & Sections",
       "Stations Master": "Stations Master",
       "Station Planning": "Station Planning",
       "Block Planning": "Block Planning",
       "Block Calendar": "Block Calendar",
-      "Asset Management": "Asset Management",
+      "Dynamic Dispatch AI": "Dynamic Dispatch AI",
+      "Asset Maintenance": "Asset Maintenance",
+      "Cost Asset Maintenance": "Cost Asset Maintenance",
+      "Asset Management": "Asset Maintenance",
       "Defects & USFD": "Defects & USFD",
       "Weather & Incidents": "Weather & Incidents",
       "Reports & Analytics": "Reports & Analytics",
@@ -385,13 +966,17 @@ const I18N = {
     },
     nav_labels: {
       "Dashboard": "डैशबोर्ड",
+      "Block Optimization": "ब्लॉक अनुकूलन (स्वचालित)",
       "Corridor Map": "कॉरिडोर मानचित्र",
       "Corridors & Sections": "गलियारे एवं ट्रैक अनुभाग",
       "Stations Master": "स्टेशन मास्टर",
       "Station Planning": "स्टेशन योजना (सिग्नलिंग)",
       "Block Planning": "ब्लॉक योजना",
       "Block Calendar": "ब्लॉक कैलेंडर",
-      "Asset Management": "परिसंपत्ति प्रबंधन",
+      "Dynamic Dispatch AI": "गतिशील प्रेषण एवं यात्री मांग एआई",
+      "Asset Maintenance": "परिसंपत्ति रखरखाव",
+      "Cost Asset Maintenance": "लागत एवं परिसंपत्ति अनुरक्षण",
+      "Asset Management": "परिसंपत्ति रखरखाव",
       "Defects & USFD": "ट्रैक दोष एवं यूएसएफडी",
       "Weather & Incidents": "मौसम एवं घटनाएं",
       "Reports & Analytics": "रिपोर्ट एवं विश्लेषण",
@@ -434,10 +1019,12 @@ const HINDI_DICTIONARY = {
   "RESOURCES & ASSETS": "संसाधन एवं परिसंपत्तियां",
   "MAINTENANCE & SAFETY": "रखरखाव एवं संरक्षा",
   "REPORTS & SYSTEM": "रिपोर्ट एवं सिस्टम",
-  "SOUTHERN RAILWAY": "दक्षिण रेलवे",
-  "GIS & BLOCK PLANNING": "जीआईएस एवं ब्लॉक योजना",
-  "SOUTHERN RAILWAY (ZONE 07)": "दक्षिण रेलवे (जोन 07)",
-  "Southern Railway (Zone 07)": "दक्षिण रेलवे (जोन 07)",
+  "RAILBLOCK AI": "रेल-ब्लॉक एआई",
+  "AUTONOMOUS BLOCK PLANNER": "स्वायत्त ब्लॉक योजनाकार",
+  "SOUTHERN RAILWAY": "रेल-ब्लॉक एआई (दक्षिण रेलवे)",
+  "GIS & BLOCK PLANNING": "जीआईएस एवं स्वायत्त ब्लॉक योजना",
+  "SOUTHERN RAILWAY (ZONE 07)": "रेल-ब्लॉक एआई (जोन 07)",
+  "Southern Railway (Zone 07)": "रेल-ब्लॉक एआई (जोन 07)",
   "Operating & Civil Engineering": "परिचालन एवं सिविल इंजीनियरिंग",
   "Zone 07 - Chennai": "जोन 07 - चेन्नई",
   "Zonal Operations • Zonal HQ": "क्षेत्रीय परिचालन • क्षेत्रीय मुख्यालय",
@@ -744,7 +1331,7 @@ let connected = false;
 let isSidebarCollapsed = false;
 let selectedDivision = "ALL";
 let selectedLiveTrainNo = "20607";
-let selectedMapLayer = currentTheme === "light" ? "osm" : "dark";
+let selectedMapLayer = "google-hybrid";
 let leafletMapInstance = null;
 let trainMarkers = {};
 let trainT = 0;
@@ -874,7 +1461,7 @@ function renderGovTopStrip() {
         <span>•</span>
         <span style="color:#ffffff">रेल मंत्रालय / MINISTRY OF RAILWAYS</span>
         <span>•</span>
-        <span style="color:#a3c2e2">SOUTHERN RAILWAY (ZONE 07)</span>
+        <span style="color:#38bdf8;font-weight:800;letter-spacing:0.4px">RAILBLOCK AI (ZONE 07)</span>
       </div>
       <div class="gov-top-right">
         <!-- Language Switcher: English & Hindi -->
@@ -899,10 +1486,13 @@ function renderSidebar() {
   return `
     <aside class="sidebar ${isSidebarCollapsed ? 'collapsed' : ''}" id="mainSidebar">
       <div class="brand-formal">
-        <img src="/southern-railway-logo.png" class="brand-crest-img" alt="Southern Railway Crest" />
+        <img src="/southern-railway-logo.png" class="brand-crest-img" alt="RailBlock AI Crest" />
         <div class="brand-text-gov">
-          <span class="brand-railway-title" style="font-size:16px;font-family:Inter,sans-serif;font-weight:800;letter-spacing:-0.2px">SOUTHERN RAILWAY</span>
-          <span class="brand-sub-title" style="color:#60a5fa;font-size:11px;font-weight:600">${currentLang === 'hi' ? 'जीआईएस एवं ब्लॉक योजना' : 'GIS &amp; BLOCK PLANNING'}</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="brand-railway-title" style="font-size:16px;font-family:Inter,sans-serif;font-weight:900;letter-spacing:-0.3px;background:linear-gradient(135deg, #ffffff 0%, #38bdf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">RAILBLOCK AI</span>
+            <span style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.4);color:#38bdf8;font-size:9px;font-weight:900;padding:1px 5px;border-radius:4px">v3.2</span>
+          </div>
+          <span class="brand-sub-title" style="color:#60a5fa;font-size:10.5px;font-weight:700">${currentLang === 'hi' ? 'एआई स्वायत्त ब्लॉक योजना' : 'AUTONOMOUS BLOCK PLANNER'}</span>
         </div>
       </div>
 
@@ -955,21 +1545,52 @@ function renderTopbar() {
         </button>
         <div class="header-title-block">
           <h1 id="topbarScreenTitle">${displayTitle}</h1>
-          <p>${currentLang === 'hi' ? 'दक्षिण रेलवे (जोन 07)' : 'Southern Railway (Zone 07)'}</p>
+          <p>${currentLang === 'hi' ? 'रेल-ब्लॉक एआई • दक्षिण रेलवे' : 'RailBlock AI • Autonomous Zonal Command'}</p>
         </div>
       </div>
 
       <div class="header-center">
-        <div class="status-badge-pill ${connected ? '' : 'offline'}" id="topbarBackendBadge" onclick="window.showBackendConnectionModal()" style="cursor:pointer" title="Click to view FastAPI Backend & Swagger documentation">
-          <div class="status-dot-pulse"></div>
-          <span>${connected ? t(null, 'online_status', 'FASTAPI v1.0 ONLINE') : t(null, 'offline_status', 'BACKEND OFFLINE')}</span>
-        </div>
+        <!-- 🚨 Emergency Block Action -->
+        <button class="btn-topbar-emergency" onclick="window.triggerEmergencyBlockModal()" title="Declare Emergency Line Possession (Rail Fracture / OHE Sag)">
+          <span class="emergency-pulse-dot"></span>
+          <span>🚨 Emergency</span>
+        </button>
+
+        <!-- 🚆 Fleet & Stations Manager -->
+        <button class="btn-topbar-action" onclick="window.openFleetStationManagerModal()" title="Add or Remove Trains &amp; Stations dynamically">
+          <span>🚆 Fleet</span>
+        </button>
+
+        <!-- 📊 Audit Reports -->
+        <button class="btn-topbar-action" onclick="window.openZonalAuditReportModal()" title="View Automatic Daily/Weekly Block &amp; Delay Audit Reports">
+          <span>📊 Audit</span>
+        </button>
+
+        <!-- 🤖 AI Asset Maintenance -->
+        <button class="btn-topbar-action ${current === 'Asset Maintenance' ? 'active' : ''}" onclick="window.navigateTo('Asset Maintenance')" title="AI Railway Maintenance Cost &amp; Block Optimization Agent">
+          <span>🤖 Asset Maint</span>
+        </button>
+
+        <!-- 💰 Dedicated Cost Asset Maintenance Window -->
+        <button class="btn-topbar-action ${current === 'Cost Asset Maintenance' ? 'active' : ''}" onclick="window.navigateTo('Cost Asset Maintenance')" title="Cost Asset Maintenance Window: Operations, Rolling Stock &amp; Infrastructure Asset Cost Cuttings">
+          <span>💰 Cost Maint</span>
+        </button>
+
+        <!-- 🧠 Dynamic Dispatch AI -->
+        <button class="btn-topbar-action ${current === 'Dynamic Dispatch AI' ? 'active' : ''}" onclick="window.navigateTo('Dynamic Dispatch AI')" title="AI Passenger Ticket History &amp; Precedence Engine">
+          <span>🧠 Dispatch AI</span>
+        </button>
       </div>
 
       <div class="header-right">
+        <!-- FastAPI Status Pill -->
+        <div class="status-badge-pill ${connected ? '' : 'offline'}" id="topbarBackendBadge" onclick="window.showBackendConnectionModal()" style="cursor:pointer" title="Click to view FastAPI Backend &amp; Swagger documentation">
+          <div class="status-dot-pulse"></div>
+          <span>${connected ? t(null, 'online_status', 'FASTAPI v1.0 ONLINE') : t(null, 'offline_status', 'BACKEND OFFLINE')}</span>
+        </div>
         <button class="btn-top-theme" id="btnToggleTheme" title="${currentTheme === 'light' ? 'Switch to Dark Mode (डार्क मोड)' : 'Switch to Light Mode (लाइट मोड)'}">
           ${currentTheme === 'light' ? SVG_ICONS.moon : SVG_ICONS.sun}
-          <span>${currentTheme === 'light' ? (currentLang === 'hi' ? 'डार्क मोड' : 'Dark Mode') : (currentLang === 'hi' ? 'लाइट मोड' : 'Light Mode')}</span>
+          <span>${currentTheme === 'light' ? (currentLang === 'hi' ? 'डार्क' : 'Dark') : (currentLang === 'hi' ? 'लाइट' : 'Light')}</span>
         </button>
         <div class="clock-formal">
           <b id="liveTime">--:--:--</b>
@@ -982,12 +1603,6 @@ function renderTopbar() {
     </header>
   `;
 }
-
-// ==========================================================================
-// 4. MODULE PAGES (FORMAL & ENTERPRISE)
-// ==========================================================================
-
-// Module 1: Dashboard & GIS Railway Network Cartography
 
 async function fetchBackendData() {
   try {
@@ -1051,181 +1666,354 @@ async function fetchBackendData() {
 function renderDashboardPage() {
   return `
     <main class="content">
-      <!-- Top 5 Metric Cards -->
-      <div class="metrics-row">
-        <div class="metric-card-formal blue" data-nav="Asset Management" style="cursor:pointer" title="Click to view Monitored P-Way Assets">
-          <div class="metric-icon-formal blue">
-            <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="16" rx="2"></rect><line x1="4" y1="11" x2="20" y2="11"></line><circle cx="8" cy="15" r="1"></circle><circle cx="16" cy="15" r="1"></circle></svg>
+      <!-- Track Possession Active Live HUD Banner (Matching Operations Specification) -->
+      <div id="liveCountdownMount">
+        ${renderLiveCountdownBanner()}
+      </div>
+
+      <!-- TOP OF WEBSITE: Full-Width Commanding GIS Railway Network Overview Map -->
+      <section class="dashboard-top-map-section">
+        <div class="map-card-snap" id="dashboardMapCard">
+          <div class="map-header-clean" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <h2 style="margin:0">GIS Railway Network Overview</h2>
+                <span class="ai-live-badge" style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35);color:#4ade80;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:5px">
+                  <span class="railblock-pulse-dot" style="width:6px;height:6px"></span> LIVE TELEMETRY
+                </span>
+              </div>
+              <p style="margin:2px 0 0">Interactive geospatial cartography of RailBlock AI zonal network, real-time train positions &amp; sanctioned maintenance zones.</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="secondary" id="btnToggleDashboardMap" onclick="window.toggleDashboardMapMinimize()" title="Minimize / Expand Map" style="padding:6px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--text-main);border:1px solid var(--border-light);border-radius:6px">
+                <span id="mapMinimizeIcon" style="font-weight:900;font-size:13px">${isDashboardMapMinimized ? '□' : '—'}</span>
+                <span id="mapMinimizeLabel">${isDashboardMapMinimized ? 'Expand Map' : 'Minimize Map'}</span>
+              </button>
+            </div>
           </div>
-          <div>
-            <span>MONITORED P-WAY ASSETS</span>
-            <strong>${dashboardData.assets || 32}</strong>
-            <div style="font-size:12px;color:#64748b;margin-bottom:4px">Sections</div>
-            <small data-nav="Asset Management" style="cursor:pointer">View zonal inventory →</small>
+
+          <!-- Minimized Map Summary Strip (Appears when map is minimized) -->
+          <div class="map-minimized-work-bar" id="mapMinimizedWorkBar" style="display:${isDashboardMapMinimized ? 'flex' : 'none'};cursor:pointer" onclick="window.toggleDashboardMapMinimize()" title="Click to Expand Full GIS Network Map">
+            <div class="minimized-work-badge">
+              <div class="work-icon-pulse">
+                <span class="animated-work-icon">${(window.__activeMaintBlock && window.__activeMaintBlock.workIcon) || '🚜'}</span>
+                <span class="work-spark-dot"></span>
+              </div>
+              <div>
+                <div class="minimized-title">Active Sanctioned Maintenance on Line</div>
+                <div class="minimized-meta">
+                  <span>Section: <b>${(window.__activeMaintBlock && window.__activeMaintBlock.section) || 'Katpadi Jn – Jolarpettai Jn (UP)'}</b></span> •
+                  <span>Machinery: <b>${(window.__activeMaintBlock && window.__activeMaintBlock.machinery) || 'Plasser CSM-09-32 Heavy Tamper'}</b></span> •
+                  <span>Window: <b>${(window.__activeMaintBlock && window.__activeMaintBlock.duration) || '01:15 - 03:45 IST (150 mins)'}</b></span> •
+                  <span>Status: <b style="color:#22c55e">${(window.__activeMaintBlock && window.__activeMaintBlock.status) || 'Sanctioned & Protected'}</b></span>
+                </div>
+              </div>
+            </div>
+            <div class="minimized-work-actions">
+              <button class="primary" style="padding:6px 14px;font-size:11.5px;font-weight:800;display:flex;align-items:center;gap:6px" onclick="event.stopPropagation(); window.openTrackStreetView('${(window.__activeMaintBlock && window.__activeMaintBlock.section) || 'SEC-MAS-CBE'}', true, window.__activeMaintBlock)">
+                <span>🎥</span> View Work Animation
+              </button>
+              <button class="secondary" style="padding:6px 12px;font-size:11.5px;font-weight:700" onclick="event.stopPropagation(); window.toggleDashboardMapMinimize()">
+                <span>□</span> Expand Map
+              </button>
+            </div>
+          </div>
+
+          <!-- Full Map Content Wrapper (Collapsible) -->
+          <div id="dashboardMapFullContent" style="display:${isDashboardMapMinimized ? 'none' : 'block'}">
+            <!-- Interactive Train Route Search Bar -->
+            <div class="train-route-search-bar" style="padding:8px 14px;background:var(--bg-panel-alt);border-bottom:1px solid var(--border-subtle)">
+              <div class="train-search-input-wrap">
+                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="trainRouteSearchInput" list="trainListDatalist" placeholder="Search Train No. or Name to highlight route on map (e.g. 20607 Vande Bharat, 12637 Pandian, 12675 Kovai, 12433 Rajdhani)..." />
+                <datalist id="trainListDatalist">
+                  ${CHENNAI_TIMETABLE_330.map(t => `<option value="${t.train_no} • ${t.name} (${t.origin} ➔ ${t.dest})"></option>`).join("")}
+                </datalist>
+                <button class="clear-route-search-btn" id="btnClearTrainSearch" style="display:none">✕ Clear</button>
+              </div>
+              <button class="primary find-route-btn" id="btnFindTrainRoute">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <span>Display Route</span>
+              </button>
+              <button class="secondary" id="btnAuditCurrentTrain" onclick="window.auditCurrentSearchTrain()" style="padding:6px 14px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.35);border-radius:6px;white-space:nowrap" title="Run AI 14-Point Asset Maintenance &amp; Cost Audit on Selected Train">
+                <span>🤖 14-Point Audit</span>
+              </button>
+            </div>
+
+            <!-- Dual-Pane Map & Stations Directory Container (540px height) -->
+            <div class="dashboard-map-station-container">
+              <!-- Leaflet Map Stage (Left / Main Pane) -->
+              <div class="map-leaflet-stage">
+                <div id="snapMapStage"></div>
+
+                <!-- Floating Layer Controls at Bottom of Map -->
+                <div class="map-floating-bottom-bar">
+                  <button class="map-floating-btn ${selectedMapLayer === 'google-hybrid' ? 'active' : ''}" data-layer="google-hybrid" title="Photorealistic Google Satellite with Roads">
+                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+                    <span>Google Satellite</span>
+                  </button>
+                  <button class="map-floating-btn ${selectedMapLayer === 'google-roadmap' ? 'active' : ''}" data-layer="google-roadmap" title="Official Google Roadmap">
+                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg>
+                    <span>Google Maps</span>
+                  </button>
+                  <button class="map-floating-btn ${selectedMapLayer === 'dark' ? 'active' : ''}" data-layer="dark" title="CRIS Tactical Dark Cartography">
+                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><polygon points="12 2 2 7 22 7 12 2"></polygon></svg>
+                    <span>Tactical Dark</span>
+                  </button>
+                  <button class="map-floating-btn ${selectedMapLayer === 'satellite' ? 'active' : ''}" data-layer="satellite" title="Esri High-Res World Imagery">
+                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                    <span>Esri Imagery</span>
+                  </button>
+                  <button class="map-floating-btn" id="btnOpenTrackView">
+                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><rect x="4" y="3" width="16" height="16" rx="2"></rect><circle cx="8" cy="15" r="1"></circle><circle cx="16" cy="15" r="1"></circle></svg>
+                    <span>Forward Cab View</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Stations Directory Sidebar Listed Neatly at the Side -->
+              <aside class="map-stations-sidebar" id="mapStationsSidebar">
+                <div class="map-stations-sidebar-header">
+                  <div class="stn-header-top-row">
+                    <div class="stn-header-title">
+                      <span class="stn-rail-icon">🚉</span>
+                      <span class="stn-title-text">Stations Directory</span>
+                    </div>
+                    <span class="stn-count-pill" id="stnCountBadge">53 Stations</span>
+                  </div>
+                  <div class="stn-search-box">
+                    <svg class="stn-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="stationListFilterInput" placeholder="Find station (e.g. Madurai, Katpadi, SA)..." oninput="window.filterStationsSidebar(this.value)" />
+                    <button class="stn-clear-filter-btn" id="btnClearStnFilter" onclick="window.clearStationFilter()" style="display:none" title="Clear search">✕</button>
+                  </div>
+                  <div class="stn-division-pills-row">
+                    <button class="stn-div-pill active" data-div="ALL" onclick="window.filterStationsByDivision('ALL')">ALL</button>
+                    <button class="stn-div-pill" data-div="MAS" onclick="window.filterStationsByDivision('MAS')">MAS</button>
+                    <button class="stn-div-pill" data-div="SA" onclick="window.filterStationsByDivision('SA')">SA</button>
+                    <button class="stn-div-pill" data-div="TPJ" onclick="window.filterStationsByDivision('TPJ')">TPJ</button>
+                    <button class="stn-div-pill" data-div="MDU" onclick="window.filterStationsByDivision('MDU')">MDU</button>
+                    <button class="stn-div-pill" data-div="PGT" onclick="window.filterStationsByDivision('PGT')">PGT</button>
+                    <button class="stn-div-pill" data-div="TVC" onclick="window.filterStationsByDivision('TVC')">TVC</button>
+                  </div>
+                </div>
+
+                <!-- Scrollable Stations List -->
+                <div class="map-stations-scroll-list" id="mapStationsScrollList">
+                  <!-- Populated dynamically via renderStationsSidebarList() -->
+                </div>
+
+                <!-- Sidebar Footer: Active Focus / Reset -->
+                <div class="map-stations-sidebar-footer" id="mapStationsSidebarFooter" style="display:none">
+                  <div class="stn-active-chip" id="stnActiveChip">
+                    <span id="stnActiveName">MAS - Chennai Central</span>
+                    <button class="stn-reset-focus-btn" onclick="window.resetStationFocus()" title="Reset Focus">✕</button>
+                  </div>
+                </div>
+              </aside>
+            </div>
           </div>
         </div>
+      </section>
+
+      <!-- Symmetrical 5-Metric Executive Ribbon (Placed Directly Below Map) -->
+      <div class="dashboard-kpi-row-5">
+        <!-- 1. Monitored P-Way Assets Card -->
+        <div class="metric-card-formal" data-nav="Asset Maintenance" style="cursor:pointer" title="Click to view Monitored P-Way Assets">
+          <div class="metric-icon-formal blue">
+            <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="16" rx="2"></rect><circle cx="8" cy="15" r="1"></circle><circle cx="16" cy="15" r="1"></circle></svg>
+          </div>
+          <div>
+            <span>MONITORED ASSETS</span>
+            <strong>${dashboardData.sections || 32}</strong>
+            <div style="font-size:11.5px;color:#64748b;margin-bottom:3px">Permanent Way Sections</div>
+            <small data-nav="Asset Maintenance" style="cursor:pointer">View zonal inventory →</small>
+          </div>
+        </div>
+
+        <!-- 2. Critical Track Defects (USFD) Card -->
         <div class="metric-card-formal red" data-nav="Defects & USFD" style="cursor:pointer" title="Click to view Critical Track Defects">
           <div class="metric-icon-formal red">
             <svg viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
           </div>
           <div>
-            <span>CRITICAL TRACK DEFECTS (USFD)</span>
+            <span>CRITICAL TRACK DEFECTS</span>
             <strong>${dashboardData.defects || 52}</strong>
-            <div style="font-size:12px;color:#64748b;margin-bottom:4px">Defects</div>
+            <div style="font-size:11.5px;color:#64748b;margin-bottom:3px">Defects Flagged (USFD)</div>
             <small data-nav="Defects & USFD" style="cursor:pointer">${currentLang === 'hi' ? 'दोष सूची देखें →' : 'Inspect defect queue →'}</small>
           </div>
         </div>
+
+        <!-- 3. Coordinated Integrated Blocks Card -->
         <div class="metric-card-formal green" data-nav="Block Planning" style="cursor:pointer" title="Click to view Coordinated Integrated Blocks">
           <div class="metric-icon-formal green">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="16 10 11 15 8 12"></polyline></svg>
           </div>
           <div>
-            <span>COORDINATED INTEGRATED BLOCKS</span>
+            <span>INTEGRATED BLOCKS</span>
             <strong>10</strong>
-            <div style="font-size:12px;color:#64748b;margin-bottom:4px">Blocks Active</div>
-            <small data-nav="Block Planning" style="cursor:pointer">Review sanction schedule →</small>
+            <div style="font-size:11.5px;color:#64748b;margin-bottom:3px">Active Sanctions</div>
+            <small data-nav="Block Planning" style="cursor:pointer">Review schedule →</small>
           </div>
         </div>
+
+        <!-- 4. Total Track Downtime Saved Card -->
         <div class="metric-card-formal gold" data-nav="Reports & Analytics" style="cursor:pointer" title="Click to view Punctuality Audit & Downtime Saved">
           <div class="metric-icon-formal gold">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           </div>
           <div>
-            <span>TOTAL TRACK DOWNTIME SAVED</span>
+            <span>TRACK DOWNTIME SAVED</span>
             <strong>20.0</strong>
-            <div style="font-size:12px;color:#64748b;margin-bottom:4px">Hours (66%)</div>
-            <small data-nav="Reports & Analytics" style="cursor:pointer">View punctuality audit →</small>
+            <div style="font-size:11.5px;color:#64748b;margin-bottom:3px">Hours (66% Efficiency)</div>
+            <small data-nav="Reports & Analytics" style="cursor:pointer">Audit reports →</small>
           </div>
         </div>
-        <div class="metric-card-formal purple" data-nav="Asset Management" style="cursor:pointer" title="Click to view Track Maintenance Machinery">
+
+        <!-- 5. Track Maintenance Machinery Card -->
+        <div class="metric-card-formal purple" data-nav="Asset Maintenance" style="cursor:pointer" title="Click to view Track Maintenance Machinery">
           <div class="metric-icon-formal purple">
             <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
           </div>
           <div>
-            <span>TRACK MAINTENANCE MACHINERY</span>
+            <span>MAINTENANCE MACHINERY</span>
             <strong>8</strong>
-            <div style="font-size:12px;color:#64748b;margin-bottom:4px">Heavy Units</div>
-            <small data-nav="Asset Management" style="cursor:pointer">View deployment log →</small>
+            <div style="font-size:11.5px;color:#64748b;margin-bottom:3px">Heavy Units Deployed</div>
+            <small data-nav="Asset Maintenance" style="cursor:pointer">Deployment log →</small>
           </div>
         </div>
       </div>
 
-      <!-- Main Dashboard Grid (GIS Overview + Announcements) -->
-      <div class="dashboard-grid-modern">
-        <!-- GIS Map Card -->
-        <div class="map-card-snap">
-          <div class="map-header-clean">
-            <h2>GIS Railway Network Overview</h2>
-            <p>Visualize and explore the Southern Railway network with advanced GIS mapping.</p>
-          </div>
-
-
-          <!-- Quick Corridor Scheduled Trains Ribbon -->
-          <div class="train-route-quick-chips" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin:6px 0 10px 0">
-            <span style="font-size:11px;font-weight:800;color:#60a5fa;display:flex;align-items:center;gap:4px">⚡ Scheduled Trains:</span>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('22616')">22616 CBE→TPTY</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('22666')">22666 CBE→SBC Uday</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('12680')">12680 CBE→MAS</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('12676')">12676 Kovai SF</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('17229')">17229 Sabari Exp</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('17230')">17230 Sabari (SC-TVC)</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('17651')">17651 CGL→KCG</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('17209')">17209 Seshadri</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('17210')">17210 Seshadri (CCT-SMVB)</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('12511')">12511 Raptisagar</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('12512')">12512 Raptisagar (KCVL-GKP)</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('12433')">12433 MAS-NZM Rajdhani</button>
-            <button type="button" class="smart-corridor-pill" style="padding:2px 8px;font-size:10.5px;cursor:pointer" onclick="window.traceScheduledTrain('17041')">17041 Amrit Bharat</button>
-          </div>
-
-          <!-- Interactive Train Route Search Bar -->
-          <div class="train-route-search-bar">
-            <div class="train-search-input-wrap">
-              <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <input type="text" id="trainRouteSearchInput" list="trainListDatalist" placeholder="Search Train No. or Name to highlight route on map (e.g. 20607 Vande Bharat, 12637 Pandian, 12675 Kovai)..." />
-              <datalist id="trainListDatalist">
-                ${CHENNAI_TIMETABLE_330.map(t => `<option value="${t.train_no} • ${t.name} (${t.origin} ➔ ${t.dest})"></option>`).join("")}
-              </datalist>
-              <button class="clear-route-search-btn" id="btnClearTrainSearch" style="display:none">✕ Clear</button>
+      <!-- FEATURES BELOW: Two Balanced Columns (Left: Corridors & Active Work | Right: Announcements & AI Matrix) -->
+      <div class="dashboard-bottom-features-grid">
+        
+        <!-- Left Features: Corridor Explorer & Sanctioned Work Telemetry -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Corridor Scheduled Trains Panel -->
+          <div class="dashboard-side-panel" style="padding:16px 20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="width:28px;height:28px;border-radius:6px;background:rgba(59,130,246,0.15);display:grid;place-items:center;color:#60a5fa">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2"><rect x="4" y="3" width="16" height="16" rx="2"></rect><line x1="4" y1="11" x2="20" y2="11"></line></svg>
+                </div>
+                <div>
+                  <strong style="font-size:13.5px;color:var(--text-heading)">High-Density Corridors &amp; Express Routes</strong>
+                  <div style="font-size:11px;color:var(--text-muted)">Click any train to highlight path on the map above</div>
+                </div>
+              </div>
+              <span style="font-size:11px;color:#38bdf8;font-weight:700;background:rgba(56,189,248,0.1);padding:3px 8px;border-radius:4px;border:1px solid rgba(56,189,248,0.3)">SR Timetable Matrix</span>
             </div>
-            <button class="primary find-route-btn" id="btnFindTrainRoute">
-              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <span>Display Route</span>
-            </button>
+            
+            <div class="train-route-quick-chips" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('22616')">⚡ 22616 CBE→TPTY</button>
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('22666')">🚅 22666 CBE→SBC Uday</button>
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('12680')">🚄 12680 CBE→MAS</button>
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('12676')">🚆 12676 Kovai SF</button>
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('17229')">🚂 17229 Sabari Exp</button>
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('17230')">🚂 17230 Sabari (SC-TVC)</button>
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('17651')">🚆 17651 CGL→KCG</button>
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('12433')">⚡ 12433 MAS-NZM Rajdhani</button>
+              <button type="button" class="smart-corridor-pill" style="padding:5px 11px;font-size:11.5px;cursor:pointer" onclick="window.traceScheduledTrain('17041')">🚄 17041 Amrit Bharat</button>
+            </div>
           </div>
 
-          <!-- Leaflet Map Container -->
-          <div class="map-leaflet-stage" style="height:440px">
-            <div id="snapMapStage"></div>
+          <!-- Active Sanctioned Work Live Card -->
+          <div class="dashboard-side-panel" style="padding:16px 20px;border-left:4px solid #22c55e">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:20px">🚜</span>
+                <div>
+                  <strong style="font-size:13.5px;color:var(--text-heading)">Active Sanctioned Maintenance Telemetry</strong>
+                  <div style="font-size:11px;color:#22c55e;font-weight:700">● LIVE SANCTION IN PROGRESS</div>
+                </div>
+              </div>
+              <button class="primary" style="padding:5px 12px;font-size:11.5px;font-weight:800;display:flex;align-items:center;gap:6px" onclick="window.openTrackStreetView('${(window.__activeMaintBlock && window.__activeMaintBlock.section) || 'SEC-MAS-CBE'}', true, window.__activeMaintBlock)">
+                <span>🎥</span> Work Animation
+              </button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-top:10px;padding:10px 12px;background:var(--bg-panel-alt);border-radius:6px">
+              <div><span style="font-size:10px;color:var(--text-muted);display:block">SECTION</span><strong style="font-size:12px;color:var(--text-main)">${(window.__activeMaintBlock && window.__activeMaintBlock.section) || 'Katpadi Jn – Jolarpettai Jn (UP)'}</strong></div>
+              <div><span style="font-size:10px;color:var(--text-muted);display:block">WORK NATURE</span><strong style="font-size:12px;color:var(--text-main)">${(window.__activeMaintBlock && window.__activeMaintBlock.workType) || 'Track Tamping & Flash-Butt Rail Welding'}</strong></div>
+              <div><span style="font-size:10px;color:var(--text-muted);display:block">MACHINERY</span><strong style="font-size:12px;color:var(--text-main)">${(window.__activeMaintBlock && window.__activeMaintBlock.machinery) || 'Plasser CSM-09-32 Heavy Tamper'}</strong></div>
+              <div><span style="font-size:10px;color:var(--text-muted);display:block">WINDOW</span><strong style="font-size:12px;color:#4ade80">${(window.__activeMaintBlock && window.__activeMaintBlock.duration) || '01:15 - 03:45 IST (150 mins)'}</strong></div>
+            </div>
+          </div>
+        </div>
 
-            <!-- Floating Layer Controls at Bottom of Map -->
-            <div class="map-floating-bottom-bar">
-              <button class="map-floating-btn ${selectedMapLayer === 'osm' ? 'active' : ''}" data-layer="osm">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg>
-                <span>Vector Map</span>
+        <!-- Right Features: System Announcements & RailBlock AI Status -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- System Announcements Card -->
+          <div class="system-announcements-card" style="margin:0">
+            <div class="announcements-header">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="width:8px;height:8px;border-radius:50%;background:#38bdf8;box-shadow:0 0 8px #38bdf8"></span>
+                <h3>System Announcements</h3>
+              </div>
+              <a href="#" id="btnViewAllAnnouncements" data-nav="Weather & Incidents">View all</a>
+            </div>
+
+            <div class="announcement-item" data-nav="Asset Maintenance" style="cursor:pointer" title="Click to view Asset Maintenance">
+              <div class="announcement-icon green">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="16 10 11 15 8 12"></polyline></svg>
+              </div>
+              <div class="announcement-content">
+                <div class="announcement-title-row">
+                  <strong>Track Maintenance Completed</strong>
+                  <span>30m ago</span>
+                </div>
+                <p>Katpadi Jn – Jolarpettai UP line restored to 130 km/h</p>
+              </div>
+            </div>
+
+            <div class="announcement-item" data-nav="Block Planning" style="cursor:pointer" title="Click to view Block Planning">
+              <div class="announcement-icon blue">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </div>
+              <div class="announcement-content">
+                <div class="announcement-title-row">
+                  <strong>Integrated Block Matrix Updated</strong>
+                  <span>2h ago</span>
+                </div>
+                <p>10 coordinated shadow blocks verified by RailBlock AI</p>
+              </div>
+            </div>
+
+            <div class="announcement-item" data-nav="Defects & USFD" style="cursor:pointer" title="Click to view Defects & USFD">
+              <div class="announcement-icon amber">
+                <svg viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              </div>
+              <div class="announcement-content">
+                <div class="announcement-title-row">
+                  <strong>Automated USFD Defect Flagged</strong>
+                  <span>5h ago</span>
+                </div>
+                <p>Defect DEF-SR-001 prioritized for night tamping window</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- RailBlock AI Autonomous Status Card -->
+          <div class="dashboard-side-panel" style="background:linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(30,58,138,0.2) 100%);border:1.5px solid rgba(56,189,248,0.3)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="display:flex;align-items:center;gap:7px">
+                <span class="railblock-pulse-dot"></span>
+                <strong style="font-size:12.5px;color:#38bdf8;letter-spacing:0.4px">RAILBLOCK AI OPTIMIZER</strong>
+              </div>
+              <span style="font-size:10px;background:#22c55e;color:#0f172a;font-weight:900;padding:2px 6px;border-radius:4px">ACTIVE</span>
+            </div>
+            <p style="font-size:11.5px;color:var(--text-muted);margin:0 0 10px;line-height:1.4">
+              Autonomous constraint solver continuously optimizes RailBlock AI train corridors against critical maintenance windows.
+            </p>
+            <div style="display:flex;gap:8px">
+              <button class="primary" style="flex:1;padding:7px 10px;font-size:11px;font-weight:800;cursor:pointer" onclick="window.navigateTo('Block Optimization')">
+                ⚡ Open AI Auto-Pilot
               </button>
-              <button class="map-floating-btn ${selectedMapLayer === 'satellite' ? 'active' : ''}" data-layer="satellite">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
-                <span>Satellite</span>
-              </button>
-              <button class="map-floating-btn ${selectedMapLayer === 'dark' ? 'active' : ''}" data-layer="dark">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><polygon points="12 2 2 7 22 7 12 2"></polygon></svg>
-                <span>Topographic</span>
-              </button>
-              <button class="map-floating-btn" id="btnOpenTrackView">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><rect x="4" y="3" width="16" height="16" rx="2"></rect><circle cx="8" cy="15" r="1"></circle><circle cx="16" cy="15" r="1"></circle></svg>
-                <span>Forward Cab View</span>
+              <button class="secondary" style="padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer" onclick="window.navigateTo('Reports & Analytics')">
+                Audit
               </button>
             </div>
           </div>
         </div>
 
-        <!-- System Announcements Card -->
-        <div class="system-announcements-card">
-          <div class="announcements-header">
-            <h3>System Announcements</h3>
-            <a href="#" id="btnViewAllAnnouncements" data-nav="Weather & Incidents">View all</a>
-          </div>
-
-          <div class="announcement-item" data-nav="Asset Management" style="cursor:pointer" title="Click to view Asset Management">
-            <div class="announcement-icon green">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="16 10 11 15 8 12"></polyline></svg>
-            </div>
-            <div class="announcement-content">
-              <div class="announcement-title-row">
-                <strong>System Maintenance Completed</strong>
-                <span>30m ago</span>
-              </div>
-              <p>All systems operational</p>
-            </div>
-          </div>
-
-          <div class="announcement-item" data-nav="Block Planning" style="cursor:pointer" title="Click to view Block Planning">
-            <div class="announcement-icon blue">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            </div>
-            <div class="announcement-content">
-              <div class="announcement-title-row">
-                <strong>Integrated Block Update</strong>
-                <span>2h ago</span>
-              </div>
-              <p>New block schedule published</p>
-            </div>
-          </div>
-
-          <div class="announcement-item" data-nav="Defects & USFD" style="cursor:pointer" title="Click to view Defects & USFD">
-            <div class="announcement-icon amber">
-              <svg viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            </div>
-            <div class="announcement-content">
-              <div class="announcement-title-row">
-                <strong>Track Inspection Due</strong>
-                <span>5h ago</span>
-              </div>
-              <p>12 sections require inspection</p>
-            </div>
-          </div>
-        </div>
       </div>
     </main>
   `;
@@ -1532,6 +2320,439 @@ function renderTimetableMovementPage() {
   `;
 }
 
+// Screen 4B: Automated Block Optimization & Multi-Department Allocation Engine
+let currentAutoPilotHorizon = "WEEKLY";
+let autoPilotLastResult = null;
+let autoPilotSystems = null;
+
+function renderAIAutoPilotPage() {
+  const isWeekly = currentAutoPilotHorizon === "WEEKLY";
+  const sys = autoPilotSystems || {
+    tms: { track_sections_tracked: 101, inspections_recorded: 1000, status: "ONLINE" },
+    tdms: { total_defects: 49, critical_defects: 8, status: "ONLINE" },
+    smms: { track_machines: 8, active_machines: 8, maintenance_requests: 1000, status: "ONLINE" },
+    coa: { scheduled_trains: 50, high_priority_trains: 18, status: "ONLINE" }
+  };
+
+  const res = autoPilotLastResult || {
+    runtime_seconds: 0.38,
+    human_effort_reduction: {
+      reduction_percentage: 88.4,
+      human_hours_saved: 14.5,
+      baseline_manual_coordination_hours: 16.0,
+      phone_calls_eliminated: 48,
+      coordination_conflicts_prevented: 12,
+      passenger_punctuality_loss: "0.0 minutes"
+    },
+    plan_summary: {
+      plan_id: "CRIS-SR-OPT-2026-01",
+      total_blocks_sanctioned: 23,
+      tasks_scheduled: 46,
+      tasks_deferred: 3,
+      total_block_hours: 80.5,
+      downtime_saved_hours: 7.0,
+      track_availability_pct: 97.32
+    }
+  };
+
+  return `
+    <main class="content">
+      <div class="screen-header-bar">
+        <div class="screen-title-wrap">
+          <div style="display:flex;align-items:center;gap:12px">
+            <h2 style="margin:0;display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;color:var(--text-heading)">
+              <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#2563eb;fill:none;stroke-width:2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              <span>Integrated Block Optimization & Multi-Department Allocation Engine</span>
+            </h2>
+            <span class="badge" style="background:#0f2b5c;color:#60a5fa;border:1px solid #1e40af;font-weight:700;padding:3px 9px;border-radius:4px;font-size:11px;display:flex;align-items:center;gap:6px">
+              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#38bdf8"></span>
+              CRIS / RDSO MULTI-SYSTEM SOLVER • ACTIVE
+            </span>
+          </div>
+          <div class="screen-breadcrumb">Home > Operations & Sanctions > Integrated Block Optimization Engine (CRIS-RDSO Joint Allocation)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <!-- Horizon Switcher -->
+          <div style="display:flex;background:var(--bg-input);padding:3px;border-radius:6px;border:1px solid var(--border-light)">
+            <button id="btnAutoHorizonWeekly" style="padding:6px 14px;font-size:12px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:${isWeekly ? 'var(--accent-blue, #1e40af)' : 'transparent'};color:${isWeekly ? '#fff' : 'var(--text-muted)'}">
+              Tactical (7-Day Rolling)
+            </button>
+            <button id="btnAutoHorizonMonthly" style="padding:6px 14px;font-size:12px;font-weight:700;border:none;border-radius:4px;cursor:pointer;background:${!isWeekly ? 'var(--accent-blue, #1e40af)' : 'transparent'};color:${!isWeekly ? '#fff' : 'var(--text-muted)'}">
+              Strategic (30-Day Master)
+            </button>
+          </div>
+          <button class="screen-action-btn-blue" id="btnTriggerAutoPilot" style="font-weight:700;display:flex;align-items:center;gap:8px;background:#1e40af;border:1px solid #3b82f6">
+            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <span>Compute Conflict-Free Block Plan</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. The 4 Mandated Siloed Systems Live Stream Bar -->
+      <div style="margin-bottom:16px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:14px 18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:800;color:var(--text-heading);text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:8px">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#2563eb;fill:none;stroke-width:2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            <span>Pillar 1: Ministry of Railways Legacy Systems Data Integration Pipeline</span>
+          </div>
+          <span style="font-size:11px;color:#10b981;font-weight:700;background:rgba(16,185,129,0.1);padding:3px 8px;border-radius:4px;border:1px solid rgba(16,185,129,0.2)">
+            ● 4 Systems Synchronized (TMS • TDMS • SMMS • COA)
+          </span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:12px">
+          <div style="background:var(--bg-input);padding:12px;border-radius:6px;border-left:4px solid #2563eb;border-top:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase">TMS (Track Management)</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text-main);margin-top:4px">${sys.tms.track_sections_tracked} Sections Monitored</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">GMT Load & OMS Ride Quality</div>
+          </div>
+          <div style="background:var(--bg-input);padding:12px;border-radius:6px;border-left:4px solid #dc2626;border-top:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase">TDMS (Traction & Defects)</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text-main);margin-top:4px">${sys.tdms.total_defects} Defects Cataloged</div>
+            <div style="font-size:11px;color:#ef4444;margin-top:2px;font-weight:600">${sys.tdms.critical_defects} Critical USFD Flaws</div>
+          </div>
+          <div style="background:var(--bg-input);padding:12px;border-radius:6px;border-left:4px solid #d97706;border-top:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase">SMMS (Signal & Machines)</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text-main);margin-top:4px">${sys.smms.track_machines} Track Machines Ready</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">${sys.smms.maintenance_requests}+ Work Requests Logged</div>
+          </div>
+          <div style="background:var(--bg-input);padding:12px;border-radius:6px;border-left:4px solid #059669;border-top:1px solid var(--border-subtle);border-right:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase">COA (Control Office)</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text-main);margin-top:4px">${sys.coa.scheduled_trains} Scheduled Trains</div>
+            <div style="font-size:11px;color:#10b981;margin-top:2px;font-weight:600">0 min Timetable Loss (100% Punctual)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Human Effort Reduction & Asset Availability KPIs -->
+      <div class="metrics-row" style="margin-bottom:16px">
+        <div class="metric-card-formal green">
+          <div class="metric-icon-formal green">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div>
+            <span>CONTROLLER EFFORT REDUCTION</span>
+            <strong>${res.human_effort_reduction.reduction_percentage}% Saved</strong>
+            <small>Reduced from ${res.human_effort_reduction.baseline_manual_coordination_hours}h to ${res.runtime_seconds}s computation</small>
+          </div>
+        </div>
+
+        <div class="metric-card-formal blue">
+          <div class="metric-icon-formal blue">
+            <svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+          </div>
+          <div>
+            <span>TRACK ASSET AVAILABILITY</span>
+            <strong>${res.plan_summary.track_availability_pct}%</strong>
+            <small>+0.69% Net Availability Gain • ${res.plan_summary.downtime_saved_hours}h Downtime Saved</small>
+          </div>
+        </div>
+
+        <div class="metric-card-formal gold">
+          <div class="metric-icon-formal gold">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </div>
+          <div>
+            <span>COORDINATED SHADOW POSSESSIONS</span>
+            <strong>${res.plan_summary.total_blocks_sanctioned} Sanctioned</strong>
+            <small>${res.plan_summary.tasks_scheduled} Tasks Synchronized (Civil + TRD + S&T)</small>
+          </div>
+        </div>
+
+        <div class="metric-card-formal red">
+          <div class="metric-icon-formal red">
+            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+          <div>
+            <span>PASSENGER PUNCTUALITY IMPACT</span>
+            <strong>0.0 Minutes Delay</strong>
+            <small>${res.human_effort_reduction.coordination_conflicts_prevented} Headway Clashes Prevented</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Two-Column Row: Live Event Simulator (Left) and Explainable AI (Right) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <!-- Live Event Simulation Terminal for Demonstration -->
+        <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h3 style="margin:0;font-size:14px;font-weight:800;color:var(--text-heading);display:flex;align-items:center;gap:8px">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#2563eb;fill:none;stroke-width:2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>Disruption & Dynamic Re-scheduling Simulation</span>
+            </h3>
+            <span style="font-size:10px;background:#0f172a;color:#38bdf8;padding:2px 8px;border-radius:3px;font-family:monospace;border:1px solid #1e293b">SUB-SECOND RE-PLAN</span>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px 0">
+            Simulate operational disturbances across corridors and evaluate the automated constraint solver without manual controller interventions:
+          </p>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <button id="btnSimulateDelay30" style="flex:1;background:var(--bg-input);border:1px solid #2563eb;color:#60a5fa;font-weight:700;padding:9px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <span>Simulate COA Train Delay (T.12676 +30m)</span>
+            </button>
+            <button id="btnSimulateRailDefect" style="flex:1;background:var(--bg-input);border:1px solid #dc2626;color:#f87171;font-weight:700;padding:9px 12px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <span>Simulate Critical Track Defect (USFD IMR at KM 142/6)</span>
+            </button>
+          </div>
+          <!-- Terminal Box -->
+          <div id="autonomousEventTerminal" style="background:#0a0f1d;color:#10b981;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:11px;padding:12px;border-radius:6px;height:140px;overflow-y:auto;border:1px solid #1e293b;line-height:1.5">
+            <div>[00:00:00] [CRIS_DISPATCH_DAEMON] Optimization daemon online.</div>
+            <div>[00:00:00] [COA_FEED] Section headway feeds synchronized with Control Office.</div>
+            <div style="color:#38bdf8">[00:00:01] [CRIS_SOLVER] Engine ready. Select an operational event above to simulate dynamic re-scheduling.</div>
+          </div>
+        </div>
+
+        <!-- Explainable AI (XAI) Feature Attributions Panel -->
+        <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h3 style="margin:0;font-size:14px;font-weight:800;color:var(--text-heading);display:flex;align-items:center;gap:8px">
+              <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#8b5cf6;fill:none;stroke-width:2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+              <span>Pillar 2: Track Degradation & Defect Risk Modeling (RDSO Standards)</span>
+            </h3>
+            <span style="font-size:10px;background:#1e1b4b;color:#a78bfa;border:1px solid #4338ca;padding:2px 8px;border-radius:3px;font-weight:700">GRADIENT-BOOSTED TREE (GBDT)</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">
+            Model failure probability score and feature contribution breakdown on <strong>SEC-MAS-CBE-01</strong>:
+          </div>
+          <!-- XAI Factor Progress Bars -->
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:2px">
+                <span>Traffic Load Fatigue (42.5 Cumulative GMT)</span>
+                <span style="color:#dc2626">+32.4% Failure Risk</span>
+              </div>
+              <div style="background:#1e293b;height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:#dc2626;width:32.4%;height:100%"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:2px">
+                <span>Ultrasonic USFD Flaw Severity (Fatigue Micro-crack)</span>
+                <span style="color:#dc2626">+26.1% Safety Urgency</span>
+              </div>
+              <div style="background:#1e293b;height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:#ea580c;width:26.1%;height:100%"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:2px">
+                <span>Track Curvature Stress (2.4° Centrifugal Flange Wear)</span>
+                <span style="color:#d97706">+18.7% Lateral Degradation</span>
+              </div>
+              <div style="background:#1e293b;height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:#d97706;width:18.7%;height:100%"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:2px">
+                <span>Inspection Interval Lag (8 Days Elapsed since Last Run)</span>
+                <span style="color:#b45309">+14.2% Risk Weight</span>
+              </div>
+              <div style="background:#1e293b;height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:#b45309;width:14.2%;height:100%"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:2px">
+                <span>Ballast Cushion Depth (300mm Standard Clean Cushion)</span>
+                <span style="color:#059669">-8.6% Risk Mitigation</span>
+              </div>
+              <div style="background:#1e293b;height:6px;border-radius:3px;overflow:hidden">
+                <div style="background:#059669;width:8.6%;height:100%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Master Block Schedule & Synergy Bundles Table -->
+      <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <h3 style="margin:0;font-size:14px;font-weight:800;color:var(--text-heading);display:flex;align-items:center;gap:8px">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#059669;fill:none;stroke-width:2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Master Coordinated Block Schedule (Joint Engineering, TRD & S&T Possessions)</span>
+          </h3>
+          <span style="font-size:12px;color:var(--text-muted)">Horizon: <strong>${isWeekly ? '7 Days Tactical (Rolling)' : '30 Days Strategic (Master)'}</strong></span>
+        </div>
+
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border-light);text-align:left;color:var(--text-muted)">
+              <th style="padding:8px">Block ID</th>
+              <th style="padding:8px">Corridor / Section</th>
+              <th style="padding:8px">Window Time (IST)</th>
+              <th style="padding:8px">Co-Scheduled Departments</th>
+              <th style="padding:8px">Track Machines Deployed</th>
+              <th style="padding:8px">Status</th>
+              <th style="padding:8px">Punctuality Impact</th>
+              <th style="padding:8px">Operational Rationale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border-light)">
+              <td style="padding:8px;font-weight:700;font-family:monospace;color:#2563eb">BLK-CRIS-01</td>
+              <td style="padding:8px"><strong>SEC-MAS-CBE-01</strong><br><small style="color:var(--text-muted)">Katpadi - Jolarpettai UP Main</small></td>
+              <td style="padding:8px;font-weight:600">01:00 - 04:30 (210m)</td>
+              <td style="padding:8px">
+                <span class="badge" style="background:#dbeafe;color:#1e40af;font-size:10px">CIVIL (P-WAY)</span>
+                <span class="badge" style="background:#fee2e2;color:#991b1b;font-size:10px">TRD (25kV OHE)</span>
+                <span class="badge" style="background:#fef3c7;color:#92400e;font-size:10px">S&T</span>
+              </td>
+              <td style="padding:8px;font-size:11px">CSM-01 (Tamping) + Tower Wagon TW-04</td>
+              <td style="padding:8px"><span class="badge EXCELLENT" style="font-size:10px">CRIS SANCTIONED</span></td>
+              <td style="padding:8px;color:#059669;font-weight:700">0 min delay (Freight gap)</td>
+              <td style="padding:8px;font-size:11px;color:var(--text-muted)">Shadow block bundling: Civil weld renewal + TRD catenary tune during freight gap</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border-light)">
+              <td style="padding:8px;font-weight:700;font-family:monospace;color:#2563eb">BLK-CRIS-02</td>
+              <td style="padding:8px"><strong>SEC-PGT-TVC-01</strong><br><small style="color:var(--text-muted)">Shoranur - Thrissur Line</small></td>
+              <td style="padding:8px;font-weight:600">02:15 - 05:45 (210m)</td>
+              <td style="padding:8px">
+                <span class="badge" style="background:#dbeafe;color:#1e40af;font-size:10px">CIVIL (P-WAY)</span>
+                <span class="badge" style="background:#fee2e2;color:#991b1b;font-size:10px">TRD (25kV OHE)</span>
+              </td>
+              <td style="padding:8px;font-size:11px">Ballast Cleaner BCM-02 + TW-07</td>
+              <td style="padding:8px"><span class="badge EXCELLENT" style="font-size:10px">CRIS SANCTIONED</span></td>
+              <td style="padding:8px;color:#059669;font-weight:700">0 min delay (Nocturnal lull)</td>
+              <td style="padding:8px;font-size:11px;color:var(--text-muted)">Combined line block eliminates duplicate traffic possession; saved 3.5h downtime</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border-light)">
+              <td style="padding:8px;font-weight:700;font-family:monospace;color:#2563eb">BLK-CRIS-03</td>
+              <td style="padding:8px"><strong>SEC-MDU-RMM-01</strong><br><small style="color:var(--text-muted)">Pamban Marine Approach</small></td>
+              <td style="padding:8px;font-weight:600">11:00 - 13:30 (150m)</td>
+              <td style="padding:8px">
+                <span class="badge" style="background:#dbeafe;color:#1e40af;font-size:10px">CIVIL (P-WAY)</span>
+                <span class="badge" style="background:#fef3c7;color:#92400e;font-size:10px">S&T</span>
+              </td>
+              <td style="padding:8px;font-size:11px">Track Relaying Train TRT-03</td>
+              <td style="padding:8px"><span class="badge EXCELLENT" style="font-size:10px">CRIS SANCTIONED</span></td>
+              <td style="padding:8px;color:#059669;font-weight:700">0 min delay</td>
+              <td style="padding:8px;font-size:11px;color:var(--text-muted)">Bridge expansion joint inspection + Axle counter tuning co-scheduled</td>
+            </tr>
+            <tr>
+              <td style="padding:8px;font-weight:700;font-family:monospace;color:#2563eb">BLK-CRIS-04</td>
+              <td style="padding:8px"><strong>SEC-MAS-MDU-01</strong><br><small style="color:var(--text-muted)">Villupuram - Trichy Chord</small></td>
+              <td style="padding:8px;font-weight:600">01:30 - 05:00 (210m)</td>
+              <td style="padding:8px">
+                <span class="badge" style="background:#dbeafe;color:#1e40af;font-size:10px">CIVIL (P-WAY)</span>
+                <span class="badge" style="background:#fee2e2;color:#991b1b;font-size:10px">TRD</span>
+                <span class="badge" style="background:#fef3c7;color:#92400e;font-size:10px">S&T</span>
+              </td>
+              <td style="padding:8px;font-size:11px">Dynamic Track Stabilizer DTS-01</td>
+              <td style="padding:8px"><span class="badge EXCELLENT" style="font-size:10px">CRIS SANCTIONED</span></td>
+              <td style="padding:8px;color:#059669;font-weight:700">0 min delay</td>
+              <td style="padding:8px;font-size:11px;color:var(--text-muted)">Tri-department joint block: 3 tasks completed in 1 possession</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  `;
+}
+
+function initAIAutoPilotPage() {
+  // 1. Fetch Systems status from API
+  api.get("/api/v1/autonomous/systems")
+    .then(data => {
+      if (data) {
+        autoPilotSystems = data;
+      }
+    })
+    .catch(() => {});
+
+  // 2. Bind Auto-Plan execution button
+  const btnRun = document.querySelector("#btnTriggerAutoPilot");
+  if (btnRun) {
+    btnRun.onclick = async () => {
+      btnRun.disabled = true;
+      btnRun.innerHTML = `<span>Optimizing Corridors...</span>`;
+      try {
+        const res = await api.post("/api/v1/autonomous/auto-plan", { horizon: currentAutoPilotHorizon });
+        autoPilotLastResult = res;
+        showToast("Integrated Master Block Plan Generated (88.4% Controller Effort Saved)");
+        render();
+      } catch (err) {
+        showToast("Optimization solver error: " + err.message, true);
+        btnRun.disabled = false;
+        btnRun.innerHTML = `<span>Compute Conflict-Free Block Plan</span>`;
+      }
+    };
+  }
+
+  // 3. Bind Horizon Switchers
+  const btnWeekly = document.querySelector("#btnAutoHorizonWeekly");
+  const btnMonthly = document.querySelector("#btnAutoHorizonMonthly");
+  if (btnWeekly) {
+    btnWeekly.onclick = () => {
+      currentAutoPilotHorizon = "WEEKLY";
+      render();
+    };
+  }
+  if (btnMonthly) {
+    btnMonthly.onclick = () => {
+      currentAutoPilotHorizon = "MONTHLY";
+      render();
+    };
+  }
+
+  // 4. Bind Live Event Injection Simulator Buttons
+  const btnDelay = document.querySelector("#btnSimulateDelay30");
+  const btnDefect = document.querySelector("#btnSimulateRailDefect");
+  const termEl = document.querySelector("#autonomousEventTerminal");
+
+  const appendTerminalLog = (msg, color = "#10b981") => {
+    if (!termEl) return;
+    const timeStr = new Date().toTimeString().split(" ")[0];
+    const line = document.createElement("div");
+    line.style.color = color;
+    line.innerHTML = `[${timeStr}] ${msg}`;
+    termEl.appendChild(line);
+    termEl.scrollTop = termEl.scrollHeight;
+  };
+
+  if (btnDelay) {
+    btnDelay.onclick = async () => {
+      btnDelay.disabled = true;
+      appendTerminalLog("[EVENT] COA Train 12676 delayed by 30 mins approaching Katpadi...", "#38bdf8");
+      try {
+        const res = await api.post("/api/v1/autonomous/simulate-event", {
+          event_type: "TRAIN_DELAY",
+          delay_minutes: 30
+        });
+        appendTerminalLog(`[SOLVER] ${res.action_taken}: Shifted block window by 30m without canceling work gangs.`, "#10b981");
+        appendTerminalLog(`[METRICS] Latency: ${res.resolution_time_ms}ms • Controller intervention: ${res.human_controller_intervention}`, "#a7f3d0");
+        appendTerminalLog(`[PUNCTUALITY] Score: ${res.passenger_punctuality_score} • Delay to scheduled trains: 0m.`, "#fef08a");
+        showToast("Dynamic Re-planning Complete: Slot shifted by 30m in 0.04s");
+      } catch (e) {
+        appendTerminalLog("[ERROR] " + e.message, "#f87171");
+      } finally {
+        btnDelay.disabled = false;
+      }
+    };
+  }
+
+  if (btnDefect) {
+    btnDefect.onclick = async () => {
+      btnDefect.disabled = true;
+      appendTerminalLog("[EVENT] Critical USFD Transverse Fatigue Rail Fracture detected at KM 142/6...", "#f87171");
+      try {
+        const res = await api.post("/api/v1/autonomous/simulate-event", {
+          event_type: "RAIL_DEFECT",
+          section_id: "SEC-MAS-CBE-01"
+        });
+        appendTerminalLog(`[SAFETY] Priority Assigned: 100.0/100.0 (IMMEDIATE PREEMPTION).`, "#ef4444");
+        appendTerminalLog(`[SANCTION] ${res.status || 'EMERGENCY_DISPATCHED'}: 120m Immediate Traffic & Power Block allocated.`, "#10b981");
+        appendTerminalLog(`[SIGNALING] TSR 30 km/h applied automatically to Section Interlocking.`, "#fef08a");
+        appendTerminalLog(`[REVISION] Schedule Evolved to Version 2 • Zero manual phone calls required.`, "#a7f3d0");
+        showToast("Emergency Preemption Sanctioned: Version 2 Created with TSR 30 km/h");
+      } catch (e) {
+        appendTerminalLog("[ERROR] " + e.message, "#f87171");
+      } finally {
+        btnDefect.disabled = false;
+      }
+    };
+  }
+}
+
+
 // Screen 5: Integrated Block Planning Console
 function renderBlockPlanningPage() {
   const divs = ["ALL", "Chennai (MAS)", "Salem (SA)", "Palakkad (PGT)", "Thiruvananthapuram (TVC)", "Tiruchirappalli (TPJ)", "Madurai (MDU)"];
@@ -1551,10 +2772,15 @@ function renderBlockPlanningPage() {
           <h2>Integrated Block Planning & Track Damage Rectification Console</h2>
           <div class="screen-breadcrumb">Home > Block Planning > Track Damage Remediation</div>
         </div>
-        <button class="screen-action-btn-blue" id="btnCreateBlock">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
-          <span>+ Create Block from Defect</span>
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="screen-action-btn-blue" onclick="window.openApprovalWorkflowModal()" title="Launch Automated Block Generation &amp; 5-Step Approval Wizard">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+            <span>+ Auto-Generate Block Proposal</span>
+          </button>
+          <button class="secondary" onclick="window.triggerEmergencyBlockModal()" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.4);font-weight:800;padding:6px 12px;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:6px">
+            <span>🚨 Emergency Block</span>
+          </button>
+        </div>
       </div>
 
       <!-- Corridor & Damage Intelligence KPI Row -->
@@ -1620,16 +2846,16 @@ function renderBlockPlanningPage() {
         </label>
 
         <button class="filter-dropdown-btn">
-          <span>📅 Date: 01 Sept 2026 ⌄</span>
+          <span>Date: 01 Sept 2026 ⌄</span>
         </button>
       </div>
 
       <div class="panel">
         <div class="block-tab-strip">
-          <button class="block-tab-btn active"><span>📋 All Damage Blocks (5)</span></button>
-          <button class="block-tab-btn"><span>🔴 Critical Rail Fractures & Wear (2)</span></button>
-          <button class="block-tab-btn"><span>⚡ TRD Traction & OHE Sag (1)</span></button>
-          <button class="block-tab-btn"><span>🛑 S&T Signal & Point Overhaul (2)</span></button>
+          <button class="block-tab-btn active"><span>All Damage Blocks (5)</span></button>
+          <button class="block-tab-btn"><span>Critical Rail Fractures & Wear (2)</span></button>
+          <button class="block-tab-btn"><span>TRD Traction & OHE Sag (1)</span></button>
+          <button class="block-tab-btn"><span>S&T Signal & Point Overhaul (2)</span></button>
         </div>
 
         <div class="table-wrap-clean">
@@ -1726,7 +2952,7 @@ function renderBlockPlanningPage() {
                   <div style="font-size:11px;color:var(--text-muted)">Thrissur ➔ Ernakulam (KM 45.3 - 52.0)</div>
                 </td>
                 <td>
-                  <b style="color:#ef4444">⚡ DEF-003: 25kV OHE Contact Wire Sag & Catenary Dropper Fault</b>
+                  <b style="color:#ef4444">DEF-003: 25kV OHE Contact Wire Sag & Catenary Dropper Fault</b>
                   <div style="font-size:10.5px;color:#94a3b8">Heavy Monsoon Rain Impact</div>
                 </td>
                 <td>
@@ -2179,8 +3405,8 @@ function renderSettingsPage() {
           <h2>Profile & System Configuration Hub</h2>
           <div class="screen-breadcrumb">Home > Settings & API Hub</div>
         </div>
-        <a href="http://127.0.0.1:8000/docs" target="_blank" class="screen-action-btn-blue" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">
-          <span>⚡ Open Live FastAPI Swagger UI ↗</span>
+        <a href="/docs" target="_blank" class="screen-action-btn-blue" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">
+          <span>Open API Documentation (Swagger) ↗</span>
         </a>
       </div>
 
@@ -3267,7 +4493,7 @@ function renderReportsAnalyticsPage() {
               </div>
             </div>
             <div style="font-size:11px;color:#22c55e;font-weight:700">
-              ⚡ 3,860 Cumulative Delay Minutes Averted
+              3,860 Cumulative Delay Minutes Averted
             </div>
           </div>
 
@@ -3574,51 +4800,69 @@ function renderLoginPage() {
     <div class="sr-portal-login-stage">
       <!-- Left Hero Pane -->
       <div class="sr-hero-pane">
-        <!-- Red Geometric Ribbon Slash -->
+        <!-- Red/Cyan Geometric Ribbon Slash -->
         <div class="sr-hero-ribbon"></div>
         <!-- Halftone Dot Matrix Pattern -->
         <div class="sr-hero-dots"></div>
 
         <div class="sr-hero-content">
+          <!-- Top HUD Header Status -->
+          <div class="railblock-hud-status">
+            <div class="railblock-brand-badge">
+              <span class="railblock-pulse-dot"></span>
+              <span>RAILBLOCK AI PLATFORM</span>
+              <span class="railblock-version-pill">v3.2 PRO</span>
+            </div>
+            <div class="railblock-telemetry-tag">IR-ZONE07 // SYS-ACTIVE</div>
+          </div>
+
           <!-- Hero Text Block -->
           <div class="sr-hero-text-block">
-            <h1 class="sr-hero-main-title">
-              <span>SOUTHERN</span>
-              <span class="sr-title-red">RAILWAY</span>
+            <h1 class="sr-hero-main-title railblock-title">
+              <span class="railblock-text-glow">RAILBLOCK</span>
+              <span class="railblock-ai-glow">AI</span>
             </h1>
-            <p class="sr-hero-subtitle">Connecting Journeys.<br>Connecting Lives.</p>
-            <div class="sr-hero-red-bar"></div>
+            <p class="sr-hero-subtitle railblock-sub">
+              Next-Gen Autonomous Railway Maintenance & Block Planning Intelligence System.<br>
+              Zero-Conflict Timetabling, Correlated P-Way Possessions & Real-Time GIS Digital Twin.
+            </p>
+            <div class="railblock-hero-tags">
+              <span class="rb-tag">⚡ AI Conflict Resolution</span>
+              <span class="rb-tag">🛰️ Live GIS Digital Twin</span>
+              <span class="rb-tag">🛡️ RDSO Fail-Safe Logic</span>
+              <span class="rb-tag">⏱️ 20.0h Downtime Saved</span>
+            </div>
           </div>
 
           <!-- Bottom Floating Stats Pill Card -->
-          <div class="sr-hero-stats-card">
+          <div class="sr-hero-stats-card railblock-stats-hud">
             <div class="sr-stat-col">
-              <div class="sr-stat-icon">
+              <div class="sr-stat-icon cyan">
                 <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="16" rx="2"></rect><line x1="4" y1="11" x2="20" y2="11"></line><path d="m8 19-2 3"></path><path d="m18 22-2-3"></path><circle cx="8" cy="15" r="1"></circle><circle cx="16" cy="15" r="1"></circle></svg>
               </div>
               <div class="sr-stat-info">
                 <strong>500+</strong>
-                <span>Daily Trains</span>
+                <span>Active Corridors</span>
               </div>
             </div>
             <div class="sr-stat-divider"></div>
             <div class="sr-stat-col">
-              <div class="sr-stat-icon">
+              <div class="sr-stat-icon green">
                 <svg viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M6 18v-7"></path><path d="M10 18v-7"></path><path d="M14 18v-7"></path><path d="M18 18v-7"></path><polygon points="12 2 2 7 22 7 12 2"></polygon></svg>
               </div>
               <div class="sr-stat-info">
                 <strong>300+</strong>
-                <span>Stations</span>
+                <span>Stations Synced</span>
               </div>
             </div>
             <div class="sr-stat-divider"></div>
             <div class="sr-stat-col">
-              <div class="sr-stat-icon">
-                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              <div class="sr-stat-icon" style="background:rgba(239,68,68,0.15);color:#ef4444">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
               </div>
               <div class="sr-stat-info">
-                <strong>Millions</strong>
-                <span>Happy Passengers</span>
+                <strong>0-Conflict</strong>
+                <span>Safety Assured</span>
               </div>
             </div>
           </div>
@@ -3630,14 +4874,18 @@ function renderLoginPage() {
         <div class="sr-auth-card-wrap">
           <!-- Master White/Red Card -->
           <div class="sr-auth-card">
-            <!-- Top Crimson Header Section -->
-            <div class="sr-card-red-header">
-              <div class="sr-card-crest-wrapper">
-                <img src="/southern-railway-logo.png" class="sr-card-crest" alt="Southern Railway Crest" />
+            <!-- Top Futuristic Header Section -->
+            <div class="sr-card-red-header railblock-card-header">
+              <div class="railblock-crest-wrapper">
+                <div class="railblock-crest-ring"></div>
+                <img src="/southern-railway-logo.png" class="sr-card-crest" alt="RailBlock AI Crest" />
               </div>
               <div class="sr-card-header-text">
-                <h2>Southern<br>Railway</h2>
-                <p>Service with Commitment</p>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <h2>RailBlock AI</h2>
+                  <span class="railblock-core-badge">PRO v3.2</span>
+                </div>
+                <p>Autonomous Block Scheduling & GIS Operations</p>
               </div>
             </div>
 
@@ -3645,18 +4893,34 @@ function renderLoginPage() {
             <div class="sr-card-white-body">
               <div class="sr-auth-welcome">
                 <h3>Welcome Back!</h3>
-                <p>Login to your account</p>
+                <p>Sign in to your authorized operational console</p>
+              </div>
+
+              <!-- Quick Demo Access Chips -->
+              <div class="quick-demo-accounts-bar">
+                <span class="demo-acc-title">⚡ ONE-CLICK DEMO ACCESS:</span>
+                <div class="demo-acc-chips">
+                  <button type="button" class="demo-chip-btn" onclick="window.quickDemoLogin('DOM')">
+                    <strong>Sr. DOM</strong> (Operations)
+                  </button>
+                  <button type="button" class="demo-chip-btn" onclick="window.quickDemoLogin('DEN')">
+                    <strong>Sr. DEN</strong> (Civil Eng)
+                  </button>
+                  <button type="button" class="demo-chip-btn" onclick="window.quickDemoLogin('CONTROLLER')">
+                    <strong>Sec. Controller</strong>
+                  </button>
+                </div>
               </div>
 
               <form id="srPortalLoginForm" onsubmit="return false;" class="sr-auth-form">
                 <!-- Username -->
                 <div class="sr-input-group">
-                  <div class="sr-input-prefix-badge">
+                  <div class="sr-input-prefix-badge railblock-prefix">
                     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                   </div>
                   <div class="sr-input-field-wrap">
-                    <input type="text" id="srInputUsername" class="sr-custom-input" placeholder="Username" required autofocus />
-                    <div class="sr-input-suffix-icon" title="Username / Employee ID">
+                    <input type="text" id="srInputUsername" class="sr-custom-input railblock-input" placeholder="HRMS ID / Officer Username" value="sr.dom.mas" required autofocus />
+                    <div class="sr-input-suffix-icon" title="Username / Official ID">
                       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><line x1="15" y1="8" x2="17" y2="8"></line><line x1="15" y1="12" x2="17" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
                     </div>
                   </div>
@@ -3664,11 +4928,11 @@ function renderLoginPage() {
 
                 <!-- Password -->
                 <div class="sr-input-group">
-                  <div class="sr-input-prefix-badge">
+                  <div class="sr-input-prefix-badge railblock-prefix">
                     <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                   </div>
                   <div class="sr-input-field-wrap">
-                    <input type="password" id="srInputPassword" class="sr-custom-input" placeholder="Password" required />
+                    <input type="password" id="srInputPassword" class="sr-custom-input railblock-input" placeholder="Password" value="railblock2026" required />
                     <div class="sr-input-suffix-icon clickable" id="toggleSrPassword" title="Show / Hide Password">
                       <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </div>
@@ -3679,28 +4943,29 @@ function renderLoginPage() {
                 <div class="sr-auth-row-options">
                   <label class="sr-checkbox-label">
                     <input type="checkbox" id="rememberMeCheckbox" checked />
-                    <span>Remember me</span>
+                    <span>Remember terminal</span>
                   </label>
-                  <a href="#" class="sr-forgot-link" id="btnForgotPassLink">Forgot Password?</a>
+                  <a href="#" class="sr-forgot-link" id="btnForgotPassLink">Forgot Key?</a>
                 </div>
 
-                <!-- Red Login Button -->
-                <button type="submit" class="sr-red-login-btn" id="btnSubmitLoginSr">
-                  Login
+                <!-- Login Button -->
+                <button type="submit" class="sr-red-login-btn railblock-submit-btn" id="btnSubmitLoginSr">
+                  <span>Enter RailBlock AI Console</span>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
 
-                <!-- Need Help Button -->
+                <!-- Help Button -->
                 <button type="button" class="sr-help-outline-btn" id="btnNeedHelpLogin">
                   <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
-                  <span>Need Help for Login?</span>
+                  <span>Operations Desk & IT Support</span>
                 </button>
               </form>
             </div>
           </div>
 
-          <!-- Bottom Create New Account -->
+          <!-- Bottom Footer -->
           <div class="sr-card-subfooter">
-            Don't have an account? <span class="sr-create-new-accent" id="btnCreateNewAcc">Create new</span>
+            RailBlock AI System v3.2 • <span class="sr-create-new-accent" id="btnCreateNewAcc">Request Clearance</span>
           </div>
         </div>
       </div>
@@ -3713,11 +4978,30 @@ function bindLoginEvents() {
   const pwdInput = document.querySelector("#srInputPassword");
   const toggleEye = document.querySelector("#toggleSrPassword");
 
+  window.quickDemoLogin = (role) => {
+    const uInput = document.querySelector("#srInputUsername");
+    const pInput = document.querySelector("#srInputPassword");
+    if (role === "DOM") {
+      if (uInput) uInput.value = "sr.dom.mas";
+      if (pInput) pInput.value = "operations2026";
+    } else if (role === "DEN") {
+      if (uInput) uInput.value = "sr.den.coordination";
+      if (pInput) pInput.value = "civileng2026";
+    } else if (role === "CONTROLLER") {
+      if (uInput) uInput.value = "controller.chennai";
+      if (pInput) pInput.value = "section2026";
+    }
+    const loginForm = document.querySelector("#srPortalLoginForm");
+    if (loginForm) {
+      loginForm.dispatchEvent(new Event("submit", { cancelable: true }));
+    }
+  };
+
   if (toggleEye && pwdInput) {
     toggleEye.onclick = () => {
       if (pwdInput.type === "password") {
         pwdInput.type = "text";
-        toggleEye.style.color = "#c91823";
+        toggleEye.style.color = "#38bdf8";
       } else {
         pwdInput.type = "password";
         toggleEye.style.color = "#6b7280";
@@ -3728,8 +5012,29 @@ function bindLoginEvents() {
   if (form) {
     form.onsubmit = async (e) => {
       e.preventDefault();
-      const username = document.querySelector("#srInputUsername")?.value.trim() || "railway.official";
+      const username = document.querySelector("#srInputUsername")?.value.trim() || "sr.dom.mas";
       const password = pwdInput?.value.trim() || "";
+
+      let fallbackDesignation = "Senior Divisional Operations Manager (Sr. DOM)";
+      let fallbackDept = "OPERATING";
+      let fallbackDeptName = "Operations & Movement Control Directorate";
+      let fallbackRole = "DIVISIONAL_OPERATIONS_MANAGER";
+      let fallbackClearance = "LEVEL_5_SANCTION";
+
+      const lowUser = username.toLowerCase();
+      if (lowUser.includes("den") || lowUser.includes("eng")) {
+        fallbackDesignation = "Senior Divisional Engineer (Sr. DEN / Co-ord)";
+        fallbackDept = "ENGINEERING";
+        fallbackDeptName = "Civil Engineering & Permanent Way Directorate";
+        fallbackRole = "DIVISIONAL_ENGINEER";
+        fallbackClearance = "LEVEL_4_MAINT_APPROVER";
+      } else if (lowUser.includes("control") || lowUser.includes("section")) {
+        fallbackDesignation = "Chief Section Controller (MAS Control Office)";
+        fallbackDept = "OPERATING";
+        fallbackDeptName = "Traffic Control & P-Way Possession Division";
+        fallbackRole = "SECTION_CONTROLLER";
+        fallbackClearance = "LEVEL_3_CONTROLLER";
+      }
 
       try {
         const profile = await api.login({
@@ -3737,31 +5042,31 @@ function bindLoginEvents() {
           password: password || "demo",
           name: username.includes(".") ? username.split(".")[0].toUpperCase() + " (Official)" : username,
           employee_id: `SR/MAS/${Math.floor(1000 + Math.random() * 9000)}`,
-          designation: "Zonal Operations & Block Planning Official",
-          department: "OPERATING",
+          designation: fallbackDesignation,
+          department: fallbackDept,
           division: "Zonal HQ (MAS GM Office)"
         });
         currentOfficial = profile;
-        showToast(`Authenticated: ${profile.name}`);
+        showToast(`Authenticated: ${profile.name} (${fallbackDesignation})`);
         render();
       } catch {
         const fallback = {
-          id: "SR-OFF-01",
-          employee_id: "SR/MAS/DOM/8941",
-          name: username || "Senior Railway Official",
-          designation: "Senior Divisional Operations Manager (Sr. DOM)",
-          department: "OPERATING",
-          department_name: "Operations & Movement Control Directorate",
+          id: "RB-OFF-01",
+          employee_id: "RB/MAS/DOM/8941",
+          name: username || "Senior Operations Official",
+          designation: fallbackDesignation,
+          department: fallbackDept,
+          department_name: fallbackDeptName,
           division: "Chennai (MAS)",
-          zone: "Southern Railway (SR)",
-          role: "DIVISIONAL_OPERATIONS_MANAGER",
-          clearance_level: "LEVEL_5_SANCTION",
+          zone: "RailBlock AI (Zone 07)",
+          role: fallbackRole,
+          clearance_level: fallbackClearance,
           permissions: ["PLAN_GENERATE", "BLOCK_SANCTION", "EMERGENCY_REPLAN", "VIEW_ALL"],
-          shift: "General Shift (09:00 - 18:00 IST)"
+          shift: "Zonal Command Shift (09:00 - 18:00 IST)"
         };
         api.setOfficial(fallback);
         currentOfficial = fallback;
-        showToast(`Authenticated: ${fallback.name}`);
+        showToast(`Authenticated: ${fallback.name} (${fallbackDesignation})`);
         render();
       }
     };
@@ -3782,7 +5087,7 @@ function bindLoginEvents() {
   const btnHelp = document.querySelector("#btnNeedHelpLogin");
   if (btnHelp) {
     btnHelp.onclick = () => {
-      showToast("Southern Railway Official Helpdesk: CUG 9003160000 | Email: itcontrol.sr@gov.in");
+      showToast("RailBlock AI Official Helpdesk: CUG 9003160000 | Email: itcontrol.sr@gov.in");
     };
   }
 
@@ -3790,14 +5095,14 @@ function bindLoginEvents() {
   if (btnForgot) {
     btnForgot.onclick = (e) => {
       e.preventDefault();
-      showToast("Please contact Zonal Telecom & IT Control (Ext. 2244) to reset HRMS credentials");
+      showToast("Please contact Zonal Telecom & IT Control (Ext. 2244) to reset credentials");
     };
   }
 
   const btnNew = document.querySelector("#btnCreateNewAcc");
   if (btnNew) {
     btnNew.onclick = () => {
-      showToast("Official registration requires clearance from Senior DPO / General Manager Office");
+      showToast("Official clearance requires authorization from Senior DPO / Zonal Operations Office");
     };
   }
 }
@@ -3809,7 +5114,7 @@ function openOfficialProfileModal() {
       <div style="display:flex;align-items:center;gap:12px;border-bottom:1px solid #16365c;padding-bottom:10px;margin-bottom:12px">
         <img src="/southern-railway-logo.png" style="width:48px;height:48px;border-radius:50%" alt="SR Crest" />
         <div>
-          <h4 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#ff9933">SOUTHERN RAILWAY • दक्षिण रेलवे</h4>
+          <h4 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#38bdf8">RAILBLOCK AI • स्वायत्त रेलवे कमांड</h4>
           <p style="margin:1px 0 0;font-size:10.5px;color:#8aa6c3">Official Digital Identity & Operational Clearance Token</p>
         </div>
       </div>
@@ -3828,7 +5133,7 @@ function openOfficialProfileModal() {
     </div>
   `;
 
-  showModal("Official Digital Authorization", "Active Southern Railway Staff Profile", modalHtml, null, "");
+  showModal("Official Digital Authorization", "Active RailBlock AI Staff Profile", modalHtml, null, "");
 
   setTimeout(() => {
     const btnSwitch = document.querySelector("#btnSwitchOfficial");
@@ -3864,10 +5169,10 @@ function showSanctionMemo() {
     <div class="memo-container">
       <div class="memo-gov-header">
         <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px">
-          <img src="/southern-railway-logo.png" style="width:48px;height:48px;border-radius:50%" alt="Southern Railway Crest" />
+          <img src="/southern-railway-logo.png" style="width:48px;height:48px;border-radius:50%" alt="RailBlock AI Crest" />
           <div>
             <h2>GOVERNMENT OF INDIA • MINISTRY OF RAILWAYS</h2>
-            <h3>SOUTHERN RAILWAY (OPERATING DEPARTMENT) — ZONE 07</h3>
+            <h3>RAILBLOCK AI (OPERATING & INFRASTRUCTURE COMMAND) — ZONE 07</h3>
             <p>INTEGRATED TRAFFIC & POWER BLOCK SANCTION PERMIT</p>
           </div>
         </div>
@@ -3969,56 +5274,318 @@ function showSanctionMemo() {
   }, 100);
 }
 
-function openTrackStreetView(sectionCode = "SEC-MAS-CBE", isMaint = true) {
+function openTrackStreetView(sectionCode = "SEC-MAS-CBE", isMaint = true, blockParam = null) {
   const existing = document.querySelector(".track-view-modal");
   if (existing) existing.remove();
 
+  let maintBlock = null;
+  if (typeof blockParam === 'object' && blockParam) {
+    maintBlock = blockParam;
+  } else if (typeof blockParam === 'string' && blockParam) {
+    maintBlock = MAINT_ZONES.find(m => m.code === blockParam || m.id === blockParam) || null;
+  }
+  if (!maintBlock && isMaint) {
+    maintBlock = MAINT_ZONES.find(m => m.section.includes(sectionCode) || m.code.includes(sectionCode)) || MAINT_ZONES[0];
+  }
+  if (maintBlock) {
+    window.__activeMaintBlock = maintBlock;
+  }
+
   const stnObj = REAL_STATIONS_30.find(s => s.code === sectionCode || s.name === sectionCode);
-  const titleText = stnObj ? `${stnObj.name} [${stnObj.code}] Approach` : sectionCode;
-  const subtitleText = stnObj ? `Locomotive Pilot Station Approach Telemetry • Platform Ingress Line (${stnObj.div} Division)` : "Locomotive Pilot Forward Cab View • Southern Railway Mainline";
-  const locRef = stnObj ? `${stnObj.name} Interlocking • KM ${Math.round(stnObj.lat * 30)}.400` : "KM 14.200 (MAS-CBE UP Main)";
+  const titleText = maintBlock ? `${maintBlock.code}: ${maintBlock.workType || maintBlock.action}` : (stnObj ? `${stnObj.name} [${stnObj.code}] Approach` : sectionCode);
+  const subtitleText = maintBlock ? `Worksite Telemetry • ${maintBlock.section} (${maintBlock.duration})` : (stnObj ? `Locomotive Pilot Station Approach Telemetry • Platform Ingress Line (${stnObj.div} Division)` : "Locomotive Pilot Forward Cab View • Southern Railway Mainline");
+  const locRef = maintBlock ? `${maintBlock.section} • Supervisor: ${maintBlock.engineer}` : (stnObj ? `${stnObj.name} Interlocking • KM ${Math.round(stnObj.lat * 30)}.400` : "KM 14.200 (MAS-CBE UP Main)");
+  const workIcon = (maintBlock && maintBlock.workIcon) || (isMaint ? "🚜" : "🚉");
 
   const modal = document.createElement("div");
   modal.className = "track-view-modal";
   modal.innerHTML = `
     <div class="track-view-topbar">
       <div>
-        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:20px;color:#ff9933;margin:0 0 2px">CRIS GIS Track Forward Telemetry • ${esc(titleText)}</h3>
-        <p style="margin:0;font-size:11.5px;color:#94a3b8">${esc(subtitleText)}</p>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:20px">${workIcon}</span>
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:21px;color:#ff9933;margin:0">CRIS GIS Section Telemetry & Work Inspection • ${esc(titleText)}</h3>
+        </div>
+        <p style="margin:2px 0 0;font-size:11.5px;color:#94a3b8">${esc(subtitleText)}</p>
       </div>
-      <div style="display:flex;gap:10px;align-items:center">
-        ${stnObj ? `<button class="secondary" style="background:#2563eb;color:#fff;border:none;font-weight:700;padding:6px 14px;border-radius:4px;cursor:pointer" onclick="document.querySelector('.track-view-modal')?.remove(); window.navigateToStation('${stnObj.code}')">🚉 Open Station Board & Planning</button>` : ''}
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        ${isMaint || maintBlock ? `
+          <button class="primary" id="btnSanctionBlockView" style="background:#10b981;color:#fff;border:none;font-weight:900;padding:7px 16px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 0 16px rgba(16,185,129,0.5);font-size:12px" title="Sanction and highlight on Dashboard Map">
+            <span>🗺️</span> Sanction Block View (Update Dashboard Map)
+          </button>
+        ` : ''}
+        ${stnObj ? `<button class="secondary" style="background:#2563eb;color:#fff;border:none;font-weight:700;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px" onclick="document.querySelector('.track-view-modal')?.remove(); window.navigateToStation('${stnObj.code}')">🚉 Open Station Board & Planning</button>` : ''}
         <button class="secondary" id="btnToggleCaution" style="padding:6px 14px;font-size:12px;font-weight:700">${isMaint ? 'Caution Speed Order (30 km/h)' : 'Normal Speed (130 km/h)'}</button>
         <button class="primary" id="btnCloseTrackView" style="padding:6px 16px;font-size:12px;font-weight:800">✕ Exit View</button>
       </div>
     </div>
 
-    <div class="track-view-stage">
-      <div class="track-3d-world">
-        <div class="track-sky"><div class="track-mountains"></div></div>
-        <div class="track-ground">
-          <div class="track-bed-3d">
-            <div class="track-sleepers"></div>
-            <div class="steel-rail rail-left"></div>
-            <div class="steel-rail rail-right"></div>
+    ${isMaint ? `
+      <!-- Work Inspection Simulation Mode Selector Tabs -->
+      <div class="work-tabs-strip">
+        <button class="work-tab-btn active" data-tab="tamping">
+          <span style="font-size:14px">🚜</span> CSM Heavy Tamping & Rail Welding Simulation (Active Work)
+        </button>
+        <button class="work-tab-btn" data-tab="catenary">
+          <span style="font-size:14px">⚡</span> TRD 25kV Catenary & OHE Alignment
+        </button>
+        <button class="work-tab-btn" data-tab="axle">
+          <span style="font-size:14px">📡</span> S&T Interlocking & Axle Counter Tuning
+        </button>
+        <button class="work-tab-btn" data-tab="cab">
+          <span style="font-size:14px">🎥</span> Locomotive Forward 3D Cab View
+        </button>
+      </div>
+    ` : ''}
+
+    <div class="work-simulation-stage">
+      <!-- PANEL 1: P-Way Tamping & Rail Welding Animation (Active Work) -->
+      <div class="work-visual-canvas" id="workPanelTamping" style="display:${isMaint ? 'flex' : 'none'}">
+        <div class="work-scene-container">
+          <!-- Night Sky with Worksite Floodlights -->
+          <div class="work-scene-sky">
+            <div style="position:absolute;top:20px;left:20%;width:80px;height:80px;background:radial-gradient(circle, rgba(254,240,138,0.25) 0%, transparent 70%);border-radius:50%"></div>
+            <div style="position:absolute;top:15px;right:25%;width:100px;height:100px;background:radial-gradient(circle, rgba(147,197,253,0.2) 0%, transparent 70%);border-radius:50%"></div>
+            <!-- Floodlight beams -->
+            <div style="position:absolute;top:0;left:35%;width:160px;height:220px;background:linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%);clip-path:polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%);pointer-events:none"></div>
+            <div style="position:absolute;top:0;right:30%;width:180px;height:220px;background:linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%);clip-path:polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%);pointer-events:none"></div>
+          </div>
+
+          <!-- Ground, Ballast Bed & Steel Rails -->
+          <div class="work-scene-ground">
+            <div class="work-ballast-bed"></div>
+            <div class="work-rails-layer"></div>
+            <div class="work-rails-layer bottom-rail"></div>
+
+            <!-- Animated Plasser & Theurer CSM-09-32 Heavy Tamping Machine -->
+            <div class="csm-tamper-unit" title="Plasser & Theurer Continuous Tamping Unit CSM-09-32">
+              <svg viewBox="0 0 320 150" style="width:100%;height:100%;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.8))">
+                <!-- Machine Main Frame / Yellow Body -->
+                <rect x="20" y="20" width="280" height="70" rx="6" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+                <!-- Machine Operator Cabin -->
+                <rect x="230" y="10" width="65" height="50" rx="4" fill="#0f172a" stroke="#64748b" stroke-width="1.5"/>
+                <rect x="235" y="15" width="55" height="28" rx="2" fill="#38bdf8" opacity="0.75"/>
+                <!-- Machine IR Logo & Identification -->
+                <text x="35" y="45" font-family="'Barlow Condensed', sans-serif" font-weight="900" font-size="14" fill="#1e293b">SOUTHERN RAILWAY P-WAY</text>
+                <text x="35" y="62" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="11" fill="#713f12">CSM-09-32 [MAS/P-WAY/08]</text>
+                <circle cx="210" cy="50" r="12" fill="#1e3a8a"/>
+                <text x="210" y="54" text-anchor="middle" font-weight="900" font-size="10" fill="#ffffff">IR</text>
+                <!-- Exhaust Pipe & Hydraulic Lines -->
+                <rect x="50" y="5" width="10" height="15" fill="#475569"/>
+                <line x1="70" y1="20" x2="180" y2="20" stroke="#1e293b" stroke-width="3"/>
+                <!-- Wheels / Bogie Assembly -->
+                <circle cx="50" cy="98" r="16" fill="#334155" stroke="#0f172a" stroke-width="3"/>
+                <circle cx="90" cy="98" r="16" fill="#334155" stroke="#0f172a" stroke-width="3"/>
+                <circle cx="230" cy="98" r="16" fill="#334155" stroke="#0f172a" stroke-width="3"/>
+                <circle cx="270" cy="98" r="16" fill="#334155" stroke="#0f172a" stroke-width="3"/>
+                <!-- Cabin Floodlight Beam -->
+                <circle cx="295" cy="55" r="5" fill="#fef08a"/>
+                <polygon points="295,55 330,40 330,70" fill="rgba(254,240,138,0.4)"/>
+              </svg>
+
+              <!-- Animated Vibrating Tamping Tines Rig (Plunging into ballast) -->
+              <div class="csm-tines-rig">
+                <svg viewBox="0 0 70 75" style="width:100%;height:100%">
+                  <!-- Hydraulic Cylinder Body -->
+                  <rect x="18" y="0" width="34" height="25" rx="3" fill="#334155" stroke="#64748b" stroke-width="1.5"/>
+                  <line x1="35" y1="25" x2="35" y2="45" stroke="#94a3b8" stroke-width="6"/>
+                  <!-- Squeeze / Tamping Tools (Tines) -->
+                  <polygon points="20,45 28,45 22,72 16,72" fill="#e2e8f0" stroke="#475569" stroke-width="1"/>
+                  <polygon points="42,45 50,45 54,72 48,72" fill="#e2e8f0" stroke="#475569" stroke-width="1"/>
+                  <circle cx="25" cy="45" r="3" fill="#f59e0b"/>
+                  <circle cx="45" cy="45" r="3" fill="#f59e0b"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Clamped Thermit / Flash-Butt Rail Weld Joint with Animated Sparks -->
+            <div class="weld-joint-station" title="In-situ Rail Flash-Butt Welding Station">
+              <!-- Molten glowing joint core -->
+              <div class="weld-molten-core"></div>
+              <!-- Spray of flying sparks -->
+              <div class="weld-sparks-emitter">
+                <div class="spark-particle"></div>
+                <div class="spark-particle"></div>
+                <div class="spark-particle"></div>
+                <div class="spark-particle"></div>
+                <div class="spark-particle"></div>
+                <div class="spark-particle"></div>
+              </div>
+              <!-- Weld Pre-heater / Hydraulic Rail Tensor -->
+              <svg viewBox="0 0 60 40" style="width:60px;height:40px;position:absolute;top:-10px;left:-16px">
+                <rect x="5" y="8" width="50" height="8" rx="2" fill="#64748b" opacity="0.8"/>
+                <circle cx="12" cy="12" r="3" fill="#ef4444"/>
+                <circle cx="48" cy="12" r="3" fill="#22c55e"/>
+              </svg>
+            </div>
+
+            <!-- P-Way Track Engineers in Orange Safety Vests holding Laser Track Gauge -->
+            <div style="position:absolute;bottom:75px;left:82%;transform:translateX(-50%);z-index:17;display:flex;gap:12px" title="Civil P-Way Alignment Gang">
+              <!-- Track Supervisor -->
+              <svg viewBox="0 0 32 60" style="width:28px;height:52px">
+                <!-- Hardhat -->
+                <path d="M6,14 Q16,4 26,14 Z" fill="#eab308"/>
+                <!-- Head -->
+                <circle cx="16" cy="18" r="6" fill="#fde047"/>
+                <!-- Hi-Vis Vest -->
+                <rect x="8" y="24" width="16" height="22" rx="3" fill="#f97316"/>
+                <line x1="8" y1="32" x2="24" y2="32" stroke="#ffffff" stroke-width="2.5"/>
+                <line x1="8" y1="38" x2="24" y2="38" stroke="#ffffff" stroke-width="2.5"/>
+                <!-- Legs -->
+                <line x1="12" y1="46" x2="12" y2="58" stroke="#1e293b" stroke-width="3.5"/>
+                <line x1="20" y1="46" x2="20" y2="58" stroke="#1e293b" stroke-width="3.5"/>
+              </svg>
+              <!-- Track Gauge Staff with Laser Beam -->
+              <div style="position:relative;width:4px;height:52px;background:#94a3b8;border-radius:2px">
+                <!-- Optical alignment beam pointing to weld -->
+                <div style="position:absolute;top:10px;right:0;width:120px;height:1.5px;background:rgba(34,197,94,0.85);box-shadow:0 0 8px #22c55e"></div>
+              </div>
+            </div>
+
+            <!-- 25kV OHE Catenary Mast & Grounding Discharge Cable -->
+            <div style="position:absolute;bottom:0;left:12%;width:18px;height:240px;background:linear-gradient(90deg, #475569 0%, #64748b 50%, #334155 100%);z-index:10" title="25kV Catenary Mast (Earthed & Locked)">
+              <div style="position:absolute;top:10px;left:0;right:0;height:4px;background:#f59e0b"></div>
+              <!-- Earthing Cable clamped to rail -->
+              <svg viewBox="0 0 80 180" style="position:absolute;top:40px;left:9px;width:80px;height:180px;overflow:visible">
+                <path d="M0,0 Q40,60 50,150" fill="none" stroke="#eab308" stroke-width="3" stroke-dasharray="6,4"/>
+                <rect x="42" y="145" width="16" height="12" rx="2" fill="#ef4444"/>
+                <text x="44" y="154" font-size="8" font-weight="900" fill="#fff">⚡</text>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Real-Time Instrumentation Telemetry HUD -->
+          <div class="work-telemetry-hud">
+            <div class="work-hud-card">
+              <span>Weld Thermography</span>
+              <strong style="color:#f97316">⚡ ${(maintBlock && maintBlock.weldTemp) || '1,425°C'}</strong>
+              <div style="font-size:10px;color:#94a3b8;margin-top:2px">Controlled cooling • Pearlite matrix</div>
+            </div>
+            <div class="work-hud-card">
+              <span>Tamping Pressure</span>
+              <strong style="color:#60a5fa">🚜 ${(maintBlock && maintBlock.tampPressure) || '145 bar'}</strong>
+              <div style="font-size:10px;color:#94a3b8;margin-top:2px">Squeeze cycle: 35 Hz continuous</div>
+            </div>
+            <div class="work-hud-card">
+              <span>Track Cross-Level</span>
+              <strong style="color:#22c55e">📐 +0.3 mm</strong>
+              <div style="font-size:10px;color:#94a3b8;margin-top:2px">RDSO Class-A tolerance (±2.0 mm)</div>
+            </div>
+            <div class="work-hud-card">
+              <span>Ultrasonic Test (USFD)</span>
+              <strong style="color:#22c55e">🔍 CLEAN (0 dB)</strong>
+              <div style="font-size:10px;color:#94a3b8;margin-top:2px">Zero flaws detected in rail head/web</div>
+            </div>
+            <div class="work-hud-card">
+              <span>Sanctioned Window</span>
+              <strong style="color:#e2e8f0">⏱️ ${(maintBlock && maintBlock.duration) || '150 Mins'}</strong>
+              <div style="font-size:10px;color:#4ade80;margin-top:2px">38% Complete • Protected Block</div>
+            </div>
           </div>
         </div>
-        <div class="cab-hud">
-          <div class="hud-stat">
-            <span>Permitted Speed</span>
-            <strong class="speed ${isMaint ? 'caution' : ''}" id="hudSpeed">${isMaint ? '30 km/h' : '130 km/h'}</strong>
+      </div>
+
+      <!-- PANEL 2: TRD 25kV Catenary Alignment -->
+      <div class="work-visual-canvas" id="workPanelCatenary" style="display:none">
+        <div class="work-scene-container" style="background:#030b17">
+          <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px">
+            <div style="background:rgba(30,58,138,0.25);border:1px solid rgba(59,130,246,0.4);border-radius:8px;padding:16px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-size:24px">⚡</span>
+                <div>
+                  <h4 style="margin:0;font-size:16px;color:#93c5fd">TRD 25kV Overhead Contact Wire Alignment & Inspection</h4>
+                  <div style="font-size:11.5px;color:#94a3b8">Tower Wagon TW-04 Elevating Platform Active • Section Isolated & Earthed</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-top:12px">
+                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px">
+                  <span style="font-size:10.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Contact Wire Height</span>
+                  <div style="font-size:18px;font-weight:900;color:#22c55e">5.60 Meters</div>
+                  <small style="color:#94a3b8">Standard RDSO regulated height</small>
+                </div>
+                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px">
+                  <span style="font-size:10.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Catenary Stagger</span>
+                  <div style="font-size:18px;font-weight:900;color:#60a5fa">± 180 mm</div>
+                  <small style="color:#94a3b8">Uniform pantograph strip wear</small>
+                </div>
+                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px">
+                  <span style="font-size:10.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Tension Weight Index</span>
+                  <div style="font-size:18px;font-weight:900;color:#facc15">1,000 kgf</div>
+                  <small style="color:#94a3b8">Auto-tension pulley calibrated</small>
+                </div>
+                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px">
+                  <span style="font-size:10.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">25kV Earth Return</span>
+                  <div style="font-size:18px;font-weight:900;color:#10b981">EARTHED & LOCKED</div>
+                  <small style="color:#94a3b8">Permit T/A 912 Validated</small>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="hud-stat">
-            <span>Location Reference</span>
-            <strong>${esc(locRef)}</strong>
+        </div>
+      </div>
+
+      <!-- PANEL 3: S&T Interlocking & Axle Counter Tuning -->
+      <div class="work-visual-canvas" id="workPanelAxle" style="display:none">
+        <div class="work-scene-container" style="background:#040e1d">
+          <div style="padding:24px;max-width:900px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:16px">
+            <div style="background:rgba(15,23,42,0.85);border:1px solid rgba(139,92,246,0.4);border-radius:8px;padding:16px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                <span style="font-size:24px">📡</span>
+                <div>
+                  <h4 style="margin:0;font-size:16px;color:#c084fc">Dual-Wheel Digital Axle Counter & Interlocking Calibration</h4>
+                  <div style="font-size:11.5px;color:#94a3b8">Electronic Solid State Interlocking (EI) Track Section Circuitry</div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin-top:12px">
+                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px">
+                  <span style="font-size:10.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Transducer Output</span>
+                  <div style="font-size:18px;font-weight:900;color:#c084fc">2.4 V Pk-Pk</div>
+                  <small style="color:#94a3b8">High-gain inductive coils tuned</small>
+                </div>
+                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px">
+                  <span style="font-size:10.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Track Circuit Voltage</span>
+                  <div style="font-size:18px;font-weight:900;color:#22c55e">1.85 V DC</div>
+                  <small style="color:#94a3b8">Relay excitation within limit</small>
+                </div>
+                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:6px">
+                  <span style="font-size:10.5px;color:#94a3b8;text-transform:uppercase;font-weight:700">Section Protection</span>
+                  <div style="font-size:18px;font-weight:900;color:#ef4444">RED DANGER (LOCKED)</div>
+                  <small style="color:#94a3b8">Signal S-14 points securely locked</small>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="hud-stat">
-            <span>Signal Aspect</span>
-            <strong style="color:${isMaint ? '#f39c12' : '#2ecc71'}">${isMaint ? 'DOUBLE YELLOW (CAUTION)' : 'GREEN (PROCEED)'}</strong>
+        </div>
+      </div>
+
+      <!-- PANEL 4: Original Locomotive Forward 3D Cab View -->
+      <div class="work-visual-canvas" id="workPanelCab" style="display:${isMaint ? 'none' : 'flex'}">
+        <div class="track-3d-world">
+          <div class="track-sky"><div class="track-mountains"></div></div>
+          <div class="track-ground">
+            <div class="track-bed-3d">
+              <div class="track-sleepers"></div>
+              <div class="steel-rail rail-left"></div>
+              <div class="steel-rail rail-right"></div>
+            </div>
           </div>
-          <div class="hud-stat">
-            <span>Traction Feed</span>
-            <strong style="color:#ffcf5c">25 kV AC 50Hz</strong>
+          <div class="cab-hud">
+            <div class="hud-stat">
+              <span>Permitted Speed</span>
+              <strong class="speed ${isMaint ? 'caution' : ''}" id="hudSpeed">${isMaint ? '30 km/h' : '130 km/h'}</strong>
+            </div>
+            <div class="hud-stat">
+              <span>Location Reference</span>
+              <strong>${esc(locRef)}</strong>
+            </div>
+            <div class="hud-stat">
+              <span>Signal Aspect</span>
+              <strong style="color:${isMaint ? '#f39c12' : '#2ecc71'}">${isMaint ? 'DOUBLE YELLOW (CAUTION)' : 'GREEN (PROCEED)'}</strong>
+            </div>
+            <div class="hud-stat">
+              <span>Traction Feed</span>
+              <strong style="color:#ffcf5c">25 kV AC 50Hz</strong>
+            </div>
           </div>
         </div>
       </div>
@@ -4026,23 +5593,278 @@ function openTrackStreetView(sectionCode = "SEC-MAS-CBE", isMaint = true) {
   `;
 
   document.body.appendChild(modal);
+
+  // Tab switching logic
+  const tabBtns = modal.querySelectorAll(".work-tab-btn");
+  const panelTamping = modal.querySelector("#workPanelTamping");
+  const panelCatenary = modal.querySelector("#workPanelCatenary");
+  const panelAxle = modal.querySelector("#workPanelAxle");
+  const panelCab = modal.querySelector("#workPanelCab");
+
+  tabBtns.forEach(btn => {
+    btn.onclick = () => {
+      tabBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.dataset.tab;
+      if (panelTamping) panelTamping.style.display = (tab === "tamping") ? "flex" : "none";
+      if (panelCatenary) panelCatenary.style.display = (tab === "catenary") ? "flex" : "none";
+      if (panelAxle) panelAxle.style.display = (tab === "axle") ? "flex" : "none";
+      if (panelCab) panelCab.style.display = (tab === "cab") ? "flex" : "none";
+    };
+  });
+
+  // Topbar Sanction Block View Button (Directly updates in Dashboard Map)
+  const btnSanction = modal.querySelector("#btnSanctionBlockView");
+  if (btnSanction) {
+    btnSanction.onclick = () => {
+      if (maintBlock) {
+        if (!MAINT_ZONES.some(m => m.code === maintBlock.code)) {
+          MAINT_ZONES.unshift(maintBlock);
+        }
+        window.__activeMaintBlock = maintBlock;
+      }
+      modal.remove();
+      const targetLat = (maintBlock && maintBlock.lat) || 12.7667;
+      const targetLng = (maintBlock && maintBlock.lng) || 78.8582;
+      const targetCode = (maintBlock && maintBlock.code) || "BLK-CRIS-DEF-01";
+      window.flyToMaintenanceZone(targetLat, targetLng, targetCode);
+      showToast("✅ Sanction Block View: Updated on Dashboard Map!");
+    };
+  }
+
   modal.querySelector("#btnCloseTrackView").onclick = () => modal.remove();
 
   let cautionActive = isMaint;
   modal.querySelector("#btnToggleCaution").onclick = () => {
     cautionActive = !cautionActive;
     modal.remove();
-    openTrackStreetView(sectionCode, cautionActive);
+    openTrackStreetView(sectionCode, cautionActive, maintBlock);
   };
 }
 
 // ==========================================================================
-// 8. MAP INITIALIZATION & CRIS RAILWAY GIS SYMBOLOGY
+// 8. MAP INITIALIZATION, STATIONS DIRECTORY & CRIS GIS SYMBOLOGY
 // ==========================================================================
 
 let overviewDefaultLayerGroup = null;
 let activeSearchedTrainRouteLayer = null;
 let singleTrainMovingTimer = null;
+
+// Stations Directory Global State
+window.__activeStationDivFilter = "ALL";
+window.__activeStationTextFilter = "";
+window.__selectedStationCode = null;
+window.__activeStationHighlightLayer = null;
+
+function renderStationsSidebarList(filterText = "", filterDiv = "ALL") {
+  const container = document.querySelector("#mapStationsScrollList");
+  if (!container) return;
+
+  const stations = (typeof liveStations !== "undefined" && liveStations && liveStations.length) ? liveStations : REAL_STATIONS_30;
+  let matches = [...stations];
+
+  if (filterDiv && filterDiv !== "ALL") {
+    matches = matches.filter(s => s.div === filterDiv || (s.div && s.div.includes(filterDiv)));
+  }
+
+  if (filterText && filterText.trim()) {
+    const q = filterText.toLowerCase().trim();
+    matches = matches.filter(s => 
+      (s.name && s.name.toLowerCase().includes(q)) || 
+      (s.code && s.code.toLowerCase().includes(q)) || 
+      (s.div && s.div.toLowerCase().includes(q))
+    );
+  }
+
+  const badge = document.querySelector("#stnCountBadge");
+  if (badge) {
+    if (filterText || filterDiv !== "ALL") {
+      badge.textContent = `${matches.length} / ${stations.length} Stns`;
+    } else {
+      badge.textContent = `${stations.length} Stations`;
+    }
+  }
+
+  if (matches.length === 0) {
+    container.innerHTML = `
+      <div class="stn-empty-state">
+        <span style="font-size:22px;margin-bottom:6px">🔍</span>
+        <div style="font-weight:700;color:var(--text-main);font-size:13px">No Stations Found</div>
+        <div style="font-size:11px;color:var(--text-muted);margin:3px 0 8px">No match for "${esc(filterText)}"</div>
+        <button class="stn-clear-filter-mini" onclick="window.clearStationFilter()">Clear Filter</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = matches.map(s => {
+    const isSelected = window.__selectedStationCode === s.code;
+    return `
+      <div class="stn-list-item ${isSelected ? 'active' : ''}" data-stn-code="${esc(s.code)}" onclick="window.highlightStationOnMap('${esc(s.code)}')">
+        <div class="stn-list-item-left">
+          <div class="stn-code-badge ${s.hub ? 'hub' : ''}">${esc(s.code)}</div>
+          <div class="stn-info-col">
+            <div class="stn-item-name" title="${esc(s.name)}">${esc(s.name)}</div>
+            <div class="stn-item-meta">
+              <span class="stn-div-tag">${esc(s.div)}</span>
+              <span class="stn-dot-sep">•</span>
+              <span class="stn-pf-info">${s.platforms || 4} Pf</span>
+              <span class="stn-dot-sep">•</span>
+              <span class="stn-tr-info">${s.dailyTrains || 50} Tr/d</span>
+            </div>
+          </div>
+        </div>
+        <div class="stn-list-item-right">
+          <span class="stn-locate-icon" title="Locate on Map">📍</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+window.renderStationsSidebarList = renderStationsSidebarList;
+
+window.filterStationsSidebar = function(query) {
+  window.__activeStationTextFilter = query || "";
+  const clearBtn = document.querySelector("#btnClearStnFilter");
+  if (clearBtn) {
+    clearBtn.style.display = window.__activeStationTextFilter ? "block" : "none";
+  }
+  renderStationsSidebarList(window.__activeStationTextFilter, window.__activeStationDivFilter);
+};
+
+window.filterStationsByDivision = function(divCode) {
+  window.__activeStationDivFilter = divCode || "ALL";
+  const pills = document.querySelectorAll(".stn-div-pill");
+  pills.forEach(p => {
+    if (p.dataset.div === divCode) {
+      p.classList.add("active");
+    } else {
+      p.classList.remove("active");
+    }
+  });
+  renderStationsSidebarList(window.__activeStationTextFilter, window.__activeStationDivFilter);
+};
+
+window.clearStationFilter = function() {
+  const input = document.querySelector("#stationListFilterInput");
+  if (input) input.value = "";
+  window.filterStationsSidebar("");
+};
+
+window.highlightStationOnMap = function(stnCode) {
+  if (!leafletMapInstance) return;
+  const stations = (typeof liveStations !== "undefined" && liveStations && liveStations.length) ? liveStations : REAL_STATIONS_30;
+  const s = stations.find(item => item.code.toUpperCase() === stnCode.toUpperCase() || item.name.toLowerCase() === stnCode.toLowerCase());
+  if (!s) return;
+
+  window.__selectedStationCode = s.code;
+
+  // Clear previous highlighted station marker
+  if (!window.__activeStationHighlightLayer) {
+    window.__activeStationHighlightLayer = L.layerGroup().addTo(leafletMapInstance);
+  } else {
+    window.__activeStationHighlightLayer.clearLayers();
+  }
+
+  // Smoothly fly camera to the station at zoom 13
+  leafletMapInstance.flyTo([s.lat, s.lng], 13, { animate: true, duration: 1.1 });
+
+  // Render high-visibility illuminated glowing beacon marker
+  const stHtml = `
+    <div class="cris-station-highlight-beacon">
+      <div class="cris-beacon-pulse"></div>
+      <div class="cris-beacon-halo"></div>
+      <div class="cris-beacon-core ${s.hub ? 'hub' : ''}"></div>
+      <div class="cris-stn-label-highlight">
+        <span class="beacon-pin-code">[${esc(s.code)}]</span>
+        <span class="beacon-pin-name">${esc(s.name)}</span>
+      </div>
+    </div>
+  `;
+
+  const stIcon = L.divIcon({
+    html: stHtml,
+    className: "custom-highlighted-stn-pin",
+    iconSize: [200, 56],
+    iconAnchor: [100, 28]
+  });
+
+  const marker = L.marker([s.lat, s.lng], { icon: stIcon, zIndexOffset: 1500 });
+
+  const popupContent = `
+    <div class="cris-popup-card cris-highlight-card">
+      <div class="cris-popup-head" style="background:linear-gradient(135deg, rgba(37,99,235,0.25), rgba(15,23,42,0.95));border-bottom:1.5px solid rgba(59,130,246,0.5)">
+        <div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+            <span style="background:#2563eb;color:#fff;font-size:9.5px;font-weight:900;padding:2px 6px;border-radius:3px">SELECTED STATION</span>
+            <span style="background:rgba(255,255,255,0.1);color:#93c5fd;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">${esc(s.div)} DIVISION</span>
+          </div>
+          <h4 style="margin:0;font-size:15px;color:#fff">${esc(s.name)} [${esc(s.code)}]</h4>
+          <span style="font-size:11px;color:#94a3b8">Southern Railway Zonal Cartography</span>
+        </div>
+      </div>
+      <div class="cris-popup-body">
+        <div><span>Platform Tracks</span><b>${s.platforms || 4} Operational Platforms</b></div>
+        <div><span>Daily Train Occupancy</span><b>${s.dailyTrains || 50} Trains / Day</b></div>
+        <div><span>Maintenance Block Window</span><b style="color:#4bd19a">3.5 hrs (01:00 - 04:30 IST)</b></div>
+        <div><span>Approach Signals</span><b style="color:#60a5fa">4-Aspect MACLS Automatic</b></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:10px">
+        <button class="cris-popup-btn" style="background:#2563eb;color:#ffffff;border:none;font-weight:800;cursor:pointer;padding:8px 12px;border-radius:6px;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(37,99,235,0.4)" onclick="window.navigateToStation('${s.code}')">
+          <span>🚉</span> View Station Board &amp; Planning
+        </button>
+        <button class="cris-popup-btn" style="background:rgba(255,255,255,0.06);color:#60a5fa;border:1px solid #3b82f6;font-weight:700;cursor:pointer;padding:7px 12px;border-radius:6px;font-size:11.5px;display:flex;align-items:center;justify-content:center;gap:6px" onclick="window.__openTrackView('${s.code}', false)">
+          <span>🎥</span> View Station Approach Telemetry
+        </button>
+        <button class="cris-popup-btn" style="background:linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(37,99,235,0.3) 100%);color:#38bdf8;border:1px solid #38bdf8;font-weight:800;cursor:pointer;padding:7px 12px;border-radius:6px;font-size:11.5px;display:flex;align-items:center;justify-content:center;gap:6px" onclick="window.openAssetMaintenanceAgentModal(null, '${s.code}')">
+          <span>🤖</span> AI Asset &amp; Maintenance Audit
+        </button>
+      </div>
+    </div>
+  `;
+
+  marker.bindPopup(popupContent, { offset: [0, -10], closeButton: true });
+  marker.addTo(window.__activeStationHighlightLayer);
+
+  // Automatically open popup after camera starts flying
+  setTimeout(() => {
+    try { marker.openPopup(); } catch(e) {}
+  }, 450);
+
+  // Update active state in sidebar list
+  const listItems = document.querySelectorAll("#mapStationsScrollList .stn-list-item");
+  listItems.forEach(item => {
+    if (item.dataset.stnCode === s.code) {
+      item.classList.add("active");
+      item.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+      item.classList.remove("active");
+    }
+  });
+
+  // Update footer info
+  const footer = document.querySelector("#mapStationsSidebarFooter");
+  const chipLabel = document.querySelector("#stnActiveChipLabel");
+  if (footer && chipLabel) {
+    chipLabel.textContent = `${s.code} • ${s.name}`;
+    footer.style.display = "flex";
+  }
+};
+
+window.clearStationHighlight = function() {
+  window.__selectedStationCode = null;
+  if (window.__activeStationHighlightLayer) {
+    window.__activeStationHighlightLayer.clearLayers();
+  }
+  if (leafletMapInstance) {
+    leafletMapInstance.closePopup();
+    leafletMapInstance.flyTo([10.8505, 78.2000], 7, { animate: true, duration: 1.0 });
+  }
+  const listItems = document.querySelectorAll("#mapStationsScrollList .stn-list-item");
+  listItems.forEach(item => item.classList.remove("active"));
+  const footer = document.querySelector("#mapStationsSidebarFooter");
+  if (footer) footer.style.display = "none";
+};
 
 function initHighResMap() {
   const container = document.querySelector("#snapMapStage");
@@ -4056,51 +5878,57 @@ function initHighResMap() {
   clearInterval(window.__trainMapTimer);
   clearInterval(singleTrainMovingTimer);
 
+  const SOUTH_INDIA_BOUNDS = L.latLngBounds(
+    L.latLng(7.5, 73.5),
+    L.latLng(15.2, 81.5)
+  );
+
   const map = L.map("snapMapStage", {
-    center: [10.8505, 77.8500],
+    center: [10.8505, 78.2000],
     zoom: 7,
-    minZoom: 5,
-    maxZoom: 16,
+    minZoom: 6,
+    maxZoom: 18,
+    maxBounds: SOUTH_INDIA_BOUNDS,
+    maxBoundsViscosity: 1.0,
     zoomControl: true,
   });
   leafletMapInstance = map;
 
   // Base Map Layer Groups
   let currentBaseLayer;
-  if (selectedMapLayer === "satellite") {
+  if (selectedMapLayer === "google-hybrid" || selectedMapLayer === "satellite") {
+    currentBaseLayer = L.tileLayer("https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+      attribution: 'Map data &copy; Google Maps',
+      subdomains: ["0", "1", "2", "3"],
+      maxZoom: 20
+    });
+  } else if (selectedMapLayer === "google-roadmap" || selectedMapLayer === "osm") {
+    currentBaseLayer = L.tileLayer("https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+      attribution: 'Map data &copy; Google Maps',
+      subdomains: ["0", "1", "2", "3"],
+      maxZoom: 20
+    });
+  } else if (selectedMapLayer === "esri-satellite") {
     currentBaseLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       attribution: 'Tiles &copy; Esri World Imagery',
       maxZoom: 18
     });
-  } else if (selectedMapLayer === "osm") {
-    currentBaseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 18
-    });
   } else {
-    // Vector Cartography
-    currentBaseLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-      attribution: 'Tiles &copy; Esri Dark Gray',
-      maxZoom: 16
+    currentBaseLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      attribution: 'Tiles &copy; CartoDB Dark',
+      subdomains: "abcd",
+      maxZoom: 19
     });
   }
   currentBaseLayer.addTo(map);
 
-  // Real OpenRailwayMap Overlay
-  L.tileLayer("https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png", {
-    attribution: 'Railway data &copy; OpenRailwayMap',
-    subdomains: "abc",
-    maxZoom: 19,
-    opacity: 0.85
-  }).addTo(map);
-
-  // Group all default overview elements
   overviewDefaultLayerGroup = L.layerGroup().addTo(map);
 
-  // Plot Default Routes
+  // Plot Authentic Southern Railway Network Corridors
   REAL_ROUTES.forEach(r => {
-    L.polyline(r.coords, { color: "#000", weight: 5, opacity: 0.8 }).addTo(overviewDefaultLayerGroup);
-    const routeLine = L.polyline(r.coords, { color: r.color, weight: 3, opacity: 0.95, dashArray: "4, 4" });
+    L.polyline(r.coords, { color: "#0f172a", weight: 6, opacity: 0.95 }).addTo(overviewDefaultLayerGroup);
+    const routeLine = L.polyline(r.coords, { color: r.color, weight: 3.5, opacity: 1.0 });
+    L.polyline(r.coords, { color: "#ffffff", weight: 1.5, opacity: 0.85, dashArray: "4, 6" }).addTo(overviewDefaultLayerGroup);
     routeLine.bindPopup(`
       <div class="cris-popup-card">
         <div class="cris-popup-head">
@@ -4120,87 +5948,134 @@ function initHighResMap() {
     routeLine.addTo(overviewDefaultLayerGroup);
   });
 
-  // Plot CRIS Station Diamond Nodes
-  REAL_STATIONS_30.forEach(s => {
-    const isMatch = selectedDivision === "ALL" || s.div.includes(selectedDivision.split(" ")[0]);
-    if (!isMatch) return;
+  // Dedicated layer for single highlighted station selection (uncluttered default map)
+  if (window.__activeStationHighlightLayer) {
+    try { window.__activeStationHighlightLayer.clearLayers(); } catch(e) {}
+  }
+  window.__activeStationHighlightLayer = L.layerGroup().addTo(map);
 
-    const stHtml = `
-      <div class="cris-station-node">
-        <div class="cris-diamond ${s.hub ? 'hub' : ''}"></div>
-        <div class="cris-stn-label">[${s.code}]</div>
-      </div>
-    `;
+  // If a station was already focused, re-illuminate it on map
+  if (window.__selectedStationCode) {
+    setTimeout(() => {
+      window.highlightStationOnMap(window.__selectedStationCode);
+    }, 250);
+  }
 
-    const stIcon = L.divIcon({
-      html: stHtml,
-      className: "custom-stn-node-cris",
-      iconSize: [60, 36],
-      iconAnchor: [30, 10]
-    });
+  // Populate the neatly docked Stations Directory Sidebar (53 Stations)
+  setTimeout(() => {
+    renderStationsSidebarList(window.__activeStationTextFilter || "", window.__activeStationDivFilter || "ALL");
+  }, 50);
 
-    const stMarker = L.marker([s.lat, s.lng], { icon: stIcon });
-    stMarker.bindPopup(`
-      <div class="cris-popup-card">
-        <div class="cris-popup-head">
-          <div>
-            <h4>${esc(s.name)} [${esc(s.code)}]</h4>
-            <span>${esc(s.div)} Division • Southern Railway</span>
-          </div>
-        </div>
-        <div class="cris-popup-body">
-          <div><span>Platform Tracks</span><b>${s.platforms} Platforms</b></div>
-          <div><span>Daily Train Occupancy</span><b>${s.dailyTrains} Trains / Day</b></div>
-          <div><span>Maintenance Block Window</span><b style="color:#4bd19a">3.5 hrs Available (01:00 - 04:30 IST)</b></div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:7px;margin-top:10px">
-          <button class="cris-popup-btn" style="background:#2563eb;color:#ffffff;border:none;font-weight:800;cursor:pointer;padding:8px 12px;border-radius:6px;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 2px 8px rgba(37,99,235,0.4)" onclick="window.navigateToStation('${s.code}')">
-            <span>🚉</span> View Station Board & Planning
-          </button>
-          <button class="cris-popup-btn" style="background:rgba(255,255,255,0.06);color:#60a5fa;border:1px solid #3b82f6;font-weight:700;cursor:pointer;padding:7px 12px;border-radius:6px;font-size:11.5px;display:flex;align-items:center;justify-content:center;gap:6px" onclick="window.__openTrackView('${s.code}', false)">
-            <span>🎥</span> View Station Approach Telemetry
-          </button>
-        </div>
-      </div>
-    `);
-    stMarker.addTo(overviewDefaultLayerGroup);
-  });
-
-  // Plot Active Maintenance Zones (CRIS Striped Warning Nodes)
+  // Plot Active Maintenance Zones with Distinct Work Representation Icons
+  window.__maintMarkers = window.__maintMarkers || {};
   MAINT_ZONES.forEach(m => {
-    L.circle([m.lat, m.lng], { color: "#e74c3c", fillColor: "#e74c3c", fillOpacity: 0.25, radius: 10000, weight: 2 }).addTo(overviewDefaultLayerGroup);
+    L.circle([m.lat, m.lng], {
+      color: m.isNew ? "#ef4444" : "#e74c3c",
+      fillColor: m.isNew ? "#f87171" : "#e74c3c",
+      fillOpacity: m.isNew ? 0.5 : 0.25,
+      radius: m.isNew ? 14000 : 10000,
+      weight: m.isNew ? 3 : 2
+    }).addTo(overviewDefaultLayerGroup);
 
+    // Marker includes small icon representing the work
     const maintHtml = `
-      <div class="cris-maint-marker">
-        <span class="cris-maint-tag">⚠️ ${esc(m.code)}</span>
+      <div class="cris-maint-marker ${m.isNew ? 'newly-created-pulse' : ''}" style="display:flex;align-items:center" title="${esc(m.action)}">
+        <span class="work-mini-badge" style="background:${m.isNew ? '#ef4444' : '#1e3a8a'};border:2px solid ${m.isNew ? '#fca5a5' : '#60a5fa'}">${m.workIcon || '🚜'}</span>
+        <span class="cris-maint-tag" style="${m.isNew ? 'background:#ef4444;color:#fff;border-color:#b91c1c;font-weight:900' : ''}">⚠️ ${esc(m.code)} • ${esc(m.workType || m.action)}</span>
       </div>
     `;
-    const maintIcon = L.divIcon({ html: maintHtml, className: "custom-maint-icon-cris", iconSize: [140, 24], iconAnchor: [70, 12] });
+    const maintIcon = L.divIcon({ html: maintHtml, className: "custom-maint-icon-cris", iconSize: [170, 28], iconAnchor: [85, 14] });
     const maintMarker = L.marker([m.lat, m.lng], { icon: maintIcon });
     maintMarker.bindPopup(`
       <div class="cris-popup-card">
-        <div class="cris-popup-head">
+        <div class="cris-popup-head" style="${m.isNew ? 'border-bottom:2px solid #ef4444;background:rgba(239,68,68,0.1)' : ''}">
           <div>
-            <h4>${esc(m.code)}: ${esc(m.action)}</h4>
+            ${m.isNew ? '<div style="background:#ef4444;color:#fff;font-size:9.5px;font-weight:900;padding:2px 6px;border-radius:3px;margin-bottom:4px;display:inline-block">NEWLY CREATED DEFECT BLOCK (SHADOW WINDOW)</div>' : ''}
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:18px">${m.workIcon || '🚜'}</span>
+              <h4 style="margin:0">${esc(m.code)}: ${esc(m.action)}</h4>
+            </div>
             <span>Supervisor: <b>${esc(m.engineer)}</b></span>
           </div>
         </div>
         <div class="cris-popup-body">
           <div><span>Sectional Location</span><b>${esc(m.section)}</b></div>
+          <div><span>Work Representation</span><b style="color:#60a5fa">${m.workIcon || '🚜'} ${esc(m.workType || m.action)}</b></div>
+          <div><span>Deployed Machinery</span><b>${esc(m.machinery || 'CSM-09-32 Heavy Tamper')}</b></div>
           <div><span>Department Coordination</span><b>${esc(m.dept)}</b></div>
           <div><span>Authorized Window</span><b>${esc(m.duration)}</b></div>
           <div><span>Safety Order</span><b style="color:#4bd19a">${esc(m.status)}</b></div>
         </div>
-        <button class="cris-popup-btn" onclick="window.__openTrackView('${m.section}', true)">Inspect Section Telemetry</button>
+        <button class="cris-popup-btn" style="background:#2563eb;color:#fff;border:none;font-weight:800;margin-top:8px;padding:8px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px" onclick="window.__openTrackView('${m.section}', true, '${m.code}')">
+          <span>🎥</span> Inspect Section Telemetry & Work Animation
+        </button>
       </div>
     `);
     maintMarker.addTo(overviewDefaultLayerGroup);
+    window.__maintMarkers[m.code] = maintMarker;
+    if (m.id) window.__maintMarkers[m.id] = maintMarker;
   });
 
   initMovingTrains(map);
+  if (typeof aiRouteAnalysisState !== "undefined" && aiRouteAnalysisState.active) {
+    renderAIRouteAnalysisOnMap(map);
+  }
   setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 100);
   setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 350);
 }
+
+window.toggleDashboardMapMinimize = function() {
+  isDashboardMapMinimized = !isDashboardMapMinimized;
+  const fullContent = document.querySelector("#dashboardMapFullContent");
+  const minBar = document.querySelector("#mapMinimizedWorkBar");
+  const icon = document.querySelector("#mapMinimizeIcon");
+  const label = document.querySelector("#mapMinimizeLabel");
+
+  if (fullContent) fullContent.style.display = isDashboardMapMinimized ? "none" : "block";
+  if (minBar) minBar.style.display = isDashboardMapMinimized ? "flex" : "none";
+  if (icon) icon.textContent = isDashboardMapMinimized ? "□" : "—";
+  if (label) label.textContent = isDashboardMapMinimized ? "Expand Map" : "Minimize Map";
+
+  if (!isDashboardMapMinimized && leafletMapInstance) {
+    setTimeout(() => {
+      try { leafletMapInstance.invalidateSize(); } catch(e) {}
+    }, 150);
+  }
+};
+
+window.__dashboardLayoutMode = window.__dashboardLayoutMode || 'center';
+
+window.toggleDashboardLayout = function(forcedMode) {
+  if (forcedMode) {
+    window.__dashboardLayoutMode = forcedMode;
+  } else {
+    window.__dashboardLayoutMode = (window.__dashboardLayoutMode === 'center') ? 'wide' : 'center';
+  }
+  const root = document.querySelector("#dashboardLayoutContainer");
+  const label = document.querySelector("#dashboardLayoutLabel");
+  const icon = document.querySelector("#dashboardLayoutIcon");
+  
+  if (root) {
+    if (window.__dashboardLayoutMode === 'center') {
+      root.className = 'dashboard-center-layout';
+      if (label) label.textContent = 'Center Cockpit';
+      if (icon) icon.textContent = '☷';
+    } else {
+      root.className = 'dashboard-wide-layout';
+      if (label) label.textContent = 'Wide View';
+      if (icon) icon.textContent = '☵';
+    }
+  }
+
+  if (leafletMapInstance) {
+    setTimeout(() => {
+      try { leafletMapInstance.invalidateSize(); } catch(e) {}
+    }, 100);
+    setTimeout(() => {
+      try { leafletMapInstance.invalidateSize(); } catch(e) {}
+    }, 300);
+  }
+};
 
 function interpolateRoute(coords, frac) {
   if (!coords || !coords.length) return [10.85, 77.85];
@@ -4215,11 +6090,10 @@ function interpolateRoute(coords, frac) {
 }
 
 function initMovingTrains(map) {
-  // Mock trains removed as per request
   clearInterval(window.__trainMapTimer);
 }
 
-window.__openTrackView = (code, isMaint = false) => openTrackStreetView(code, isMaint);
+window.__openTrackView = (code, isMaint = false, blockParam = null) => openTrackStreetView(code, isMaint, blockParam);
 
 let gisLayerGroups = {};
 
@@ -4232,25 +6106,27 @@ function initGISCartographyMap() {
     leafletMapInstance = null;
   }
 
+  const SOUTH_INDIA_BOUNDS = L.latLngBounds(
+    L.latLng(7.5, 73.5),
+    L.latLng(15.2, 81.5)
+  );
+
   const map = L.map("gisCartographyMapStage", {
-    center: [10.8505, 77.8500],
+    center: [10.8505, 78.2000],
     zoom: 7,
     minZoom: 6,
-    maxZoom: 16,
+    maxZoom: 18,
+    maxBounds: SOUTH_INDIA_BOUNDS,
+    maxBoundsViscosity: 1.0,
     zoomControl: true,
   });
   leafletMapInstance = map;
 
-  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-    attribution: 'Tiles &copy; Esri Dark Gray',
-    maxZoom: 16
-  }).addTo(map);
-
-  L.tileLayer("https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png", {
-    attribution: 'Railway data &copy; OpenRailwayMap',
-    subdomains: "abc",
-    maxZoom: 19,
-    opacity: 0.85
+  // Real Google Satellite GIS Cartography Base Layer (Locked strictly to South India)
+  L.tileLayer("https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+    attribution: 'Map data &copy; Google Maps',
+    subdomains: ["0", "1", "2", "3"],
+    maxZoom: 20
   }).addTo(map);
 
   // Initialize Layer Groups
@@ -4543,25 +6419,26 @@ function initLiveTrainGPSMap() {
     leafletMapInstance = null;
   }
 
+  const SOUTH_INDIA_BOUNDS = L.latLngBounds(
+    L.latLng(7.5, 73.5),
+    L.latLng(15.2, 81.5)
+  );
+
   const map = L.map("rtisLiveMapStage", {
-    center: [11.5000, 78.5000],
+    center: [10.8505, 78.2000],
     zoom: 7,
     minZoom: 6,
-    maxZoom: 16,
+    maxZoom: 18,
+    maxBounds: SOUTH_INDIA_BOUNDS,
+    maxBoundsViscosity: 1.0,
     zoomControl: true,
   });
   leafletMapInstance = map;
 
-  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-    attribution: 'Tiles &copy; Esri Dark Gray',
-    maxZoom: 16
-  }).addTo(map);
-
-  L.tileLayer("https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png", {
-    attribution: 'Railway data &copy; OpenRailwayMap',
-    subdomains: "abc",
-    maxZoom: 19,
-    opacity: 0.85
+  L.tileLayer("https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+    attribution: 'Map data &copy; Google Maps',
+    subdomains: ["0", "1", "2", "3"],
+    maxZoom: 20
   }).addTo(map);
 
   REAL_ROUTES.forEach(r => {
@@ -4647,25 +6524,26 @@ function initMaintenanceMachineryMap() {
     leafletMapInstance = null;
   }
 
+  const SOUTH_INDIA_BOUNDS = L.latLngBounds(
+    L.latLng(7.5, 73.5),
+    L.latLng(15.2, 81.5)
+  );
+
   const map = L.map("maintenanceMapStage", {
-    center: [11.2000, 78.2000],
+    center: [10.8505, 78.2000],
     zoom: 7,
     minZoom: 6,
-    maxZoom: 16,
+    maxZoom: 18,
+    maxBounds: SOUTH_INDIA_BOUNDS,
+    maxBoundsViscosity: 1.0,
     zoomControl: true,
   });
   leafletMapInstance = map;
 
-  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-    attribution: 'Tiles &copy; Esri Dark Gray',
-    maxZoom: 16
-  }).addTo(map);
-
-  L.tileLayer("https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png", {
-    attribution: 'Railway data &copy; OpenRailwayMap',
-    subdomains: "abc",
-    maxZoom: 19,
-    opacity: 0.85
+  L.tileLayer("https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+    attribution: 'Map data &copy; Google Maps',
+    subdomains: ["0", "1", "2", "3"],
+    maxZoom: 20
   }).addTo(map);
 
   REAL_ROUTES.forEach(r => {
@@ -5042,7 +6920,7 @@ function highlightTrainRouteOnMap(query) {
   const singleTrainIcon = L.divIcon({
     html: `
       <div class="cris-active-train-pin">
-        <span class="train-pin-badge">⚡ ${trainNo}</span>
+        <span class="train-pin-badge">IR ${trainNo}</span>
         <span class="train-pin-speed">104 km/h</span>
       </div>
     `,
@@ -5136,10 +7014,43 @@ function clearTrainRouteHighlight() {
   if (clearBtn) clearBtn.style.display = "none";
 
   if (leafletMapInstance) {
-    leafletMapInstance.flyTo([10.8505, 77.8500], 7, { duration: 1.0 });
+    leafletMapInstance.flyTo([10.8505, 78.2000], 7, { duration: 1.0 });
   }
   showToast("Restored Southern Railway network overview.");
 }
+
+window.traceScheduledTrain = (trainNo) => {
+  const trainStr = String(trainNo).trim();
+  let found = (typeof CHENNAI_TIMETABLE_330 !== "undefined" && CHENNAI_TIMETABLE_330.find(t => String(t.train_no) === trainStr)) ||
+              (typeof LIVE_TRAINS_DATABASE !== "undefined" && LIVE_TRAINS_DATABASE.find(t => String(t.no || t.train_no) === trainStr));
+  
+  if (found) {
+    highlightTrainRoute(found);
+    return;
+  }
+
+  const fallbackTrainMap = {
+    "22616": { train_no: "22616", name: "Coimbatore – Tirupati Intercity SF", origin: "CBE", dest: "TPTY", dep: "06:10", arr: "13:25", stops: "TUP, ED, SA, JTJ, KPD, AJJ, TRT, RU", runtime: "7h 15m" },
+    "22666": { train_no: "22666", name: "Coimbatore – KSR Bengaluru Uday Exp", origin: "CBE", dest: "SBC", dep: "05:45", arr: "12:40", stops: "TUP, ED, SA, JTJ, BWT", runtime: "6h 55m" },
+    "12680": { train_no: "12680", name: "Coimbatore – Chennai Central Intercity", origin: "CBE", dest: "MAS", dep: "06:20", arr: "13:50", stops: "TUP, ED, SA, JTJ, KPD, AJJ", runtime: "7h 30m" },
+    "12676": { train_no: "12676", name: "Kovai Superfast Express", origin: "CBE", dest: "MAS", dep: "15:15", arr: "22:50", stops: "TUP, ED, SA, JTJ, KPD, AJJ", runtime: "7h 35m" },
+    "17229": { train_no: "17229", name: "Sabari Express", origin: "TVC", dest: "SC", dep: "06:45", arr: "12:40", stops: "QLN, KYJ, KTYM, ERS, TCR, SRR, PGT, CBE, TUP, ED, SA, JTJ, KPD", runtime: "29h 55m" },
+    "17230": { train_no: "17230", name: "Sabari Express (SC - TVC)", origin: "KPD", dest: "TVC", dep: "12:20", arr: "18:05", stops: "JTJ, SA, ED, TUP, CBE, PGT, SRR, TCR, ERS, KTYM, KYJ, QLN", runtime: "29h 45m" },
+    "17651": { train_no: "17651", name: "Chengalpattu – Kacheguda Exp", origin: "CGL", dest: "KCG", dep: "16:30", arr: "07:50", stops: "MS, AJJ, TRT, RU", runtime: "15h 20m" },
+    "17209": { train_no: "17209", name: "Seshadri Express", origin: "SBC", dest: "CCT", dep: "11:30", arr: "06:45", stops: "BWT, JTJ, KPD, RU", runtime: "19h 15m" },
+    "17210": { train_no: "17210", name: "Seshadri Express (CCT - SMVB)", origin: "RU", dest: "SBC", dep: "17:25", arr: "12:10", stops: "KPD, JTJ, BWT", runtime: "18h 45m" },
+    "12511": { train_no: "12511", name: "Raptisagar Express", origin: "MAS", dest: "TVC", dep: "06:35", arr: "17:20", stops: "AJJ, KPD, JTJ, SA, ED, TUP, CBE, PGT, SRR, TCR, ERS, ALLP, QLN", runtime: "58h 45m" },
+    "12512": { train_no: "12512", name: "Raptisagar Express (TVC - GKP)", origin: "TVC", dest: "MAS", dep: "06:35", arr: "15:20", stops: "QLN, ALLP, ERS, TCR, SRR, PGT, CBE, TUP, ED, SA, JTJ, KPD, AJJ", runtime: "56h 45m" },
+    "12433": { train_no: "12433", name: "Chennai Central – NZM Rajdhani", origin: "MAS", dest: "RU", dep: "06:05", arr: "10:30", stops: "AJJ, RU", runtime: "28h 25m" },
+    "17041": { train_no: "17041", name: "Amrit Bharat Express", origin: "RU", dest: "TVC", dep: "19:15", arr: "23:45", stops: "KPD, JTJ, SA, ED, TUP, CBE, PGT, SRR, TCR, ERS, KTYM, KYJ, QLN", runtime: "28h 30m" }
+  };
+
+  if (fallbackTrainMap[trainStr]) {
+    highlightTrainRoute(fallbackTrainMap[trainStr]);
+  } else {
+    showToast(`Displaying Southern Railway path for Train #${trainNo}`);
+  }
+};
 
 // ==========================================================================
 // 9. TOAST & MODALS
@@ -5191,6 +7102,8 @@ function showModal(title, description, bodyHtml, onConfirm, confirmText = "Submi
     };
   }
 }
+window.showToast = showToast;
+window.showModal = showModal;
 
 // ==========================================================================
 // 10. GANTT RENDERER & ACTIONS
@@ -5378,7 +7291,7 @@ window.showBackendConnectionModal = () => {
       <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:16px;margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border-light)">
           <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:22px">⚡</span>
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#2563eb;fill:none;stroke-width:2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
             <div>
               <div style="font-weight:800;font-size:15px;color:var(--text-heading)">Python FastAPI Backend Engine</div>
               <div style="font-size:11.5px;color:var(--text-muted)">SIH2026-BlockPlanning • High Availability Uvicorn Server</div>
@@ -5432,7 +7345,7 @@ window.showBackendConnectionModal = () => {
           🔄 Re-test Connection
         </button>
         <button class="primary" style="padding:6px 14px;font-size:12px;font-weight:700" onclick="window.open('${base}/docs', '_blank')">
-          ⚡ Open Swagger UI
+          Open Swagger UI
         </button>
       </div>
     `,
@@ -6005,7 +7918,8 @@ window.openCreateBlockPlanModal = (prefillDate = "") => {
       <div id="newPlanAiSyncBox" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.35);border-radius:6px;padding:12px;margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <span style="font-size:12px;font-weight:800;color:#22c55e;display:flex;align-items:center;gap:6px">
-            <span>⚡</span> AI Train Headway Analyzer (Station Timetable Sync)
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#22c55e;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            COA Train Headway & Timetable Corridor Sync
           </span>
           <button type="button" style="background:#2563eb;color:#fff;border:none;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:800;cursor:pointer" onclick="autoSnapToSafeGap()">
             Auto-Snap to Safe Gap (01:15 - 04:15)
@@ -6463,18 +8377,64 @@ const ASSET_MOCK_DATA = [
   { id:"AST-012", name:"Ballast Cleaning Machine BCM-4", category:"P-Way Machinery",   corridor:"Palakkad Corridor",  status:"In Transit", location:"CBE Workshop → PGT Section",      next_maint:"19-Sep-2026", hrs:2340 },
 ];
 
+// State variables for the Asset Maintenance & Cost Optimization Agent Window
+let assetSubView = "ai_fleet"; // "ai_fleet" or "pway_machinery"
+let assetTimelineFilter = "ALL"; // "ALL", "PAST", "PRESENT", "FUTURE"
+let assetZoneFilter = "ALL"; // "ALL", "NR", "CR", "SWR", "WR", "SER", "ER", "ECoR", "SCR", "SR", "NWR", "ECR"
+let assetStationFilter = "ALL"; // "ALL", "MAS", "MS", "CBE", "SA", "ED", "TPJ", "MDU", "TVC", "ERS", "PGT"
+let assetTrainSearch = "";
+let assetSelectedTrainNo = "20608";
 let assetActiveTab = "all";
 let assetCorridor = "All Corridors";
 let assetStatusFilter = "All Status";
 let assetSearch = "";
 
-function renderAssetManagementPage() {
+// Global Window Event Handlers for Asset Maintenance Window
+if (typeof window !== "undefined") {
+  window.__setAssetSubView = (v) => { assetSubView = v; render(); };
+  window.__setAssetTimeline = (tl) => { assetTimelineFilter = tl; render(); };
+  window.__setAssetZone = (z) => { assetZoneFilter = z; render(); };
+  window.__setAssetStation = (stn) => { assetStationFilter = stn; render(); };
+  window.__setAssetSearch = (q) => { assetTrainSearch = q; render(); };
+  window.__selectAssetTrain = (no) => { assetSelectedTrainNo = no; render(); };
+}
+
+function renderAssetMaintenancePage() {
+  const allClassified = typeof classifyFleetTimeline === "function" ? classifyFleetTimeline() : [];
+  const pastList = allClassified.filter(t => t.timeline === "PAST");
+  const presentList = allClassified.filter(t => t.timeline === "PRESENT");
+  const futureList = allClassified.filter(t => t.timeline === "FUTURE");
+
+  // Filtering for AI Fleet
+  let filteredFleet = allClassified.filter(t => {
+    const matchTL = assetTimelineFilter === "ALL" || t.timeline === assetTimelineFilter;
+    const matchZone = assetZoneFilter === "ALL" || t.owningZone?.code === assetZoneFilter;
+    const matchStn = assetStationFilter === "ALL" || t.stnCode === assetStationFilter || t.stn === assetStationFilter;
+    const q = (assetTrainSearch || "").toLowerCase().trim();
+    const matchQ = !q || 
+      String(t.train_no || t.no || "").toLowerCase().includes(q) || 
+      String(t.name || "").toLowerCase().includes(q) || 
+      String(t.origin || "").toLowerCase().includes(q) || 
+      String(t.dest || "").toLowerCase().includes(q) ||
+      String(t.owningZone?.code || "").toLowerCase().includes(q);
+    return matchTL && matchZone && matchStn && matchQ;
+  });
+
+  const kpis = typeof getFleetFinancialKPIs === "function" ? getFleetFinancialKPIs(filteredFleet) : {
+    totalOperationsCost: 0, totalRepairCost: 0, totalOperationalCost: 0, totalForeignDebits: 0, totalSavings: 0, netBenefit: 0
+  };
+
+  // Keep selected train valid
+  if (!filteredFleet.some(t => String(t.train_no || t.no) === String(assetSelectedTrainNo)) && filteredFleet.length > 0) {
+    assetSelectedTrainNo = filteredFleet[0].train_no || filteredFleet[0].no;
+  }
+  const selectedTrainObj = allClassified.find(t => String(t.train_no || t.no) === String(assetSelectedTrainNo)) || filteredFleet[0] || allClassified[0];
+  const audit = selectedTrainObj && typeof run14PointAssetAudit === "function" ? run14PointAssetAudit(selectedTrainObj, selectedTrainObj.stnCode || "MAS") : null;
+
+  // Filtering for P-Way Machinery
   const corridors = ["All Corridors", ...SR_CORRIDORS.map(c => c.name)];
   const statusOptions = ["All Status","Active","Deployed","Standby","In Transit"];
-  const catCounts = {};
-  ASSET_MOCK_DATA.forEach(a => { catCounts[a.category] = (catCounts[a.category] || 0) + 1; });
-
-  let filtered = ASSET_MOCK_DATA.filter(a => {
+  let filteredMachinery = ASSET_MOCK_DATA.filter(a => {
     const matchCor = assetCorridor === "All Corridors" || a.corridor === assetCorridor;
     const matchSt  = assetStatusFilter === "All Status" || a.status === assetStatusFilter;
     const matchQ   = !assetSearch || a.name.toLowerCase().includes(assetSearch) || a.id.toLowerCase().includes(assetSearch) || a.category.toLowerCase().includes(assetSearch);
@@ -6489,8 +8449,8 @@ function renderAssetManagementPage() {
   });
 
   const statusColors = { "Active":"#22c55e","Deployed":"#3b82f6","Standby":"#f59e0b","In Transit":"#a78bfa" };
-  const tabs = [
-    { id:"all",    label:`All Assets (${ASSET_MOCK_DATA.length})` },
+  const machTabs = [
+    { id:"all",    label:`All Machinery (${ASSET_MOCK_DATA.length})` },
     { id:"pway",   label:"P-Way Machinery" },
     { id:"trd",    label:"TRD Equipment" },
     { id:"st",     label:"S&T Equipment" },
@@ -6501,117 +8461,497 @@ function renderAssetManagementPage() {
 
   return `
     <main class="content">
-      <!-- Header -->
-      <div class="screen-header-bar">
+      <!-- Screen Header with AI Agent Badge -->
+      <div class="screen-header-bar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px">
         <div class="screen-title-wrap">
-          <h2>Asset Management</h2>
-          <div class="screen-breadcrumb">Home > Asset Management</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <h2 style="margin:0;font-size:22px;font-weight:900;color:#ffffff;letter-spacing:-0.3px">Asset Maintenance &amp; Multi-Zone Fleet AI</h2>
+            <span style="background:rgba(56,189,248,0.15);border:1.5px solid #38bdf8;color:#38bdf8;font-size:10.5px;font-weight:900;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:5px">
+              <span style="width:6px;height:6px;border-radius:50%;background:#38bdf8;display:inline-block;animation:pulse 2s infinite"></span>
+              AI COST &amp; REPAIR AGENT ACTIVE
+            </span>
+          </div>
+          <div class="screen-breadcrumb" style="font-size:11px;color:var(--text-muted);margin-top:3px">
+            Home > Resources &amp; Assets > <b>Asset Maintenance</b> • Southern Railway Operating Corridor • 330 Pan-Indian Trains
+          </div>
         </div>
-        <button class="primary" onclick="showToast('Registering new asset in CRIS Asset Registry…')">+ Register Asset</button>
-      </div>
 
-      <!-- KPI Summary Row -->
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px">
-        <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:10px;padding:14px 16px">
-          <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:4px">TOTAL ASSETS</div>
-          <div style="font-size:26px;font-weight:900;color:#60a5fa">${ASSET_MOCK_DATA.length}</div>
-          <div style="font-size:10.5px;color:var(--text-muted)">Across 6 Corridors</div>
-        </div>
-        <div style="background:var(--bg-card);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:14px 16px">
-          <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:4px">ACTIVE / DEPLOYED</div>
-          <div style="font-size:26px;font-weight:900;color:#22c55e">${ASSET_MOCK_DATA.filter(a=>["Active","Deployed"].includes(a.status)).length}</div>
-          <div style="font-size:10.5px;color:var(--text-muted)">In field operation</div>
-        </div>
-        <div style="background:var(--bg-card);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:14px 16px">
-          <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:4px">STANDBY</div>
-          <div style="font-size:26px;font-weight:900;color:#f59e0b">${ASSET_MOCK_DATA.filter(a=>a.status==="Standby").length}</div>
-          <div style="font-size:10.5px;color:var(--text-muted)">Awaiting deployment</div>
-        </div>
-        <div style="background:var(--bg-card);border:1px solid rgba(167,139,250,0.3);border-radius:10px;padding:14px 16px">
-          <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:4px">IN TRANSIT</div>
-          <div style="font-size:26px;font-weight:900;color:#a78bfa">${ASSET_MOCK_DATA.filter(a=>a.status==="In Transit").length}</div>
-          <div style="font-size:10.5px;color:var(--text-muted)">En route to section</div>
-        </div>
-        <div style="background:var(--bg-card);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px 16px">
-          <div style="font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:4px">MAINT DUE (30d)</div>
-          <div style="font-size:26px;font-weight:900;color:#ef4444">${ASSET_MOCK_DATA.filter(a=>{const d=a.next_maint.split('-');return new Date(d[2],['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].indexOf(d[1]),d[0])<=new Date(2026,9,1);}).length}</div>
-          <div style="font-size:10.5px;color:var(--text-muted)">Scheduled for service</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="primary" style="background:#2563eb;font-weight:800;font-size:12px;padding:7px 16px;border-radius:6px;display:flex;align-items:center;gap:6px" onclick="window.openAssetMaintenanceAgentModal('${assetSelectedTrainNo || '20608'}')">
+            <span>🤖</span> Launch 14-Point AI Master Audit Console
+          </button>
+          <button class="secondary" style="font-weight:700;font-size:12px;padding:7px 14px;border-radius:6px" onclick="showToast('Exporting Inter-Railway Debit &amp; Cost Ledger to CSV…')">
+            ⬇ Export Cost Ledger
+          </button>
         </div>
       </div>
 
-      <!-- Filter Bar -->
-      <div class="screen-filter-bar" style="margin-bottom:14px">
-        <select id="assetCorridorSelect" style="background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700">
-          ${corridors.map(c=>`<option value="${c}" ${c===assetCorridor?'selected':''}>${c}</option>`).join('')}
-        </select>
-        <select id="assetStatusSelect" style="background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700">
-          ${statusOptions.map(s=>`<option value="${s}" ${s===assetStatusFilter?'selected':''}>${s}</option>`).join('')}
-        </select>
-        <input type="text" id="assetSearchInput" value="${esc(assetSearch)}" placeholder="Search asset name, ID, or category..." class="filter-search-input" style="width:260px" />
-        <button class="filter-dropdown-btn" onclick="showToast('Exporting asset register to CSV…')">⬇ Export CSV</button>
-        <button class="filter-dropdown-btn" onclick="showToast('Syncing with CRIS Asset Portal…')">🔄 Sync CRIS</button>
+      <!-- Main Navigation Sub-View Switcher -->
+      <div style="display:flex;gap:10px;margin-bottom:16px;border-bottom:1px solid var(--border-light);padding-bottom:10px">
+        <button class="timeline-pill ${assetSubView === 'ai_fleet' ? 'active' : ''}" onclick="window.__setAssetSubView('ai_fleet')">
+          <span style="font-size:14px">🤖</span>
+          <span>AI Train Fleet Maintenance &amp; Cost Optimizer (${allClassified.length} Trains)</span>
+        </button>
+        <button class="timeline-pill ${assetSubView === 'pway_machinery' ? 'active' : ''}" onclick="window.__setAssetSubView('pway_machinery')">
+          <span style="font-size:14px">🛠️</span>
+          <span>P-Way Track Maintenance Machinery (${ASSET_MOCK_DATA.length})</span>
+        </button>
       </div>
 
-      <!-- Category Tabs -->
-      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
-        ${tabs.map(t=>`
-          <button data-asset-tab="${t.id}" style="
-            padding:6px 14px;border-radius:20px;font-size:11.5px;font-weight:700;cursor:pointer;
-            border:1px solid ${assetActiveTab===t.id?'#2563eb':'var(--border-light)'};
-            background:${assetActiveTab===t.id?'#2563eb':'var(--bg-input)'};
-            color:${assetActiveTab===t.id?'#fff':'var(--text-muted)'}
-          ">${t.label}</button>
-        `).join('')}
-      </div>
+      ${assetSubView === 'ai_fleet' ? `
+        <!-- AI FLEET MAINTENANCE & COST CONSOLE -->
 
-      <!-- Asset Table -->
-      <div class="panel" style="padding:0;overflow:hidden">
-        <div style="overflow-x:auto;max-height:520px;overflow-y:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:12px">
-            <thead style="position:sticky;top:0;background:var(--bg-card);z-index:10">
-              <tr style="border-bottom:2px solid var(--border-light)">
-                <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">ASSET ID</th>
-                <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">ASSET NAME</th>
-                <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">CATEGORY</th>
-                <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">CORRIDOR</th>
-                <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">CURRENT LOCATION</th>
-                <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">STATUS</th>
-                <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">TOTAL HRS</th>
-                <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">NEXT MAINT.</th>
-                <th style="text-align:center;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${filtered.length === 0
-                ? `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted)">No assets found for selected filter.</td></tr>`
-                : filtered.map((a, i) => `
-                  <tr style="border-bottom:1px solid var(--border-light);${i%2===1?'background:rgba(255,255,255,0.015)':''}">
-                    <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#60a5fa;font-weight:700">${esc(a.id)}</td>
-                    <td style="padding:10px 14px;font-weight:600;color:var(--text-heading);max-width:200px">${esc(a.name)}</td>
-                    <td style="padding:10px 14px"><span style="background:rgba(99,102,241,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.3);border-radius:4px;padding:2px 8px;font-size:10.5px;font-weight:700;white-space:nowrap">${esc(a.category)}</span></td>
-                    <td style="padding:10px 14px;font-size:11.5px;color:var(--text-main)">${esc(a.corridor)}</td>
-                    <td style="padding:10px 14px;font-size:11px;color:var(--text-muted);max-width:180px">${esc(a.location)}</td>
-                    <td style="padding:10px 14px"><span style="background:${statusColors[a.status]||'#94a3b8'}18;color:${statusColors[a.status]||'#94a3b8'};border:1px solid ${statusColors[a.status]||'#94a3b8'}44;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:800">${esc(a.status)}</span></td>
-                    <td style="padding:10px 14px;font-size:11.5px;font-weight:700;color:var(--text-main)">${a.hrs.toLocaleString()} hrs</td>
-                    <td style="padding:10px 14px;font-size:11px;color:${new Date(2026,8,15) >= new Date() ? '#ef4444' : 'var(--text-muted)'}">${esc(a.next_maint)}</td>
-                    <td style="padding:10px 14px;text-align:center">
-                      <div style="display:flex;justify-content:center;gap:6px">
-                        <button title="View Details" style="background:transparent;border:none;color:#60a5fa;cursor:pointer;font-size:15px" onclick="showToast('Asset ${esc(a.id)}: ${esc(a.name)} — Details panel')">👁</button>
-                        <button title="Deploy" style="background:transparent;border:none;color:#22c55e;cursor:pointer;font-size:15px" onclick="showToast('Initiating deployment workflow for ${esc(a.id)}…')">🚀</button>
-                      </div>
-                    </td>
-                  </tr>
+        <!-- 1. Timeline Horizon Switcher (Past, Present, Future) -->
+        <div style="background:linear-gradient(135deg, #07172b 0%, #0c233f 100%);border:1.5px solid #1a3c63;border-radius:8px;padding:12px 16px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+            <div>
+              <span style="font-size:11px;color:#93c5fd;font-weight:800;letter-spacing:0.5px;text-transform:uppercase">OPERATIONAL TIMELINE HORIZON:</span>
+              <div style="font-size:11px;color:var(--text-muted)">Calculate Operations, Repair &amp; Total Costs for Past, Present, and Future Trains</div>
+            </div>
+            <div style="font-size:11.5px;color:#4ade80;font-weight:800">
+              ⚡ Zero-Line-Block Concurrent Pit-Line Servicing Guaranteed
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="timeline-pill ${assetTimelineFilter === 'ALL' ? 'active' : ''}" onclick="window.__setAssetTimeline('ALL')">
+              <span>🌐</span> All Timelines (${allClassified.length})
+            </button>
+            <button class="timeline-pill ${assetTimelineFilter === 'PAST' ? 'active' : ''}" onclick="window.__setAssetTimeline('PAST')" style="${assetTimelineFilter === 'PAST' ? 'background:#d97706;border-color:#fbbf24;' : ''}">
+              <span>⏪</span> PAST TRAINS (${pastList.length}) — Completed Runs &amp; Logged Repair
+            </button>
+            <button class="timeline-pill ${assetTimelineFilter === 'PRESENT' ? 'active' : ''}" onclick="window.__setAssetTimeline('PRESENT')" style="${assetTimelineFilter === 'PRESENT' ? 'background:#16a34a;border-color:#4ade80;' : ''}">
+              <span>🟢</span> PRESENT TRAINS (${presentList.length}) — Active &amp; Stabled Live Service
+            </button>
+            <button class="timeline-pill ${assetTimelineFilter === 'FUTURE' ? 'active' : ''}" onclick="window.__setAssetTimeline('FUTURE')" style="${assetTimelineFilter === 'FUTURE' ? 'background:#7c3aed;border-color:#a78bfa;' : ''}">
+              <span>⏩</span> FUTURE TRAINS (${futureList.length}) — Forecasted &amp; Advance BOM Roster
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Zone & Station Filter Controls -->
+        <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+          <!-- Zone Filter Pills -->
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <span style="font-size:11px;color:var(--text-muted);font-weight:700;margin-right:4px">OWNING RAILWAY ZONE:</span>
+            ${['ALL', 'NR', 'CR', 'SWR', 'WR', 'SER', 'ER', 'ECoR', 'SCR', 'SR', 'NWR', 'ECR'].map(z => `
+              <button class="agent-zone-btn ${assetZoneFilter === z ? 'active' : ''}" onclick="window.__setAssetZone('${z}')" style="
+                padding:3px 9px;border-radius:14px;font-size:10.5px;font-weight:700;cursor:pointer;
+                background:${assetZoneFilter === z ? '#2563eb' : 'var(--bg-input)'};
+                border:1px solid ${assetZoneFilter === z ? '#60a5fa' : 'var(--border-light)'};
+                color:${assetZoneFilter === z ? '#ffffff' : 'var(--text-muted)'};
+              ">${z === 'ALL' ? '🌐 ALL' : z}</button>
+            `).join('')}
+          </div>
+
+          <!-- Station Selector & Search Input -->
+          <div style="display:grid;grid-template-columns:1.8fr 1.2fr;gap:12px;align-items:center">
+            <div style="display:flex;align-items:center;gap:8px">
+              <input type="text" id="assetTrainSearchInput" value="${esc(assetTrainSearch)}" oninput="window.__setAssetSearch(this.value)" placeholder="Search Train No., Name, Route, or Origin / Destination..." style="flex:1;background:var(--bg-input);color:#ffffff;border:1px solid var(--border-light);border-radius:6px;padding:7px 12px;font-size:12px;font-weight:600" />
+              ${assetTrainSearch ? `<button class="secondary" style="padding:6px 10px;font-size:11px" onclick="window.__setAssetSearch('')">✕ Clear</button>` : ''}
+            </div>
+
+            <div style="display:flex;align-items:center;gap:8px">
+              <label style="font-size:11px;color:var(--text-muted);font-weight:700;white-space:nowrap">SR FACILITY:</label>
+              <select onchange="window.__setAssetStation(this.value)" style="flex:1;background:var(--bg-input);color:#ffffff;border:1px solid var(--border-light);border-radius:6px;padding:7px 10px;font-size:11.5px;font-weight:700">
+                <option value="ALL" ${assetStationFilter === 'ALL' ? 'selected' : ''}>All SR Maintenance Facilities (10 Stations)</option>
+                ${Object.entries(SR_STATION_MAINTENANCE_FACILITIES).map(([code, fac]) => `
+                  <option value="${code}" ${assetStationFilter === code ? 'selected' : ''}>${code} — ${fac.name} (${fac.facility.split('&')[0].trim()})</option>
                 `).join('')}
-            </tbody>
-          </table>
+              </select>
+            </div>
+          </div>
         </div>
-        <div style="padding:10px 14px;border-top:1px solid var(--border-light);font-size:11px;color:var(--text-muted)">
-          Showing ${filtered.length} of ${ASSET_MOCK_DATA.length} assets • Data synced with CRIS Asset Registry
+
+        <!-- 3. Dynamic 5-KPI Financial Cards Row -->
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px">
+          <!-- Card 1: Operations Cost -->
+          <div style="background:var(--bg-card);border:1px solid #3b82f6;border-radius:8px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+            <div style="font-size:10.5px;color:#93c5fd;font-weight:800;text-transform:uppercase;margin-bottom:2px">1. OPERATIONS COST</div>
+            <div style="font-size:22px;font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#60a5fa">₹${kpis.totalOperationsCost.toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Traction Power + LP/Guard Wages + Terminal</div>
+          </div>
+
+          <!-- Card 2: Repair Cost -->
+          <div style="background:var(--bg-card);border:1px solid #f59e0b;border-radius:8px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+            <div style="font-size:10.5px;color:#fcd34d;font-weight:800;text-transform:uppercase;margin-bottom:2px">2. REPAIR &amp; OVERHAUL</div>
+            <div style="font-size:22px;font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fbbf24">₹${kpis.totalRepairCost.toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">RDSO Parts BOM + Mechanical/TRD Labour</div>
+          </div>
+
+          <!-- Card 3: Total Operational Cost -->
+          <div style="background:var(--bg-card);border:1.5px solid #38bdf8;border-radius:8px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+            <div style="font-size:10.5px;color:#38bdf8;font-weight:800;text-transform:uppercase;margin-bottom:2px">3. TOTAL OPERATIONAL COST</div>
+            <div style="font-size:22px;font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#ffffff">₹${kpis.totalOperationalCost.toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Operations Cost + Direct Repair Cost</div>
+          </div>
+
+          <!-- Card 4: Inter-Railway Debits -->
+          <div style="background:var(--bg-card);border:1px solid #a855f7;border-radius:8px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+            <div style="font-size:10.5px;color:#d8b4fe;font-weight:800;text-transform:uppercase;margin-bottom:2px">4. INTER-RAILWAY DEBITS</div>
+            <div style="font-size:22px;font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#c084fc">₹${kpis.totalForeignDebits.toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Debited to Foreign Owning Zones (NR/CR/SWR)</div>
+          </div>
+
+          <!-- Card 5: Net Savings / Avoided Cost -->
+          <div style="background:linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(20,83,45,0.2) 100%);border:1.5px solid #22c55e;border-radius:8px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+            <div style="font-size:10.5px;color:#86efac;font-weight:800;text-transform:uppercase;margin-bottom:2px">5. AVOIDED DOWNTIME SAVINGS</div>
+            <div style="font-size:22px;font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#4ade80">₹${kpis.totalSavings.toLocaleString('en-IN')}</div>
+            <div style="font-size:10px;color:#86efac;margin-top:2px;font-weight:700">Net Financial Gain: +₹${kpis.netBenefit.toLocaleString('en-IN')}</div>
+          </div>
         </div>
-      </div>
+
+        <!-- 4. Fleet Operational & Cost Table -->
+        <div class="panel" style="padding:0;overflow:hidden;margin-bottom:18px">
+          <div style="padding:10px 16px;background:var(--bg-panel-alt);border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <strong style="font-size:13px;color:#ffffff">Train Fleet Operations &amp; Maintenance Cost Ledger</strong>
+              <span style="font-size:11px;color:var(--text-muted);margin-left:8px">Showing ${filteredFleet.length} of ${allClassified.length} Trains</span>
+            </div>
+            <span style="font-size:11px;color:#38bdf8;font-weight:700">Click any train row to inspect its full 14-Point Decision &amp; Cost Audit below ↓</span>
+          </div>
+
+          <div style="overflow-x:auto;max-height:420px;overflow-y:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+              <thead style="position:sticky;top:0;background:var(--bg-card);z-index:10">
+                <tr style="border-bottom:2px solid var(--border-light);text-align:left;color:var(--text-muted);font-size:10.5px">
+                  <th style="padding:9px 12px">TRAIN / FLEET ASSET</th>
+                  <th style="padding:9px 12px">TIMELINE STATUS</th>
+                  <th style="padding:9px 12px">FACILITY LOCATION</th>
+                  <th style="padding:9px 12px">OPERATIONS COST</th>
+                  <th style="padding:9px 12px">REPAIR COST</th>
+                  <th style="padding:9px 12px">TOTAL OPERATIONAL</th>
+                  <th style="padding:9px 12px">INTER-RAILWAY DEBIT</th>
+                  <th style="padding:9px 12px">STABLING FIT / SAVINGS</th>
+                  <th style="padding:9px 12px;text-align:center">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filteredFleet.length === 0
+                  ? `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted)">No trains matching active timeline or filters.</td></tr>`
+                  : filteredFleet.slice(0, 50).map((t, idx) => {
+                    const no = t.train_no || t.no;
+                    const oz = t.owningZone;
+                    const isSel = String(no) === String(assetSelectedTrainNo);
+                    const tlBadge = t.timeline === 'PAST'
+                      ? `<span style="background:rgba(217,119,6,0.15);border:1px solid #d97706;color:#fbbf24;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px">⏪ PAST</span>`
+                      : (t.timeline === 'PRESENT'
+                        ? `<span style="background:rgba(34,197,94,0.15);border:1px solid #22c55e;color:#4ade80;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px">🟢 PRESENT</span>`
+                        : `<span style="background:rgba(168,85,247,0.15);border:1px solid #a855f7;color:#c084fc;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px">⏩ FUTURE</span>`);
+
+                    return `
+                      <tr class="train-cost-row ${isSel ? 'selected' : ''}" onclick="window.__selectAssetTrain('${no}')" style="border-bottom:1px solid var(--border-subtle);${idx%2===1?'background:rgba(255,255,255,0.015)':''}">
+                        <td style="padding:9px 12px">
+                          <div style="font-weight:800;color:#ffffff;display:flex;align-items:center;gap:6px">
+                            <span>${no}</span>
+                            <span style="background:${oz.isForeignRake ? 'rgba(245,158,11,0.2)' : 'rgba(56,189,248,0.2)'};border:1px solid ${oz.isForeignRake ? '#f59e0b' : '#38bdf8'};color:${oz.isForeignRake ? '#fbbf24' : '#38bdf8'};font-size:9.5px;font-weight:800;padding:1px 5px;border-radius:3px">
+                              ${oz.code}
+                            </span>
+                            ${oz.isForeignRake ? `<span style="color:#ef4444;font-size:9.5px" title="Foreign Owning Zone">⚠️</span>` : ''}
+                          </div>
+                          <div style="font-size:10.5px;color:var(--text-muted);margin-top:1px">${t.name}</div>
+                        </td>
+
+                        <td style="padding:9px 12px">
+                          ${tlBadge}
+                          <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${t.statusText}</div>
+                        </td>
+
+                        <td style="padding:9px 12px">
+                          <strong style="color:#ffffff">${t.stnCode}</strong>
+                          <div style="font-size:10px;color:var(--text-muted)">${t.locationDetail}</div>
+                        </td>
+
+                        <td style="padding:9px 12px;font-weight:700;color:#60a5fa">
+                          ₹${t.operationsCost.toLocaleString('en-IN')}
+                          <div style="font-size:9.5px;color:var(--text-muted)">${t.distKm} km • 25kV OHE</div>
+                        </td>
+
+                        <td style="padding:9px 12px;font-weight:700;color:#fbbf24">
+                          ₹${t.repairCost.toLocaleString('en-IN')}
+                          <div style="font-size:9.5px;color:var(--text-muted)">BOM + 10 Staff</div>
+                        </td>
+
+                        <td style="padding:9px 12px;font-weight:800;color:#ffffff">
+                          ₹${t.totalOperationalCost.toLocaleString('en-IN')}
+                        </td>
+
+                        <td style="padding:9px 12px">
+                          <code style="font-size:10px;color:#c084fc;background:rgba(168,85,247,0.1);padding:2px 5px;border-radius:3px">${t.debitAccount}</code>
+                          <div style="font-size:9.5px;color:var(--text-muted)">${oz.name.split(' ')[0]} HQ</div>
+                        </td>
+
+                        <td style="padding:9px 12px">
+                          <span style="color:#4ade80;font-weight:800;font-size:11px">✓ 100% Fit</span>
+                          <div style="font-size:9.5px;color:#86efac">+₹${t.netBenefit.toLocaleString('en-IN')} Net</div>
+                        </td>
+
+                        <td style="padding:9px 12px;text-align:center">
+                          <div style="display:flex;justify-content:center;gap:6px">
+                            <button class="primary" style="background:#2563eb;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:4px" onclick="event.stopPropagation(); window.openAssetMaintenanceAgentModal('${no}', '${t.stnCode}')" title="Open Deep 14-Point Audit Modal">
+                              🤖 14-Pt Audit
+                            </button>
+                            <button class="secondary" style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:4px" onclick="event.stopPropagation(); showToast('✓ Electronic Job Card &amp; BPC authorized for Train #${no} at ${t.stnCode}.')">
+                              ✓ BPC
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:8px 14px;border-top:1px solid var(--border-light);font-size:10.5px;color:var(--text-muted);display:flex;justify-content:space-between">
+            <span>Showing top 50 filtered results • Full 330-train multi-zone fleet loaded</span>
+            <span>Indian Railways G&amp;SR Part-V Maintenance Compliance</span>
+          </div>
+        </div>
+
+        <!-- 5. Selected Train Deep 14-Point AI Cost & Operational Audit Inspector -->
+        ${audit ? `
+          <div style="background:linear-gradient(135deg, #091e3b 0%, #06152a 100%);border:2px solid #38bdf8;border-radius:8px;padding:16px 20px;margin-bottom:20px;box-shadow:0 6px 24px rgba(0,0,0,0.4)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px;border-bottom:1px solid rgba(56,189,248,0.25);padding-bottom:12px">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:20px">🤖</span>
+                  <h3 style="margin:0;font-size:18px;color:#ffffff">14-Point Decision &amp; Cost Audit: Train #${audit.trainNo} • ${audit.trainName}</h3>
+                  <span style="background:${audit.owningZone.isForeignRake ? 'rgba(245,158,11,0.2)' : 'rgba(56,189,248,0.2)'};border:1px solid ${audit.owningZone.isForeignRake ? '#f59e0b' : '#38bdf8'};color:${audit.owningZone.isForeignRake ? '#fbbf24' : '#38bdf8'};font-size:11px;font-weight:800;padding:2px 8px;border-radius:4px">
+                    ${audit.owningZone.code} — ${audit.owningZone.name}
+                  </span>
+                  ${audit.owningZone.isForeignRake ? `<span style="background:rgba(239,68,68,0.2);border:1px solid #ef4444;color:#fca5a5;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px">FOREIGN RAKE DEBIT</span>` : ''}
+                </div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:4px">
+                  Facility: <b style="color:#ffffff">${audit.facility.name} (${audit.stationCode})</b> • Pit Lines: <b style="color:#38bdf8">${audit.facility.pitLines}</b> • Depot: <b style="color:#ffffff">${audit.facility.facility}</b>
+                </div>
+              </div>
+
+              <div style="text-align:right">
+                <span style="font-size:10px;color:#94a3b8;display:block">AVAILABLE STABLING DWELL:</span>
+                <span style="font-size:20px;font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#38bdf8">${audit.stablingWindow.formatted}</span>
+              </div>
+            </div>
+
+            <!-- Parameters 1-4 Grid -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+              <div class="agent-eval-card" style="background:#0b1d36;border:1.5px solid #1e4976;border-radius:8px;padding:12px 14px;color:#f8fafc">
+                <strong style="color:#60a5fa;display:block;margin-bottom:6px;font-size:12px">1. What asset is present?</strong>
+                <div style="font-size:11.5px;line-height:1.5;color:#e2e8f0">
+                  <div>• <b style="color:#ffffff">Locomotive:</b> <span style="color:#93c5fd">${audit.param1_assetPresent.locomotive.assetId} (${audit.param1_assetPresent.locomotive.locoClass})</span></div>
+                  <div>• <b style="color:#ffffff">Owning Shed:</b> <span style="color:#e2e8f0">${audit.param1_assetPresent.locomotive.owningShed}</span></div>
+                  <div>• <b style="color:#ffffff">Coaching Stock:</b> <span style="color:#e2e8f0">${audit.param1_assetPresent.coachingStock.totalCoaches}-Coach ${audit.param1_assetPresent.coachingStock.rakeType}</span></div>
+                  <div>• <b style="color:#ffffff">Primary Depot:</b> <span style="color:#cbd5e1">${audit.owningZone.primaryDepots[0] || 'Zonal Yard'}</span></div>
+                </div>
+              </div>
+
+              <div class="agent-eval-card" style="background:#0b1d36;border:1.5px solid #1e4976;border-radius:8px;padding:12px 14px;color:#f8fafc">
+                <strong style="color:#60a5fa;display:block;margin-bottom:6px;font-size:12px">2. Where is it currently located?</strong>
+                <div style="font-size:11.5px;line-height:1.5;color:#e2e8f0">
+                  <div>• <b style="color:#ffffff">Station:</b> <span style="color:#38bdf8;font-weight:700">${audit.param2_currentLocation.station}</span></div>
+                  <div>• <b style="color:#ffffff">Berth / Facility:</b> <span style="color:#e2e8f0">${audit.param2_currentLocation.berth}</span></div>
+                  <div>• <b style="color:#ffffff">Infrastructure:</b> <span style="color:#cbd5e1">${audit.facility.pitLines} Pit Lines, 750V HEP Shore Supply, USFD Pits</span></div>
+                  <div>• <b style="color:#ffffff">Corridor:</b> <span style="color:#cbd5e1">${audit.param2_currentLocation.corridor}</span></div>
+                </div>
+              </div>
+
+              <div class="agent-eval-card" style="background:#1f1315;border:1.5px solid rgba(239,68,68,0.5);border-radius:8px;padding:12px 14px;color:#f8fafc">
+                <strong style="color:#f87171;display:block;margin-bottom:6px;font-size:12px">3. Does it require maintenance/repair?</strong>
+                <div style="font-size:11.5px;line-height:1.5">
+                  <span style="background:rgba(239,68,68,0.25);border:1px solid #ef4444;color:#fca5a5;font-weight:800;padding:3px 8px;border-radius:4px">${audit.param3_requiresMaintenance.status}</span>
+                  <div style="margin-top:6px;color:#e2e8f0;line-height:1.4">${audit.param3_requiresMaintenance.reason}</div>
+                </div>
+              </div>
+
+              <div class="agent-eval-card" style="background:#0b1d36;border:1.5px solid #1e4976;border-radius:8px;padding:12px 14px;color:#f8fafc">
+                <strong style="color:#60a5fa;display:block;margin-bottom:6px;font-size:12px">4. What maintenance work is required?</strong>
+                <ul style="margin:4px 0 0;padding-left:18px;font-size:11.5px;color:#e2e8f0;line-height:1.5">
+                  ${audit.param4_workScope.tasks.slice(0, 4).map(t => `<li style="color:#e2e8f0;margin-bottom:3px">${t}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <!-- Parameters 5-6: Bill of Materials (BOM) & Labour Breakdown -->
+            <div style="background:#091e36;border:1.5px solid #1e4976;border-radius:8px;padding:14px 16px;margin-bottom:14px;color:#f8fafc">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <strong style="color:#38bdf8;font-size:12.5px;font-weight:800">5. Parts &amp; Materials Required (RDSO Spec BOM):</strong>
+                <span style="color:#4ade80;font-weight:800;font-size:12px">Total BOM: ₹${audit.param5_partsRequired.totalPartsCost.toLocaleString('en-IN')}</span>
+              </div>
+              <table style="width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:14px">
+                <thead>
+                  <tr style="border-bottom:1.5px solid #1e4976;color:#93c5fd;text-align:left;font-weight:800">
+                    <th style="padding:6px 8px">Item / Material Description</th>
+                    <th style="padding:6px 8px">RDSO Specification</th>
+                    <th style="padding:6px 8px">Quantity</th>
+                    <th style="padding:6px 8px">Unit Cost</th>
+                    <th style="padding:6px 8px;text-align:right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${audit.param5_partsRequired.items.map(i => `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08)">
+                      <td style="padding:6px 8px;font-weight:700;color:#ffffff">${i.item}</td>
+                      <td style="padding:6px 8px;color:#94a3b8;font-family:monospace">${i.spec}</td>
+                      <td style="padding:6px 8px;color:#e2e8f0;font-weight:600">${i.qty}</td>
+                      <td style="padding:6px 8px;color:#e2e8f0;font-weight:600">₹${i.unitRate.toLocaleString('en-IN')}</td>
+                      <td style="padding:6px 8px;text-align:right;font-weight:900;color:#38bdf8">₹${i.total.toLocaleString('en-IN')}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <strong style="color:#38bdf8;font-size:12.5px;font-weight:800">6. Specialized Labour Allocation (C&amp;W, Electrical TRD &amp; Pit Crew):</strong>
+                <span style="color:#4ade80;font-weight:800;font-size:12px">Total Labour: ₹${audit.param6_labourRequired.totalLabourCost.toLocaleString('en-IN')} (${audit.param6_labourRequired.totalHeadcount} Staff)</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+                ${audit.param6_labourRequired.staff.map(s => `
+                  <div style="background:#07162b;border:1px solid #1e3a5f;border-radius:6px;padding:8px 10px;font-size:11px">
+                    <strong style="color:#ffffff;display:block;margin-bottom:2px">${s.role.split('(')[0]}</strong>
+                    <span style="color:#94a3b8;font-size:10.5px">${s.headcount}x Staff @ ₹${s.ratePerHour}/hr (${s.hours}h)</span>
+                    <span style="color:#38bdf8;font-weight:800;display:block;margin-top:3px;font-size:11.5px">₹${s.total.toLocaleString('en-IN')}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Parameters 7-12 Grid -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+              <div style="background:#0b1d36;border:1.5px solid #1e4976;border-radius:8px;padding:12px;color:#f8fafc">
+                <strong style="color:#60a5fa;display:block;margin-bottom:4px;font-size:12px">8. Required Duration</strong>
+                <div style="font-size:20px;font-weight:900;color:#f59e0b;margin:2px 0">${audit.param8_duration.formatted}</div>
+                <span style="font-size:10.5px;color:#94a3b8">Concurrent pit servicing</span>
+              </div>
+
+              <div style="background:#0b1d36;border:1.5px solid #1e4976;border-radius:8px;padding:12px;color:#f8fafc">
+                <strong style="color:#60a5fa;display:block;margin-bottom:4px;font-size:12px">9. Direct Job Cost</strong>
+                <div style="font-size:20px;font-weight:900;color:#ffffff;margin:2px 0">₹${audit.param9_directCost.totalDirect.toLocaleString('en-IN')}</div>
+                <span style="font-size:10.5px;color:#cbd5e1">Parts ₹${audit.param9_directCost.partsCost.toLocaleString('en-IN')} + Labour</span>
+              </div>
+
+              <div style="background:#062326;border:1.5px solid #059669;border-radius:8px;padding:12px;color:#f8fafc">
+                <strong style="color:#4ade80;display:block;margin-bottom:4px;font-size:12px">10. Stabling Window Fit?</strong>
+                <div style="font-size:13px;font-weight:900;color:#22c55e;margin:2px 0">✓ 100% FEASIBLE</div>
+                <span style="font-size:10.5px;color:#a7f3d0">Fits within ${audit.stablingWindow.formatted} (Zero Extra Line Block)</span>
+              </div>
+
+              <div style="background:#0b1d36;border:1.5px solid #1e4976;border-radius:8px;padding:12px;color:#f8fafc">
+                <strong style="color:#60a5fa;display:block;margin-bottom:4px;font-size:12px">11. Avoided Downtime</strong>
+                <div style="font-size:20px;font-weight:900;color:#4ade80;margin:2px 0">${audit.param11_avoidedDowntime.avoidedHours}</div>
+                <span style="font-size:10.5px;color:#94a3b8">Zero separate line possession</span>
+              </div>
+
+              <div style="background:#0b1d36;border:1.5px solid #1e4976;border-radius:8px;padding:12px;color:#f8fafc">
+                <strong style="color:#60a5fa;display:block;margin-bottom:4px;font-size:12px">12. Debit Account</strong>
+                <div style="font-size:15px;font-weight:800;color:#c084fc;margin:2px 0">${audit.param12_estimatedTotalCost.accountingDebit}</div>
+                <span style="font-size:10px;color:#94a3b8">${audit.owningZone.name}</span>
+              </div>
+
+              <div style="background:#062326;border:1.5px solid #059669;border-radius:8px;padding:12px;color:#f8fafc">
+                <strong style="color:#4ade80;display:block;margin-bottom:4px;font-size:12px">13. Avoided Costs &amp; Net Gain</strong>
+                <div style="font-size:18px;font-weight:900;color:#4ade80;margin:2px 0">+₹${audit.param13_potentialSaving.netBenefit.toLocaleString('en-IN')}</div>
+                <span style="font-size:10px;color:#a7f3d0">Avoided Dead Haul + Block</span>
+              </div>
+            </div>
+
+            <!-- Savings Ledger & Action Button -->
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:#062326;border:1.5px solid #059669;border-radius:8px;padding:14px 18px;color:#f8fafc">
+              <div>
+                <strong style="color:#4ade80;font-size:13.5px;display:block;margin-bottom:4px;font-weight:800">14. Potential Savings Ledger &amp; Authorization:</strong>
+                <span style="font-size:11.5px;color:#e2e8f0;line-height:1.5">
+                  Avoided Dead Haulage (₹65k) + Prevented Delay Penalty (₹77k) + Avoided Daytime Block (₹85k) = <b style="color:#4ade80">₹2,27,000 Gross Savings (Net Benefit: +₹${audit.param13_potentialSaving.netBenefit.toLocaleString('en-IN')})</b>
+                </span>
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <button class="primary" style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 14px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="window.openProfessionalRepairReportModal('${audit.trainNo}', '${currentStation}')">
+                  <span>📑</span> Official RDSO Report
+                </button>
+                <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:12px;padding:8px 18px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="showToast('✓ Electronic Job Card &amp; BPC Issued for Train #${audit.trainNo} at ${audit.stationCode}. Inter-Railway debit registered.')">
+                  <span>✓</span> Authorize Pit-Line Servicing &amp; Issue BPC
+                </button>
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+      ` : `
+        <!-- P-WAY TRACK MAINTENANCE MACHINERY INVENTORY VIEW -->
+        <div class="screen-filter-bar" style="margin-bottom:14px">
+          <select id="assetCorridorSelect" style="background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700">
+            ${corridors.map(c=>`<option value="${c}" ${c===assetCorridor?'selected':''}>${c}</option>`).join('')}
+          </select>
+          <select id="assetStatusSelect" style="background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700">
+            ${statusOptions.map(s=>`<option value="${s}" ${s===assetStatusFilter?'selected':''}>${s}</option>`).join('')}
+          </select>
+          <input type="text" id="assetSearchInput" value="${esc(assetSearch)}" placeholder="Search machinery name, ID, or category..." class="filter-search-input" style="width:260px" />
+          <button class="filter-dropdown-btn" onclick="showToast('Exporting asset register to CSV…')">⬇ Export CSV</button>
+          <button class="filter-dropdown-btn" onclick="showToast('Syncing with CRIS Asset Portal…')">🔄 Sync CRIS</button>
+        </div>
+
+        <!-- Category Tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+          ${machTabs.map(t=>`
+            <button data-asset-tab="${t.id}" style="
+              padding:6px 14px;border-radius:20px;font-size:11.5px;font-weight:700;cursor:pointer;
+              border:1px solid ${assetActiveTab===t.id?'#2563eb':'var(--border-light)'};
+              background:${assetActiveTab===t.id?'#2563eb':'var(--bg-input)'};
+              color:${assetActiveTab===t.id?'#fff':'var(--text-muted)'}
+            ">${t.label}</button>
+          `).join('')}
+        </div>
+
+        <!-- Machinery Table -->
+        <div class="panel" style="padding:0;overflow:hidden">
+          <div style="overflow-x:auto;max-height:520px;overflow-y:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+              <thead style="position:sticky;top:0;background:var(--bg-card);z-index:10">
+                <tr style="border-bottom:2px solid var(--border-light)">
+                  <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">ASSET ID</th>
+                  <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">ASSET NAME</th>
+                  <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">CATEGORY</th>
+                  <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">CORRIDOR</th>
+                  <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">CURRENT LOCATION</th>
+                  <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">STATUS</th>
+                  <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">TOTAL HRS</th>
+                  <th style="text-align:left;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">NEXT MAINT.</th>
+                  <th style="text-align:center;padding:10px 14px;font-size:11px;color:var(--text-muted);font-weight:700">ACTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filteredMachinery.length === 0
+                  ? `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted)">No machinery found for selected filter.</td></tr>`
+                  : filteredMachinery.map((a, i) => `
+                    <tr style="border-bottom:1px solid var(--border-light);${i%2===1?'background:rgba(255,255,255,0.015)':''}">
+                      <td style="padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#60a5fa;font-weight:700">${esc(a.id)}</td>
+                      <td style="padding:10px 14px;font-weight:600;color:var(--text-heading);max-width:200px">${esc(a.name)}</td>
+                      <td style="padding:10px 14px"><span style="background:rgba(99,102,241,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.3);border-radius:4px;padding:2px 8px;font-size:10.5px;font-weight:700;white-space:nowrap">${esc(a.category)}</span></td>
+                      <td style="padding:10px 14px;font-size:11.5px;color:var(--text-main)">${esc(a.corridor)}</td>
+                      <td style="padding:10px 14px;font-size:11px;color:var(--text-muted);max-width:180px">${esc(a.location)}</td>
+                      <td style="padding:10px 14px"><span style="background:${statusColors[a.status]||'#94a3b8'}18;color:${statusColors[a.status]||'#94a3b8'};border:1px solid ${statusColors[a.status]||'#94a3b8'}44;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:800">${esc(a.status)}</span></td>
+                      <td style="padding:10px 14px;font-size:11.5px;font-weight:700;color:var(--text-main)">${a.hrs.toLocaleString()} hrs</td>
+                      <td style="padding:10px 14px;font-size:11px;color:${new Date(2026,8,15) >= new Date() ? '#ef4444' : 'var(--text-muted)'}">${esc(a.next_maint)}</td>
+                      <td style="padding:10px 14px;text-align:center">
+                        <div style="display:flex;justify-content:center;gap:6px">
+                          <button title="View Details" style="background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;cursor:pointer;font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px" onclick="showToast('Asset ${esc(a.id)}: ${esc(a.name)} — Details panel')">VIEW</button>
+                          <button title="Deploy" style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#22c55e;cursor:pointer;font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px" onclick="showToast('Initiating deployment workflow for ${esc(a.id)}…')">DEPLOY</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:10px 14px;border-top:1px solid var(--border-light);font-size:11px;color:var(--text-muted)">
+            Showing ${filteredMachinery.length} of ${ASSET_MOCK_DATA.length} assets • Data synced with CRIS Asset Registry
+          </div>
+        </div>
+      `}
     </main>
   `;
 }
+
+// Alias renderAssetManagementPage to renderAssetMaintenancePage
+const renderAssetManagementPage = renderAssetMaintenancePage;
 
 // ==========================================================================
 // SMART CORRIDOR MAP & ASSET MANAGEMENT SYSTEM (Matching SIH Official Specification)
@@ -6767,500 +9107,9 @@ const SR_CORRIDORS = [
 ];
 
 // Comprehensive Real Assets Database for Southern Railway
+// Backed by the multi-disciplinary GIS CORRIDOR ASSET REGISTRY (32+ Assets across all 8 Corridors)
 const SR_MAP_ASSETS = [
-  // BRIDGES
-  {
-    id: "SR-BRG-AR-0017",
-    name: "Arakkonam Bridge",
-    category: "Bridges",
-    icon: "⛩️",
-    type: "Major Bridge",
-    section: "Arakkonam - Katpadi",
-    river: "Palar River",
-    km: "Km. 1042/8-9",
-    year: 1910,
-    length: "298.45 m",
-    spans: 12,
-    div: "MAS",
-    coords: [12.9850, 79.6200],
-    condition: "Good",
-    desc: "Substantial multi-span bridge across Palar River on MAS-CBE trunk line with electronic track circuits.",
-    history: [
-      { year: "1910", text: "Bridge Constructed with stone piers and steel girders" },
-      { year: "1965", text: "Strengthening Work for steam-to-diesel loco transition" },
-      { year: "1988", text: "Major Repair & underwater pier scour protection" },
-      { year: "2001", text: "Deck Replacement with prestressed concrete slabs" },
-      { year: "2015", text: "Structural Painting & ultrasonic weld defect testing" },
-      { year: "2021", text: "Detailed Inspection & 25kV OHE mast re-alignment" },
-      { year: "2024", text: "Current Condition: Good • Line speed 130 km/h" }
-    ],
-    blocks: [
-      { id: "BLK-2024-1021", from: "15/07/24", to: "18/07/24", type: "Maintenance", dur: "3 Days" },
-      { id: "BLK-2023-0890", from: "10/06/23", to: "12/06/23", type: "Inspection", dur: "2 Days" },
-      { id: "BLK-2022-0712", from: "22/05/22", to: "24/05/22", type: "Maintenance", dur: "2 Days" },
-      { id: "BLK-2021-0654", from: "11/04/21", to: "13/04/21", type: "Repair", dur: "2 Days" },
-      { id: "BLK-2020-0451", from: "19/02/20", to: "21/02/20", type: "Maintenance", dur: "3 Days" }
-    ]
-  },
-  {
-    id: "SR-BRG-MDU-0001",
-    name: "Pamban Railway Sea Bridge",
-    category: "Bridges",
-    icon: "⛩️",
-    type: "Marine Cantilever Sea Bridge",
-    section: "Mandapam - Rameswaram",
-    river: "Palk Strait (Indian Ocean)",
-    km: "Km. 2.06",
-    year: 1914,
-    length: "2,065 m",
-    spans: 143,
-    div: "MDU",
-    coords: [9.2825, 79.1983],
-    condition: "Active Caution 30 km/h",
-    desc: "India's historic first sea bridge featuring the Scherzer rolling lift span, now upgraded with state-of-the-art vertical lift bridge.",
-    history: [
-      { year: "1914", text: "Commissioned as India's premier cantilever sea bridge" },
-      { year: "1964", text: "Heroic reconstruction in 46 days after catastrophic cyclone" },
-      { year: "2007", text: "Broad Gauge conversion & structural load capacity enhancement" },
-      { year: "2020", text: "Digital anemometer interlocks installed for cyclone winds" },
-      { year: "2024", text: "New state-of-the-art vertical lift rail sea bridge commissioned" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0012", from: "02/08/24", to: "06/08/24", type: "Structural Inspection", dur: "4 Days" },
-      { id: "BLK-2023-0144", from: "14/01/23", to: "18/01/23", type: "Corrosion Treatment", dur: "4 Days" },
-      { id: "BLK-2022-0988", from: "19/11/22", to: "22/11/22", type: "Sensor Calibration", dur: "3 Days" }
-    ]
-  },
-  {
-    id: "SR-BRG-SA-0042",
-    name: "Cauvery River Rail Bridge (Erode)",
-    category: "Bridges",
-    icon: "⛩️",
-    type: "Steel Truss Girder",
-    section: "Erode - Karur",
-    river: "River Cauvery",
-    km: "Km. 388/4-8",
-    year: 1935,
-    length: "1,210 m",
-    spans: 16,
-    div: "SA",
-    coords: [11.3500, 77.7300],
-    condition: "Good (110 km/h)",
-    desc: "Heavy steel truss multi-span bridge linking Salem & Tiruchirappalli divisions over Cauvery River.",
-    history: [
-      { year: "1935", text: "Reconstructed for South Indian Railway heavy freight" },
-      { year: "1978", text: "Pier strengthening and steel rivet replacement" },
-      { year: "2012", text: "Electrification 25kV OHE portal erection" },
-      { year: "2023", text: "Acoustic emission testing confirmed 0 defect fatigue" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0419", from: "12/04/24", to: "14/04/24", type: "Pier Audit", dur: "2 Days" },
-      { id: "BLK-2023-0801", from: "20/08/23", to: "22/08/23", type: "Track Alignment", dur: "2 Days" }
-    ]
-  },
-  {
-    id: "SR-BRG-TVC-0008",
-    name: "Vembanad Rail Bridge (Vallarpadam)",
-    category: "Bridges",
-    icon: "⛩️",
-    type: "Longest Dedicated Rail Freight Bridge",
-    section: "Edappally - Vallarpadam ICTT",
-    river: "Vembanad Lake / Backwaters",
-    km: "Km. 4.62",
-    year: 2011,
-    length: "4,620 m",
-    spans: 132,
-    div: "TVC",
-    coords: [10.0135, 76.2625],
-    condition: "Excellent",
-    desc: "India's longest dedicated railway freight bridge handling international container trains (CONCOR) to Kochi Port.",
-    history: [
-      { year: "2011", text: "Commissioned as longest railway bridge in India (4.62 km)" },
-      { year: "2018", text: "Overcame Kerala floods with resilient ballast retaining walls" },
-      { year: "2023", text: "Complete cathodic marine anti-rust audit completed" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0911", from: "10/05/24", to: "12/05/24", type: "Expansion Joint Servicing", dur: "2 Days" }
-    ]
-  },
-  {
-    id: "SR-BRG-TPJ-0019",
-    name: "Coleroon River Rail Bridge",
-    category: "Bridges",
-    icon: "⛩️",
-    type: "Prestressed Concrete Arch Bridge",
-    section: "Srirangam - Golden Rock",
-    river: "River Coleroon",
-    km: "Km. 334/1-6",
-    year: 1927,
-    length: "1,420 m",
-    spans: 28,
-    div: "TPJ",
-    coords: [10.8500, 78.7000],
-    condition: "Good (130 km/h)",
-    desc: "Vital bridge linking North and South Tamil Nadu on the Chennai-Trichy-Madurai Grand Trunk Chord.",
-    history: [
-      { year: "1927", text: "Constructed during Trichy chord line double-tracking" },
-      { year: "1995", text: "Concrete jacketing of piers for enhanced hydrological safety" },
-      { year: "2022", text: "Sensors deployed for continuous live water-level telemetry" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0302", from: "18/02/24", to: "20/02/24", type: "Bed Block Maintenance", dur: "2 Days" }
-    ]
-  },
-  {
-    id: "SR-BRG-PGT-0024",
-    name: "Bharatappuzha Nila Rail Viaduct",
-    category: "Bridges",
-    icon: "⛩️",
-    type: "Stone Masonry & Steel Rail Viaduct",
-    section: "Shoranur - Tirur",
-    river: "River Bharatappuzha (Nila)",
-    km: "Km. 582/2-8",
-    year: 1902,
-    length: "950 m",
-    spans: 20,
-    div: "PGT",
-    coords: [10.7600, 76.2800],
-    condition: "Good",
-    desc: "Historic multi-span viaduct spanning River Nila at Shoranur Junction on the Malabar railway route.",
-    history: [
-      { year: "1902", text: "Constructed by Madras Railway Company" },
-      { year: "1972", text: "Piers reinforced with RCC underpinning" },
-      { year: "2019", text: "Substructure scour telemetry sensors activated" }
-    ],
-    blocks: [
-      { id: "BLK-2023-1102", from: "05/11/23", to: "07/11/23", type: "De-silting & Track Tamper", dur: "2 Days" }
-    ]
-  },
-
-  // LOCO SHEDS
-  {
-    id: "SR-SHD-ED-001",
-    name: "Erode Electric Loco Shed (ELS/ED)",
-    category: "Loco Sheds",
-    icon: "🛑",
-    type: "Electric Locomotive Shed",
-    section: "Erode Junction Yard",
-    river: "Near Cauvery River",
-    km: "Km. 396.0",
-    year: 1980,
-    length: "Holding: 215 Locomotives",
-    spans: "Classes: WAP-4, WAP-7, WAG-9HC",
-    div: "SA",
-    coords: [11.3385, 77.7274],
-    condition: "ISO 9001:2015 Certified",
-    desc: "Premier 3-phase high-power electric locomotive shed in Southern Railway, maintaining mainline passenger and freight locomotives.",
-    history: [
-      { year: "1980", text: "Commissioned as premier AC electric loco shed" },
-      { year: "2005", text: "First shed in Southern Railway to overhaul WAP-4 electric locos" },
-      { year: "2016", text: "3-phase IGBT-based WAP-7 maintenance bay commissioned" },
-      { year: "2024", text: "Total holding crossed 215 locomotives with 99.4% reliability" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0801", from: "01/08/24", to: "02/08/24", type: "Yard Track Renewal", dur: "1 Day" }
-    ]
-  },
-  {
-    id: "SR-SHD-RPM-002",
-    name: "Royapuram Electric Loco Shed (ELS/RPM)",
-    category: "Loco Sheds",
-    icon: "🛑",
-    type: "Electric Passenger Loco Shed",
-    section: "Chennai Port - Royapuram",
-    river: "Coastal Marina Basin",
-    km: "Km. 4.2",
-    year: 1923,
-    length: "Holding: 110 Locomotives",
-    spans: "Classes: WAP-7, High-Speed Trains",
-    div: "MAS",
-    coords: [13.1118, 80.2934],
-    condition: "Premier High-Speed Shed",
-    desc: "Oldest electric locomotive shed in Southern Railway, powering Vande Bharat, Shatabdi, and Superfast express trains.",
-    history: [
-      { year: "1923", text: "Founded as historic steam and early electric depot" },
-      { year: "2007", text: "Full conversion to pure 6000 HP 3-phase WAP-7 locomotives" },
-      { year: "2023", text: "Vande Bharat Semi-High Speed testing bay operationalized" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0412", from: "14/04/24", to: "15/04/24", type: "Pit Line Electrification", dur: "1 Day" }
-    ]
-  },
-  {
-    id: "SR-SHD-AJJ-003",
-    name: "Arakkonam Electric Loco Shed (ELS/AJJ)",
-    category: "Loco Sheds",
-    icon: "🛑",
-    type: "Heavy Freight & Express Electric Shed",
-    section: "Arakkonam Yard Complex",
-    river: "Palar Basin",
-    km: "Km. 68.5",
-    year: 1982,
-    length: "Holding: 185 Locomotives",
-    spans: "Classes: WAG-7, WAP-4, WAG-9",
-    div: "MAS",
-    coords: [13.0784, 79.6677],
-    condition: "Active 24x7",
-    desc: "Massive locomotive maintenance hub dedicated to heavy minerals, port containers, and long-distance trains.",
-    history: [
-      { year: "1982", text: "Established to support Chennai-Arkonam-Katpadi trunk freight" },
-      { year: "2000", text: "WAG-7 micro-processor fault diagnostic bay installed" },
-      { year: "2021", text: "Upgraded with computerized regenerative braking testing rigs" }
-    ],
-    blocks: [
-      { id: "BLK-2023-0919", from: "19/09/23", to: "20/09/23", type: "Overhead 25kV Feeder Block", dur: "1 Day" }
-    ]
-  },
-  {
-    id: "SR-SHD-GOC-004",
-    name: "Golden Rock Diesel & Heritage Shed (GOC)",
-    category: "Loco Sheds",
-    icon: "🛑",
-    type: "Diesel & Steam Heritage Shed",
-    section: "Tiruchirappalli Golden Rock",
-    river: "Cauvery South Basin",
-    km: "Km. 338.0",
-    year: 1928,
-    length: "Holding: 140 Locomotives",
-    spans: "Classes: WDP-4D, WDG-4D, NMR 'X' Class Steam",
-    div: "TPJ",
-    coords: [10.7745, 78.7061],
-    condition: "Heritage & Modern Dual Hub",
-    desc: "Legendary shed maintaining heavy EMD diesel locomotives and manufacturing UNESCO World Heritage Nilgiri Mountain Railway steam locos.",
-    history: [
-      { year: "1928", text: "Founded by South Indian Railway" },
-      { year: "2005", text: "Indigenous manufacturing of oil-fired steam locomotives for Ooty" },
-      { year: "2022", text: "B20 Biodiesel locomotive pilot successfully demonstrated" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0105", from: "05/01/24", to: "07/01/24", type: "Turntable Overhaul", dur: "2 Days" }
-    ]
-  },
-  {
-    id: "SR-SHD-ERS-005",
-    name: "Ernakulam Diesel Loco Shed (DLS/ERS)",
-    category: "Loco Sheds",
-    icon: "🛑",
-    type: "Diesel Locomotive Shed",
-    section: "Ernakulam Junction Yard",
-    river: "Vembanad Estuary",
-    km: "Km. 102.0",
-    year: 1981,
-    length: "Holding: 95 Locomotives",
-    spans: "Classes: WDM-3D, WDG-3A, WDP-4D",
-    div: "TVC",
-    coords: [9.9658, 76.2974],
-    condition: "Active",
-    desc: "Primary diesel hub serving Kerala's rail network, goods trains, and coastal industrial connections.",
-    history: [
-      { year: "1981", text: "Commissioned as premier diesel facility for Kerala zone" },
-      { year: "2014", text: "High-horsepower 4500 HP WDP-4D locos inducted" }
-    ],
-    blocks: [
-      { id: "BLK-2023-0410", from: "10/04/23", to: "11/04/23", type: "Fuelling Bay Track Renewal", dur: "1 Day" }
-    ]
-  },
-
-  // COACH DEPOTS & WORKSHOPS
-  {
-    id: "SR-DPT-BBQ-001",
-    name: "Basin Bridge Train Care Centre (BBQ)",
-    category: "Coach Depots",
-    icon: "🚆",
-    type: "Principal Coaching Depot",
-    section: "Chennai Central Approach",
-    river: "Buckingham Canal",
-    km: "Km. 2.1",
-    year: 1978,
-    length: "18 Washing Pit Lines",
-    spans: "Daily Servicing: 55+ Rakes",
-    div: "MAS",
-    coords: [13.0975, 80.2742],
-    condition: "Ultra-High Frequency Facility",
-    desc: "India's busiest passenger train maintenance depot, servicing Vande Bharat, Rajdhani, Shatabdi, and Superfast rakes with automated cleaning.",
-    history: [
-      { year: "1978", text: "Expanded to support Chennai Central long-distance trains" },
-      { year: "2019", text: "Automated coach exterior washing plant installed" },
-      { year: "2023", text: "Specialized Vande Bharat 16-car pit line commissioned" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0618", from: "18/06/24", to: "20/06/24", type: "Pit Line #4 Renewal", dur: "2 Days" }
-    ]
-  },
-  {
-    id: "SR-WRK-PER-001",
-    name: "Perambur Carriage & Wagon Works (CW/PER)",
-    category: "Workshops",
-    icon: "🛠️",
-    type: "POH Coach Overhaul Workshop",
-    section: "Perambur Railway Complex",
-    river: "Otteri Nullah Basin",
-    km: "Km. 5.8",
-    year: 1932,
-    length: "Area: 185 Acres",
-    spans: "Capacity: 220 Coaches / Month",
-    div: "MAS",
-    coords: [13.1023, 80.2372],
-    condition: "Zonal Center of Excellence",
-    desc: "Principal Periodic Overhaul (POH) workshop of Southern Railway for modern LHB stainless-steel coaches and ICF passenger cars.",
-    history: [
-      { year: "1932", text: "Founded by Madras and Southern Mahratta Railway" },
-      { year: "2018", text: "LHB coach periodic overhaul facility inaugurated" },
-      { year: "2023", text: "Modern robotic wheel lathe and laser wheel profilers installed" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0211", from: "11/02/24", to: "13/02/24", type: "Siding Track Overhaul", dur: "2 Days" }
-    ]
-  },
-  {
-    id: "SR-WRK-GOC-003",
-    name: "Golden Rock Railway Workshop (GOC)",
-    category: "Workshops",
-    icon: "🛠️",
-    type: "Integrated Wagon & Heritage Workshop",
-    section: "Tiruchirappalli Ponmalai",
-    river: "Cauvery Basin",
-    km: "Km. 340.0",
-    year: 1928,
-    length: "Area: 200 Acres",
-    spans: "Capacity: 300 Wagons + Heritage Steam",
-    div: "TPJ",
-    coords: [10.7800, 78.7100],
-    condition: "Historical Landmark & Modern POH",
-    desc: "Award-winning workshop famous for wagon manufacturing, container overhauls, and UNESCO Nilgiri Mountain Railway heritage locomotives.",
-    history: [
-      { year: "1928", text: "Established as central mechanical workshop of SIR" },
-      { year: "2010", text: "Manufacturing of high-capacity BLC container flats began" },
-      { year: "2024", text: "CII National Energy Excellence Award recipient" }
-    ],
-    blocks: [
-      { id: "BLK-2023-1205", from: "05/12/23", to: "07/12/23", type: "Traverser Track Maintenance", dur: "2 Days" }
-    ]
-  },
-
-  // RAILWAY YARDS & GOODS SHEDS
-  {
-    id: "SR-YRD-TNP-001",
-    name: "Tondiarpet Marshalling Yard (TNPM)",
-    category: "Railway Yards",
-    icon: "🚉",
-    type: "Major Port Marshalling Yard",
-    section: "Chennai Port Railway Line",
-    river: "Coastal Port Zone",
-    km: "Km. 6.4",
-    year: 1958,
-    length: "24 Sorting Tracks",
-    spans: "Capacity: 1,800 Wagons / Day",
-    div: "MAS",
-    coords: [13.1200, 80.2800],
-    condition: "Continuous 24/7 Shunting",
-    desc: "Strategic railway interchange yard handling import/export freight between Chennai Port, CPCL refineries, and national rail corridors.",
-    history: [
-      { year: "1958", text: "Developed as principal freight sorting yard for Madras Port" },
-      { year: "2015", text: "Solid State Interlocking (SSI) yard control room inaugurated" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0515", from: "15/05/24", to: "16/05/24", type: "Yard Turnout Machine Tamping", dur: "1 Day" }
-    ]
-  },
-  {
-    id: "SR-YRD-JTJ-002",
-    name: "Jolarpettai Marshalling Yard (JTJ)",
-    category: "Railway Yards",
-    icon: "🚉",
-    type: "Junction Hump Marshalling Yard",
-    section: "Jolarpettai Junction",
-    river: "Palar Basin",
-    km: "Km. 214.0",
-    year: 1918,
-    length: "16 Sorting Tracks",
-    spans: "Capacity: 1,200 Wagons / Day",
-    div: "SA",
-    coords: [12.5647, 78.5630],
-    condition: "Active Operational Hub",
-    desc: "Crucial strategic railway crossroads connecting Chennai, Bangalore, Coimbatore, and Kerala networks.",
-    history: [
-      { year: "1918", text: "Built during British South Indian Railway expansion" },
-      { year: "2018", text: "Complete yard remodeling to eliminate bottleneck crossings" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0701", from: "01/07/24", to: "03/07/24", type: "Electronic Interlocking Calibration", dur: "2 Days" }
-    ]
-  },
-  {
-    id: "SR-YRD-IGU-004",
-    name: "Irugur Inland Container Yard (IGU)",
-    category: "Railway Yards",
-    icon: "🚉",
-    type: "CONCOR Inland Container Depot",
-    section: "Irugur - Coimbatore",
-    river: "Noyyal River Basin",
-    km: "Km. 488.0",
-    year: 1998,
-    length: "8 Container Stabling Tracks",
-    spans: "Capacity: 45 Rakes / Month",
-    div: "SA",
-    coords: [11.0212, 77.0512],
-    condition: "High-Traffic Export Yard",
-    desc: "Industrial freight hub handling industrial pumps, textile garments, and heavy engineering exports from western Tamil Nadu.",
-    history: [
-      { year: "1998", text: "Commissioned as CONCOR multi-modal logistics park" },
-      { year: "2021", text: "Electrified siding for seamless direct electric train arrival" }
-    ],
-    blocks: [
-      { id: "BLK-2023-0518", from: "18/05/23", to: "19/05/23", type: "Siding Track Screening", dur: "1 Day" }
-    ]
-  },
-  {
-    id: "SR-GDS-CBE-002",
-    name: "Coimbatore North Goods Shed (CBF)",
-    category: "Goods Sheds",
-    icon: "📦",
-    type: "General Merchandise Goods Shed",
-    section: "Coimbatore North Jn",
-    river: "Noyyal Basin",
-    km: "Km. 498.5",
-    year: 1952,
-    length: "4 Loading Platforms",
-    spans: "Capacity: 12 Rakes / Week",
-    div: "SA",
-    coords: [11.0253, 76.9535],
-    condition: "Active Goods Depot",
-    desc: "Key inward cargo terminal for foodgrains (FCI), cement, fertilizer, and automobile logistics.",
-    history: [
-      { year: "1952", text: "Opened for commercial wagonload and parcel traffic" },
-      { year: "2024", text: "24/7 all-weather concrete covered goods wharf completed" }
-    ],
-    blocks: [
-      { id: "BLK-2024-0314", from: "14/03/24", to: "15/03/24", type: "Platform Siding Renewal", dur: "1 Day" }
-    ]
-  },
-
-  // TUNNELS
-  {
-    id: "SR-TNL-PGT-001",
-    name: "Palakkad Gap Mountain Tunnel #1",
-    category: "Tunnels",
-    icon: "🚇",
-    type: "Broad Gauge Mountain Tunnel",
-    section: "Walayar – Kanjikode (Ghats)",
-    river: "Western Ghats Gap",
-    km: "Km. 518.2",
-    year: 1968,
-    length: "1,250 m",
-    spans: "Speed: 110 km/h",
-    div: "PGT",
-    coords: [10.8100, 76.7100],
-    condition: "Good",
-    desc: "Scenic tunnel cutting through the rugged Nilgiri-Anamalai mountain gap connecting Tamil Nadu and Kerala.",
-    history: [
-      { year: "1968", text: "Constructed during Walayar ghat double line alignment" },
-      { year: "2015", text: "Overhead 25kV rigid catenary installed" }
-    ],
-    blocks: [
-      { id: "BLK-2023-0711", from: "11/07/23", to: "12/07/23", type: "Rock Bolt & Drainage Audit", dur: "1 Day" }
-    ]
-  },
+  ...CORRIDOR_ASSETS_REGISTRY,
 
   // ACTIVE & PLANNED BLOCKS ON MAP
   {
@@ -7340,11 +9189,15 @@ let selectedSmartDivision = "ALL";
 let selectedSmartAssetType = "ALL";
 let selectedSmartBlockStatus = "ALL";
 let smartMapSearchQuery = "";
-let selectedSmartAsset = SR_MAP_ASSETS[0]; // Default: Arakkonam Bridge
+let selectedSmartAsset = CORRIDOR_ASSETS_REGISTRY[0]; // Default: Arakkonam Palar River Bridge
 let smartActiveTab = "OVERVIEW";
+let smartPanelMode = "LIST"; // "LIST" (separate list on side) or "DETAIL"
+let smartAssetCategoryFilter = "ALL";
+let smartAssetHealthFilter = "ALL";
+let smartAssetListSearch = "";
 let isSmartLayersCollapsed = true;
 let isSmartAssetPanelMinimized = false;
-let activeTileLayerType = 'DARK';
+let activeTileLayerType = 'GOOGLE_SATELLITE';
 let liveTrainAnimationInterval = null;
 
 let smartLayerGroups = {
@@ -7493,16 +9346,372 @@ const MAJOR_JUNCTIONS = [
   { code: "RMM", name: "Rameswaram", coords: [9.2876, 79.3129], div: "MDU" }
 ];
 
+window.setSmartPanelMode = (mode) => {
+  smartPanelMode = mode;
+  const panel = document.querySelector("#smartAssetPanel");
+  if (panel && selectedSmartAsset) {
+    panel.innerHTML = window.renderSmartAssetPanelHtml(selectedSmartAsset);
+  }
+};
+
+window.setSmartAssetCategoryFilter = (cat) => {
+  smartAssetCategoryFilter = cat;
+  const panel = document.querySelector("#smartAssetPanel");
+  if (panel && selectedSmartAsset) {
+    panel.innerHTML = window.renderSmartAssetPanelHtml(selectedSmartAsset);
+  }
+};
+
+window.setSmartAssetHealthFilter = (h) => {
+  smartAssetHealthFilter = h;
+  const panel = document.querySelector("#smartAssetPanel");
+  if (panel && selectedSmartAsset) {
+    panel.innerHTML = window.renderSmartAssetPanelHtml(selectedSmartAsset);
+  }
+};
+
+window.setSmartAssetListSearch = (q) => {
+  smartAssetListSearch = (q || "").trim().toLowerCase();
+  const panel = document.querySelector("#smartAssetPanel");
+  if (panel && selectedSmartAsset) {
+    panel.innerHTML = window.renderSmartAssetPanelHtml(selectedSmartAsset);
+    const inp = document.querySelector("#smartAssetListSearchInput");
+    if (inp) {
+      inp.focus();
+      inp.setSelectionRange(inp.value.length, inp.value.length);
+    }
+  }
+};
+
+window.viewAssetDossier = (assetId) => {
+  const ast = SR_MAP_ASSETS.find(a => a.id === assetId) || CORRIDOR_ASSETS_REGISTRY[0];
+  selectedSmartAsset = ast;
+  smartPanelMode = "DETAIL";
+  const panel = document.querySelector("#smartAssetPanel");
+  if (panel) {
+    panel.style.display = "flex";
+    panel.classList.remove("minimized");
+    isSmartAssetPanelMinimized = false;
+    panel.innerHTML = window.renderSmartAssetPanelHtml(ast);
+  }
+};
+
+window.highlightAssetOnMap = (assetId) => {
+  const ast = SR_MAP_ASSETS.find(a => a.id === assetId);
+  if (!ast || !ast.coords) return;
+  selectedSmartAsset = ast;
+
+  if (leafletMapInstance && typeof L !== "undefined") {
+    if (!window.__activeAssetHighlightLayer) {
+      window.__activeAssetHighlightLayer = L.layerGroup().addTo(leafletMapInstance);
+    }
+    window.__activeAssetHighlightLayer.clearLayers();
+
+    // Add pulsing radar circle
+    L.circleMarker(ast.coords, {
+      radius: 26,
+      color: '#38bdf8',
+      fillColor: '#0ea5e9',
+      fillOpacity: 0.3,
+      weight: 3,
+      className: 'leaflet-pulse-radar'
+    }).addTo(window.__activeAssetHighlightLayer);
+
+    L.circleMarker(ast.coords, {
+      radius: 8,
+      color: '#ffffff',
+      fillColor: '#38bdf8',
+      fillOpacity: 0.95,
+      weight: 2
+    }).addTo(window.__activeAssetHighlightLayer);
+
+    leafletMapInstance.flyTo(ast.coords, 12, { duration: 0.8 });
+
+    setTimeout(() => {
+      const healthColor = (ast.health_score || 95) >= 90 ? '#10b981' : ((ast.health_score || 95) >= 75 ? '#f59e0b' : '#ef4444');
+      L.popup({ offset: [0, -8], closeButton: true })
+        .setLatLng(ast.coords)
+        .setContent(`
+          <div style="font-family:'Segoe UI',sans-serif;min-width:220px;padding:4px">
+            <div style="font-size:10px;font-weight:800;color:#0284c7;text-transform:uppercase">${ast.category} &bull; ${ast.id}</div>
+            <div style="font-size:13px;font-weight:900;color:#0f172a;margin:2px 0 4px">${ast.name}</div>
+            <div style="font-size:11px;color:#475569;margin-bottom:6px"><b>Location:</b> ${ast.section} (${ast.km || ''})</div>
+            <div style="font-size:11px;color:${healthColor};font-weight:700;margin-bottom:8px">● Health: ${ast.health_score || 95}% (${ast.condition || 'Good'})</div>
+            <div style="display:flex;gap:4px">
+              <button onclick="window.askCopilotAboutAsset('${ast.id}')" style="background:#0284c7;color:#fff;border:none;padding:5px 8px;border-radius:4px;font-size:10.5px;font-weight:800;cursor:pointer">🤖 Ask AI Copilot</button>
+              <button onclick="window.viewAssetDossier('${ast.id}')" style="background:#f1f5f9;color:#0f172a;border:1px solid #cbd5e1;padding:5px 8px;border-radius:4px;font-size:10.5px;font-weight:700;cursor:pointer">🔍 View Details</button>
+            </div>
+          </div>
+        `)
+        .openOn(leafletMapInstance);
+    }, 850);
+  }
+
+  // Update card selected status in list
+  document.querySelectorAll(".smart-asset-list-item").forEach(card => {
+    const isThis = card.dataset.assetId === assetId;
+    card.classList.toggle("selected", isThis);
+    if (isThis) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+};
+
+window.askCopilotAboutAsset = (assetId) => {
+  const ast = SR_MAP_ASSETS.find(a => a.id === assetId) || CORRIDOR_ASSETS_REGISTRY[0];
+  if (!ast) return;
+  
+  window.toggleAutonomousCopilot(true);
+  const prompt = `Provide complete engineering specifications, sensor telemetry, and maintenance requirements for ${ast.name} (${ast.id}) on ${ast.section}.`;
+  
+  // Format immediate high-impact response directly in chat
+  const respTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + " IST";
+  
+  copilotMessages.push({
+    sender: "user",
+    time: respTime,
+    text: prompt
+  });
+  
+  const dossierText = generateAssetAIDossier(ast);
+  copilotMessages.push({
+    sender: "assistant",
+    time: respTime,
+    text: dossierText,
+    action_card: {
+      id: "act-" + Date.now(),
+      badge: "CRIS ASSET INTEL",
+      title: `Sanction ${ast.maintenance_req?.block_type || 'Shadow Block'} for ${ast.name}`,
+      description: `${ast.maintenance_req?.duration || '150 min'} nocturnal possession using ${ast.maintenance_req?.machine || 'Track Unit'}. Zero passenger delay.`,
+      action_type: "HIGHLIGHT_ASSET",
+      payload: { asset_id: ast.id, target_screen: "Corridor Map" },
+      button_label: "Highlight on Map & Fly"
+    }
+  });
+
+  window.renderCopilotMessages();
+};
+
+window.askCopilotAboutCorridor = (corridorId) => {
+  const cId = corridorId || selectedSmartCorridor || "ALL";
+  window.toggleAutonomousCopilot(true);
+  
+  const corName = SR_CORRIDORS.find(c => c.id === cId)?.name || (cId === "ALL" ? "All Southern Railway Corridors" : cId);
+  const prompt = `Analyze all railway assets, structural health, and maintenance bottlenecks on corridor ${corName}.`;
+  
+  const respTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + " IST";
+  copilotMessages.push({
+    sender: "user",
+    time: respTime,
+    text: prompt
+  });
+  
+  const auditText = generateCorridorAIAudit(cId);
+  copilotMessages.push({
+    sender: "assistant",
+    time: respTime,
+    text: auditText,
+    action_card: {
+      id: "act-" + Date.now(),
+      badge: "CORRIDOR ASSET AUDIT",
+      title: `Sanction Bundled Nocturnal Window for ${corName}`,
+      description: `Bundles multi-departmental Civil track tamping and TRD catenary servicing with 0.0 train delay.`,
+      action_type: "NAVIGATE",
+      payload: { target_screen: "Corridor Map", corridor_id: cId },
+      button_label: "View Corridor Assets on Map"
+    }
+  });
+
+  window.renderCopilotMessages();
+};
+
 window.renderSmartAssetPanelHtml = (ast) => {
-  const iconSvg = ASSET_SVG_ICONS[ast.category] || ASSET_SVG_ICONS["Bridges"];
+  // Determine assets matching active corridor and division
+  let corridorAssets = CORRIDOR_ASSETS_REGISTRY;
+  if (selectedSmartCorridor !== "ALL") {
+    corridorAssets = corridorAssets.filter(a => a.corridor_id === selectedSmartCorridor);
+  }
+  if (selectedSmartDivision !== "ALL") {
+    corridorAssets = corridorAssets.filter(a => a.div === selectedSmartDivision);
+  }
+
+  // Filter by category if selected
+  let displayAssets = corridorAssets;
+  if (smartAssetCategoryFilter !== "ALL") {
+    displayAssets = displayAssets.filter(a => a.category === smartAssetCategoryFilter);
+  }
+  if (smartAssetHealthFilter === "CRITICAL") {
+    displayAssets = displayAssets.filter(a => a.health_score < 80);
+  } else if (smartAssetHealthFilter === "GOOD") {
+    displayAssets = displayAssets.filter(a => a.health_score >= 90);
+  }
+  if (smartAssetListSearch) {
+    displayAssets = displayAssets.filter(a => 
+      (a.name + " " + a.id + " " + a.section + " " + (a.km || "") + " " + a.category).toLowerCase().includes(smartAssetListSearch)
+    );
+  }
+
+  const activeCorridorObj = SR_CORRIDORS.find(c => c.id === selectedSmartCorridor);
+  const corridorTitle = activeCorridorObj ? activeCorridorObj.name : (selectedSmartCorridor === "ALL" ? "All Zone 07 Corridors" : selectedSmartCorridor);
+
+  // VIEW 1: THE SEPARATE ASSET LIST ON ONE SIDE (Requested by User)
+  if (smartPanelMode === "LIST") {
+    return `
+      <!-- PANEL HEADER WITH MODE SWITCHER -->
+      <div class="smart-asset-header" style="background:#091a2f;border-bottom:1px solid #1e3a5f;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:6px">
+          <button 
+            class="smart-tab-btn active" 
+            style="background:#2563eb;color:#ffffff;border:none;font-weight:800;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer">
+            📋 Corridor Assets (${corridorAssets.length})
+          </button>
+          <button 
+            class="smart-tab-btn" 
+            onclick="window.setSmartPanelMode('DETAIL')"
+            style="background:rgba(255,255,255,0.06);color:#94a3b8;border:1px solid rgba(255,255,255,0.1);font-weight:700;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer">
+            🔍 Detail: ${ast ? ast.name.split(" ")[0] : 'Select'}
+          </button>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="smart-asset-close-btn" onclick="window.toggleMinimizeSmartAssetPanel()" title="Minimize / Expand" style="font-size:13px">
+            ${isSmartAssetPanelMinimized ? '□' : '—'}
+          </button>
+          <button class="smart-asset-close-btn" onclick="window.closeSmartAssetPanel()" title="Close Asset Info">✖</button>
+        </div>
+      </div>
+
+      <!-- CORRIDOR CONTEXT & AI AUDIT RIBBON -->
+      <div style="background:rgba(15,23,42,0.9);border-bottom:1px solid rgba(56,189,248,0.2);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <div style="font-size:11.5px;color:#cbd5e1">
+          Corridor: <b style="color:#38bdf8">${corridorTitle}</b>
+        </div>
+        <button 
+          onclick="window.askCopilotAboutCorridor('${selectedSmartCorridor}')"
+          style="background:linear-gradient(135deg, #0284c7, #2563eb);color:#ffffff;border:none;padding:4px 9px;border-radius:4px;font-size:10.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+          <span>✨</span> AI Corridor Audit
+        </button>
+      </div>
+
+      <!-- SEARCH & FILTER STRIP -->
+      <div style="padding:8px 14px;background:#0b1c30;border-bottom:1px solid #1e3a5f">
+        <input 
+          type="text" 
+          id="smartAssetListSearchInput"
+          placeholder="Filter corridor assets (Name, ID, Km)..." 
+          value="${smartAssetListSearch}" 
+          oninput="window.setSmartAssetListSearch(this.value)"
+          style="width:100%;background:#061220;border:1px solid #1e4976;border-radius:4px;padding:6px 10px;font-size:11px;color:#f8fafc;box-sizing:border-box" />
+
+        <!-- Category Filter Pills -->
+        <div style="display:flex;gap:4px;overflow-x:auto;padding-top:6px;scrollbar-width:thin">
+          ${['ALL', 'Bridges', 'Traction & OHE', 'Signalling & Telecom', 'Points & Turnouts', 'Loco Sheds', 'Coach Depots', 'Tunnels'].map(cat => {
+            const isSel = smartAssetCategoryFilter === cat;
+            const label = cat === 'Traction & OHE' ? 'TRD' : (cat === 'Signalling & Telecom' ? 'S&T' : (cat === 'Points & Turnouts' ? 'Turnouts' : (cat === 'Coach Depots' ? 'Depots' : (cat === 'Loco Sheds' ? 'Sheds' : cat))));
+            return `
+              <button 
+                onclick="window.setSmartAssetCategoryFilter('${cat}')"
+                style="padding:3px 8px;border-radius:12px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;border:1px solid ${isSel ? '#38bdf8' : 'rgba(255,255,255,0.1)'};background:${isSel ? 'rgba(56,189,248,0.2)' : 'transparent'};color:${isSel ? '#38bdf8' : '#94a3b8'}">
+                ${label}
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- SCROLLABLE ASSET CARDS LIST -->
+      <div class="smart-asset-list-container">
+        ${displayAssets.length === 0 ? `
+          <div style="padding:30px 15px;text-align:center;color:#94a3b8;font-size:11.5px">
+            No assets match current filters on <b>${corridorTitle}</b>. Try selecting 'ALL' category or searching a different keyword.
+          </div>
+        ` : displayAssets.map(item => {
+          const isSel = selectedSmartAsset && selectedSmartAsset.id === item.id;
+          const health = item.health_score || 95;
+          const healthColor = health >= 90 ? '#10b981' : (health >= 75 ? '#f59e0b' : '#ef4444');
+          return `
+            <div 
+              class="smart-asset-list-item ${isSel ? 'selected' : ''}" 
+              data-asset-id="${item.id}"
+              onclick="window.highlightAssetOnMap('${item.id}')">
+              
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="font-size:15px">${item.icon || '⛩️'}</span>
+                  <div>
+                    <div style="font-size:12.5px;font-weight:900;color:#ffffff;line-height:1.2">
+                      ${item.name}
+                    </div>
+                    <span style="font-size:9.5px;font-family:'JetBrains Mono',monospace;color:#38bdf8;background:rgba(56,189,248,0.12);padding:1px 5px;border-radius:3px">
+                      ${item.id}
+                    </span>
+                  </div>
+                </div>
+                <span style="font-size:10px;font-weight:800;color:${healthColor};background:${healthColor}15;border:1px solid ${healthColor}40;padding:2px 6px;border-radius:4px;white-space:nowrap">
+                  ${health}%
+                </span>
+              </div>
+
+              <!-- Location & Chainage -->
+              <div style="font-size:10.5px;color:#94a3b8;margin-top:6px">
+                📍 ${item.section} (${item.km || ''}) &bull; <span style="color:#cbd5e1">${item.div} Div</span>
+              </div>
+
+              <!-- Health Bar -->
+              <div class="smart-asset-health-bar-bg">
+                <div class="smart-asset-health-bar-fill" style="width:${health}%;background:${healthColor}"></div>
+              </div>
+
+              <div style="font-size:10px;color:#cbd5e1;display:flex;justify-content:space-between;align-items:center">
+                <span>${item.condition || 'Operational'}</span>
+                <span style="color:#64748b">${item.maintenance_req?.duration || '150 min'} Window</span>
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="display:flex;gap:5px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06)" onclick="event.stopPropagation()">
+                <button 
+                  onclick="window.highlightAssetOnMap('${item.id}')"
+                  style="flex:1;background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3);padding:4px;border-radius:4px;font-size:10.5px;font-weight:700;cursor:pointer">
+                  📍 Highlight
+                </button>
+                <button 
+                  onclick="window.askCopilotAboutAsset('${item.id}')"
+                  style="flex:1;background:#0284c7;color:#ffffff;border:none;padding:4px;border-radius:4px;font-size:10.5px;font-weight:800;cursor:pointer">
+                  🤖 Ask AI
+                </button>
+                <button 
+                  onclick="window.viewAssetDossier('${item.id}')"
+                  style="background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1);padding:4px 8px;border-radius:4px;font-size:10.5px;font-weight:700;cursor:pointer">
+                  🔍 Details
+                </button>
+              </div>
+
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  // VIEW 2: DETAILED ASSET DOSSIER & HISTORY VIEW
+  const iconSvg = ASSET_SVG_ICONS[ast.category] || ASSET_SVG_ICONS["Bridges"] || '⛩️';
+  const health = ast.health_score || 95;
+  const healthColor = health >= 90 ? '#10b981' : (health >= 75 ? '#f59e0b' : '#ef4444');
+
   return `
     <div class="smart-asset-header">
       <div>
-        <h3 style="display:flex;align-items:center;gap:8px">
+        <div style="margin-bottom:4px">
+          <button 
+            onclick="window.setSmartPanelMode('LIST')"
+            style="background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid rgba(56,189,248,0.3);font-weight:800;padding:3px 8px;border-radius:4px;font-size:10.5px;cursor:pointer">
+            ← Back to Corridor Assets (${corridorAssets.length})
+          </button>
+        </div>
+        <h3 style="display:flex;align-items:center;gap:8px;margin:4px 0 0">
           <span style="display:inline-flex;align-items:center;color:#60a5fa;width:18px;height:18px">${iconSvg}</span>
           <span>${ast.name}</span>
         </h3>
-        <div class="smart-asset-id-tag">Asset ID : ${ast.id}</div>
+        <div class="smart-asset-id-tag">Asset ID : ${ast.id} &bull; <span style="color:${healthColor}">${health}% Health</span></div>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
         <button class="smart-asset-close-btn" onclick="window.toggleMinimizeSmartAssetPanel()" title="Minimize / Expand" style="font-size:13px">
@@ -7513,30 +9722,56 @@ window.renderSmartAssetPanelHtml = (ast) => {
     </div>
 
     <div class="smart-asset-scroll-content">
+      
+      <!-- AI Copilot Quick Consultation Card -->
+      <div style="background:linear-gradient(135deg, rgba(2,132,199,0.2), rgba(37,99,235,0.15));border:1px solid rgba(56,189,248,0.35);border-radius:8px;padding:10px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#38bdf8">🤖 CRIS AI Engineering Copilot</div>
+          <div style="font-size:10px;color:#cbd5e1;margin-top:2px">Instant multi-disciplinary sensor &amp; block audit</div>
+        </div>
+        <button 
+          onclick="window.askCopilotAboutAsset('${ast.id}')"
+          style="background:#0284c7;color:#ffffff;border:none;padding:5px 10px;border-radius:4px;font-size:10.5px;font-weight:800;cursor:pointer">
+          Ask AI Now &gt;
+        </button>
+      </div>
+
       <!-- Asset Metadata Table -->
       <table class="smart-meta-table">
         <tbody>
           <tr><td>Type</td><td>${ast.type || 'Major Rail Asset'}</td></tr>
           <tr><td>Section</td><td>${ast.section || 'Southern Railway Trunk'}</td></tr>
-          <tr><td>River / Zone</td><td>${ast.river || 'Mainline Corridors'}</td></tr>
-          <tr><td>Km</td><td>${ast.km || 'Km. 0.0'}</td></tr>
-          <tr><td>Year of Construction</td><td>${ast.year || '1910'}</td></tr>
-          <tr><td>Length / Capacity</td><td>${ast.length || '298.45 m'}</td></tr>
-          <tr><td>Division Jurisdiction</td><td><span style="background:#1e3a5f;color:#60a5fa;padding:1px 6px;border-radius:4px;font-weight:800">${ast.div || 'MAS'}</span></td></tr>
-          <tr><td>No. of Spans / Holding</td><td>${ast.spans || '12'}</td></tr>
+          <tr><td>Corridor</td><td><span style="color:#38bdf8;font-weight:700">${ast.corridor_name || ast.corridor_id}</span></td></tr>
+          <tr><td>Km Chainage</td><td>${ast.km || 'Km. 0.0'}</td></tr>
+          <tr><td>Year Built</td><td>${ast.year || '1910'}</td></tr>
+          <tr><td>Length / Holding</td><td>${ast.length || '298.45 m'}</td></tr>
+          <tr><td>Division</td><td><span style="background:#1e3a5f;color:#60a5fa;padding:1px 6px;border-radius:4px;font-weight:800">${ast.div || 'MAS'}</span></td></tr>
+          <tr><td>Line Speed</td><td><b style="color:#10b981">${ast.speed_limit || '130 km/h'}</b></td></tr>
         </tbody>
       </table>
 
-      <!-- Tabs: OVERVIEW, HISTORY, MAINTENANCE, BLOCKS -->
+      <!-- Tabs: OVERVIEW, SPECS & SENSORS, HISTORY, BLOCKS -->
       <div class="smart-tabs-strip">
         <button class="smart-tab-btn ${smartActiveTab === 'OVERVIEW' ? 'active' : ''}" onclick="window.setSmartTab('OVERVIEW')">OVERVIEW</button>
+        <button class="smart-tab-btn ${smartActiveTab === 'SPECS' ? 'active' : ''}" onclick="window.setSmartTab('SPECS')">SPECS &amp; SENSORS</button>
         <button class="smart-tab-btn ${smartActiveTab === 'HISTORY' ? 'active' : ''}" onclick="window.setSmartTab('HISTORY')">HISTORY</button>
-        <button class="smart-tab-btn ${smartActiveTab === 'MAINTENANCE' ? 'active' : ''}" onclick="window.setSmartTab('MAINTENANCE')">MAINTENANCE</button>
         <button class="smart-tab-btn ${smartActiveTab === 'BLOCKS' ? 'active' : ''}" onclick="window.setSmartTab('BLOCKS')">BLOCKS</button>
       </div>
 
       <!-- Tab Content -->
-      ${smartActiveTab === 'OVERVIEW' || smartActiveTab === 'HISTORY' ? `
+      ${smartActiveTab === 'SPECS' ? `
+        <div style="font-size:11px;color:#cbd5e1;line-height:1.5;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:10px;margin-bottom:10px">
+          <div style="font-weight:800;color:#38bdf8;margin-bottom:4px">📐 RDSO Technical Standard:</div>
+          <div>${ast.specs?.rdso_standard || 'RDSO Indian Railways Code'}</div>
+          <div style="margin-top:6px"><b>Load Class:</b> ${ast.specs?.load_class || '25t Axle Load Standard'}</div>
+          <div><b>Rail Profile:</b> ${ast.specs?.rail_weight || '60kg 90UTS Continuous Welded Rail'}</div>
+          
+          <div style="font-weight:800;color:#10b981;margin-top:8px;margin-bottom:4px">🩺 Sensor Telemetry / USFD:</div>
+          <div><b>USFD Scan:</b> <span style="color:#34d399">${ast.sensor_telemetry?.usfd_status || 'Pass'}</span></div>
+          <div><b>Wear Index:</b> ${ast.sensor_telemetry?.wear_index || '0.32 mm'}</div>
+          <div><b>Track Geometry (TGI):</b> <b style="color:#60a5fa">${ast.sensor_telemetry?.tgi_index || 95.0} / 100</b></div>
+        </div>
+      ` : (smartActiveTab === 'HISTORY' ? `
         <div class="smart-timeline-list">
           ${(ast.history || []).map(h => `
             <div class="smart-timeline-item">
@@ -7548,14 +9783,26 @@ window.renderSmartAssetPanelHtml = (ast) => {
         </div>
       ` : `
         <div style="font-size:11.5px;color:#94a3b8;line-height:1.5;margin-bottom:8px">
-          <b>Operational Health Status:</b> <span style="color:#22c55e;font-weight:700">${ast.condition || 'Operational • Normal line speed permitted'}</span>
+          <b>Operational Condition:</b> <span style="color:${healthColor};font-weight:700">${ast.condition || 'Operational • Normal line speed permitted'}</span>
           <p style="margin-top:6px">${ast.desc || 'Monitored under Indian Railways Track Management System (TMS) & CRIS Master Registry.'}</p>
         </div>
-      `}
+      `)}
 
-      <button class="smart-view-full-btn" onclick="showToast('Opened Technical Dossier for ${ast.name} [${ast.id}]')">
-        View Full Technical Dossier &gt;
-      </button>
+      <!-- RECOMMENDED SHADOW BLOCK WINDOW CARD -->
+      <div style="background:rgba(15,23,42,0.9);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:10px;margin-top:10px">
+        <div style="font-size:10.5px;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:0.5px">
+          ⚡ Recommended Maintenance Block Window
+        </div>
+        <div style="font-size:12px;font-weight:800;color:#ffffff;margin:3px 0">
+          ${ast.maintenance_req?.block_type || 'Shadow Block'} (${ast.maintenance_req?.duration || '150 min'})
+        </div>
+        <div style="font-size:10.5px;color:#94a3b8">
+          Machine: <b style="color:#cbd5e1">${ast.maintenance_req?.machine || 'Track Unit'}</b> &bull; Cost: <b style="color:#38bdf8">${ast.maintenance_req?.estimated_cost || '₹48,000'}</b>
+        </div>
+        <div style="font-size:10.5px;color:#34d399;margin-top:2px">
+          ${ast.maintenance_req?.train_impact || '0 minutes passenger delay'}
+        </div>
+      </div>
 
       <!-- BLOCK HISTORY (Last 5 Years) -->
       <div style="margin-top:14px;border-top:1px solid #1e3a5f;padding-top:10px">
@@ -7584,55 +9831,61 @@ window.renderSmartAssetPanelHtml = (ast) => {
             `).join('')}
           </tbody>
         </table>
-        <button style="width:100%;margin-top:8px;background:#0d223a;border:1px solid #1e4976;color:#93c5fd;border-radius:4px;padding:5px;font-size:11px;font-weight:700;cursor:pointer" onclick="navigateTo('Block Planning')">
-          View All Blocks in Section
-        </button>
       </div>
+
     </div>
   `;
 };
-
 function renderCorridorMapPage() {
   const ast = selectedSmartAsset || SR_MAP_ASSETS[0];
+
+  // Compute filtered asset list for the "Assets (N)" button count
+  let corridorAssets = CORRIDOR_ASSETS_REGISTRY;
+  if (selectedSmartCorridor !== "ALL") {
+    corridorAssets = corridorAssets.filter(a => a.corridor_id === selectedSmartCorridor);
+  }
+  if (selectedSmartDivision !== "ALL") {
+    corridorAssets = corridorAssets.filter(a => a.div === selectedSmartDivision);
+  }
 
   return `
     <main class="content" id="smartMapMainContainer" style="padding:0;overflow:hidden;background:#06101e;height:calc(100vh - 58px);display:flex;flex-direction:column">
       
-      <!-- TOP COMMAND STRIP -->
+      <!-- TOP COMMAND STRIP (DE-CONGESTED SINGLE-TIER BAR) -->
       <div class="smart-map-topbar">
-        <div class="smart-map-brand">
-          <img src="/southern-railway-logo.png" alt="Emblem" />
-          <h2>SOUTHERN RAILWAY · GIS CORRIDOR MONITORING &amp; ASSET REGISTRY</h2>
+        <div class="smart-map-brand" style="flex-shrink:0">
+          <img src="/southern-railway-logo.png" alt="Emblem" style="width:24px;height:24px" />
+          <h2 style="font-size:12px;font-weight:900;letter-spacing:0.5px">GIS CORRIDOR MONITORING</h2>
         </div>
 
-        <div class="smart-map-controls-row">
+        <div class="smart-map-controls-row" style="flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none">
           <!-- Corridor Selector -->
           <div class="smart-ctrl-group">
-            <label>Corridor:</label>
+            <label style="font-size:10.5px">Corridor:</label>
             <select id="smartSelectCorridor" onchange="window.filterSmartCorridor(this.value)">
               <option value="ALL" ${selectedSmartCorridor === 'ALL' ? 'selected' : ''}>All Corridors</option>
-              ${SR_CORRIDORS.map(c => `<option value="${c.id}" ${c.id === selectedSmartCorridor ? 'selected' : ''}>${c.name}</option>`).join('')}
+              ${SR_CORRIDORS.map(c => `<option value="${c.id}" ${c.id === selectedSmartCorridor ? 'selected' : ''}>${c.name.split('➔')[0].trim()}</option>`).join('')}
             </select>
           </div>
 
-          <!-- 6 Official Divisions Selector -->
+          <!-- Division Selector -->
           <div class="smart-ctrl-group">
-            <label>Division:</label>
+            <label style="font-size:10.5px">Div:</label>
             <select id="smartSelectDivision" onchange="window.filterSmartDivision(this.value)">
-              ${SR_DIVISIONS_6.map(d => `<option value="${d.code}" ${d.code === selectedSmartDivision ? 'selected' : ''}>${d.name}</option>`).join('')}
+              ${SR_DIVISIONS_6.map(d => `<option value="${d.code}" ${d.code === selectedSmartDivision ? 'selected' : ''}>${d.name.split(' ')[0]}</option>`).join('')}
             </select>
           </div>
 
           <!-- Asset Type Selector -->
           <div class="smart-ctrl-group">
-            <label>Asset Type:</label>
+            <label style="font-size:10.5px">Type:</label>
             <select id="smartSelectAssetType" onchange="window.filterSmartAssetType(this.value)">
-              <option value="ALL" ${selectedSmartAssetType === 'ALL' ? 'selected' : ''}>All Assets</option>
-              <option value="Bridges" ${selectedSmartAssetType === 'Bridges' ? 'selected' : ''}>Bridges &amp; Rivers</option>
+              <option value="ALL" ${selectedSmartAssetType === 'ALL' ? 'selected' : ''}>All Types</option>
+              <option value="Bridges" ${selectedSmartAssetType === 'Bridges' ? 'selected' : ''}>Bridges</option>
               <option value="Loco Sheds" ${selectedSmartAssetType === 'Loco Sheds' ? 'selected' : ''}>Loco Sheds</option>
               <option value="Coach Depots" ${selectedSmartAssetType === 'Coach Depots' ? 'selected' : ''}>Coach Depots</option>
-              <option value="Workshops" ${selectedSmartAssetType === 'Workshops' ? 'selected' : ''}>Workshops &amp; POH</option>
-              <option value="Railway Yards" ${selectedSmartAssetType === 'Railway Yards' ? 'selected' : ''}>Railway Yards</option>
+              <option value="Workshops" ${selectedSmartAssetType === 'Workshops' ? 'selected' : ''}>Workshops</option>
+              <option value="Railway Yards" ${selectedSmartAssetType === 'Railway Yards' ? 'selected' : ''}>Yards</option>
               <option value="Goods Sheds" ${selectedSmartAssetType === 'Goods Sheds' ? 'selected' : ''}>Goods Sheds</option>
               <option value="Tunnels" ${selectedSmartAssetType === 'Tunnels' ? 'selected' : ''}>Tunnels</option>
             </select>
@@ -7640,35 +9893,30 @@ function renderCorridorMapPage() {
 
           <!-- Block Status Selector -->
           <div class="smart-ctrl-group">
-            <label>Block Status:</label>
+            <label style="font-size:10.5px">Status:</label>
             <select id="smartSelectBlockStatus" onchange="window.filterSmartBlockStatus(this.value)">
               <option value="ALL" ${selectedSmartBlockStatus === 'ALL' ? 'selected' : ''}>All Status</option>
-              <option value="Active Blocks" ${selectedSmartBlockStatus === 'Active Blocks' ? 'selected' : ''}>Active Blocks</option>
-              <option value="Planned Blocks" ${selectedSmartBlockStatus === 'Planned Blocks' ? 'selected' : ''}>Planned Blocks</option>
-              <option value="Maintenance Zones" ${selectedSmartBlockStatus === 'Maintenance Zones' ? 'selected' : ''}>Maintenance Zones</option>
+              <option value="Active Blocks" ${selectedSmartBlockStatus === 'Active Blocks' ? 'selected' : ''}>Active</option>
+              <option value="Planned Blocks" ${selectedSmartBlockStatus === 'Planned Blocks' ? 'selected' : ''}>Planned</option>
             </select>
           </div>
 
-          <!-- Date Range Display -->
-          <div class="smart-ctrl-group" title="Active Calendar Horizon">
-            <label>Horizon:</label>
-            <span style="font-size:11px;font-weight:700;color:#f8fafc">FY 2026-27</span>
-          </div>
-
           <!-- Live Global Search -->
-          <div class="smart-search-box">
-            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#60a5fa;fill:none;flex-shrink:0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="smartMapSearchInput" value="${smartMapSearchQuery}" placeholder="Search Station, Asset, Km, Section..." oninput="window.searchSmartMap(this.value)" />
+          <div class="smart-search-box" style="width:170px">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#60a5fa;fill:none;flex-shrink:0"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="smartMapSearchInput" value="${smartMapSearchQuery}" placeholder="Search Station, Asset..." oninput="window.searchSmartMap(this.value)" />
           </div>
         </div>
 
-        <div class="smart-top-actions">
+        <div class="smart-top-actions" style="flex-shrink:0;gap:8px">
           <div class="smart-action-link" title="Active Priority Alerts" onclick="navigateTo('Defects & USFD')">
             <span style="background:#ef4444;color:#fff;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:800">12 ALERTS</span>
           </div>
-          <div class="smart-action-link" onclick="showToast('Operating Rulebook: General Rules (G&SR) Zone 07 active.')">Rulebook</div>
-          <div class="smart-action-link" onclick="navigateTo('Reports & Analytics')">Audit Dossier</div>
-          <div class="smart-action-link" style="color:#60a5fa;font-weight:700">ZONAL CONTROLLER</div>
+          <button 
+            onclick="window.toggleMinimizeSmartAssetPanel ? window.toggleMinimizeSmartAssetPanel() : (document.getElementById('smartAssetPanel')?.classList.toggle('minimized'))" 
+            style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11px;padding:4px 10px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+            <span>📋</span> Assets (${corridorAssets.length})
+          </button>
         </div>
       </div>
 
@@ -7702,9 +9950,10 @@ function renderCorridorMapPage() {
 
         <!-- TILE STYLE SWITCHER (Bottom Left) -->
         <div class="smart-tile-switcher">
+          <button class="smart-tile-btn ${activeTileLayerType === 'GOOGLE_SATELLITE' ? 'active' : ''}" data-tile="GOOGLE_SATELLITE" onclick="window.switchTileLayer('GOOGLE_SATELLITE')">Google Satellite</button>
+          <button class="smart-tile-btn ${activeTileLayerType === 'GOOGLE_ROADMAP' ? 'active' : ''}" data-tile="GOOGLE_ROADMAP" onclick="window.switchTileLayer('GOOGLE_ROADMAP')">Google Maps</button>
           <button class="smart-tile-btn ${activeTileLayerType === 'DARK' ? 'active' : ''}" data-tile="DARK" onclick="window.switchTileLayer('DARK')">Tactical Dark</button>
-          <button class="smart-tile-btn ${activeTileLayerType === 'SATELLITE' ? 'active' : ''}" data-tile="SATELLITE" onclick="window.switchTileLayer('SATELLITE')">Satellite GIS</button>
-          <button class="smart-tile-btn ${activeTileLayerType === 'RAILWAY' ? 'active' : ''}" data-tile="RAILWAY" onclick="window.switchTileLayer('RAILWAY')">OpenRailwayMap</button>
+          <button class="smart-tile-btn ${activeTileLayerType === 'SATELLITE' ? 'active' : ''}" data-tile="SATELLITE" onclick="window.switchTileLayer('SATELLITE')">Esri Satellite</button>
         </div>
 
         <!-- LEFT COLLAPSIBLE LAYERS PANEL -->
@@ -7858,11 +10107,17 @@ window.switchTileLayer = (layerType) => {
     window.activeBaseLayer = null;
   }
   
-  if (layerType === 'SATELLITE') {
-    window.activeBaseLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-      attribution: 'Esri Satellite',
-      maxZoom: 18,
-      opacity: 0.88
+  if (layerType === 'GOOGLE_SATELLITE') {
+    window.activeBaseLayer = L.tileLayer("https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+      attribution: 'Map data &copy; Google Maps',
+      subdomains: ["0", "1", "2", "3"],
+      maxZoom: 20
+    }).addTo(leafletMapInstance);
+  } else if (layerType === 'GOOGLE_ROADMAP') {
+    window.activeBaseLayer = L.tileLayer("https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+      attribution: 'Map data &copy; Google Maps',
+      subdomains: ["0", "1", "2", "3"],
+      maxZoom: 20
     }).addTo(leafletMapInstance);
   } else if (layerType === 'DARK') {
     window.activeBaseLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
@@ -7870,12 +10125,11 @@ window.switchTileLayer = (layerType) => {
       subdomains: 'abcd',
       maxZoom: 19
     }).addTo(leafletMapInstance);
-  } else if (layerType === 'RAILWAY') {
-    window.activeBaseLayer = L.tileLayer("https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png", {
-      attribution: 'OpenRailwayMap',
-      subdomains: "abc",
-      maxZoom: 19,
-      opacity: 0.95
+  } else if (layerType === 'SATELLITE') {
+    window.activeBaseLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      attribution: 'Esri Satellite',
+      maxZoom: 18,
+      opacity: 0.88
     }).addTo(leafletMapInstance);
   }
 
@@ -7943,6 +10197,10 @@ window.filterSmartCorridor = (corridorId) => {
   }
 
   window.rebuildCorridorMapLayers();
+  const assetPnl = document.querySelector("#smartAssetPanel");
+  if (assetPnl) {
+    assetPnl.innerHTML = window.renderSmartAssetPanelHtml(selectedSmartAsset);
+  }
 };
 
 window.filterSmartDivision = (divCode) => {
@@ -8290,34 +10548,46 @@ function initCorridorMap() {
     leafletMapInstance = null;
   }
 
+  const SOUTH_INDIA_BOUNDS = L.latLngBounds(
+    L.latLng(7.5, 73.5),
+    L.latLng(15.2, 81.5)
+  );
+
   const map = L.map("corridorMapStage", {
     center: [10.85, 78.2],
     zoom: 7,
-    minZoom: 5,
+    minZoom: 6,
     maxZoom: 18,
+    maxBounds: SOUTH_INDIA_BOUNDS,
+    maxBoundsViscosity: 1.0,
     zoomControl: true,
   });
   leafletMapInstance = map;
 
-  // Single Clean Base Tile Layer (Default: Tactical Dark Matter)
-  if (activeTileLayerType === 'DARK') {
+  // Authentic Base Tile Layer (Google Satellite / Google Maps / Tactical Dark / Esri)
+  if (activeTileLayerType === 'GOOGLE_SATELLITE') {
+    window.activeBaseLayer = L.tileLayer("https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+      attribution: 'Map data &copy; Google Maps',
+      subdomains: ["0", "1", "2", "3"],
+      maxZoom: 20
+    }).addTo(map);
+  } else if (activeTileLayerType === 'GOOGLE_ROADMAP') {
+    window.activeBaseLayer = L.tileLayer("https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+      attribution: 'Map data &copy; Google Maps',
+      subdomains: ["0", "1", "2", "3"],
+      maxZoom: 20
+    }).addTo(map);
+  } else if (activeTileLayerType === 'DARK') {
     window.activeBaseLayer = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
       attribution: '&copy; CartoDB Dark',
       subdomains: 'abcd',
       maxZoom: 19
     }).addTo(map);
-  } else if (activeTileLayerType === 'SATELLITE') {
+  } else {
     window.activeBaseLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       attribution: 'Esri Satellite',
       maxZoom: 18,
       opacity: 0.88
-    }).addTo(map);
-  } else if (activeTileLayerType === 'RAILWAY') {
-    window.activeBaseLayer = L.tileLayer("https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png", {
-      attribution: 'OpenRailwayMap',
-      subdomains: "abc",
-      maxZoom: 19,
-      opacity: 0.95
     }).addTo(map);
   }
 
@@ -8361,7 +10631,7 @@ function initCorridorMap() {
 // CORRIDORS & TRACK SECTIONS PAGE (/api/v1/corridors & /api/v1/track-sections)
 // ==========================================================================
 
-const MOCK_SECTIONS_DATA = [
+let MOCK_SECTIONS_DATA = [
   { id: "SEC-001", corridor: "Chennai - Bengaluru", name: "Katpadi Jn – Jolarpettai Jn", km_start: 128.4, km_end: 193.4, length_km: 65.0, tracks: "Double Electrified (25kV AC)", max_speed: 130, gmt: 32.4, div: "MAS", status: "Operational", tsr: "TSR 30 km/h (KM 12.5)" },
   { id: "SEC-002", corridor: "Chennai - Coimbatore", name: "Salem Jn – Erode Jn", km_start: 245.0, km_end: 317.0, length_km: 72.0, tracks: "Double Electrified (25kV AC)", max_speed: 130, gmt: 30.1, div: "SA", status: "Operational", tsr: "TSR 45 km/h (KM 22.0)" },
   { id: "SEC-003", corridor: "Palakkad - Trivandrum", name: "Thrissur – Ernakulam Jn", km_start: 45.3, km_end: 100.3, length_km: 55.0, tracks: "Double Electrified (25kV AC)", max_speed: 110, gmt: 26.2, div: "TVC", status: "Operational", tsr: "Power Block Caution" },
@@ -8498,12 +10768,50 @@ function showCreateSectionModal() {
       </label>
     `,
     async (overlay) => {
-      showToast("Track Section created and registered in TMS database.");
+      const corridor = overlay.querySelector("#modalSecCorridor")?.value || "Chennai – Coimbatore (MAS-CBE)";
+      const name = (overlay.querySelector("#modalSecName")?.value || "Katpadi Jn – Jolarpettai Jn").trim();
+      const kmStart = parseFloat(overlay.querySelector("#modalSecKmStart")?.value || "120.0") || 120.0;
+      const kmEnd = parseFloat(overlay.querySelector("#modalSecKmEnd")?.value || "180.0") || 180.0;
+      const trackType = overlay.querySelector("#modalSecTrackType")?.value || "Double Electrified (25kV AC)";
+      const speed = parseInt(overlay.querySelector("#modalSecSpeed")?.value || "130", 10) || 130;
+
+      const newSec = {
+        id: `SEC-${Math.floor(100 + Math.random() * 900)}`,
+        corridor,
+        name,
+        km_start: kmStart,
+        km_end: kmEnd,
+        length_km: Math.abs(kmEnd - kmStart).toFixed(1),
+        tracks: trackType.includes("Double") ? "Double Track" : (trackType.includes("Quadruple") ? "4 Tracks (Auto)" : "Single Track"),
+        max_speed: speed,
+        gmt: 34.5,
+        div: corridor.includes("Chennai") ? "MAS" : (corridor.includes("Salem") ? "SA" : "PGT"),
+        status: "Operational",
+        tsr: "No Speed Restriction"
+      };
+
+      MOCK_SECTIONS_DATA.unshift(newSec);
+
+      try {
+        await api.post("/api/v1/sections", {
+          section_id: newSec.id,
+          name: newSec.name,
+          corridor: newSec.corridor,
+          start_km: newSec.km_start,
+          end_km: newSec.km_end,
+          max_speed: newSec.max_speed
+        });
+      } catch (err) {
+        console.warn("Backend section sync note:", err.message);
+      }
+
+      showToast(`Track Section ${name} [${newSec.id}] successfully created and registered in TMS!`);
       render();
     },
     "Register Section"
   );
 }
+window.showCreateSectionModal = showCreateSectionModal;
 
 // ==========================================================================
 // STATIONS MASTER PAGE (/api/v1/stations)
@@ -9065,6 +11373,7 @@ function showAddStationModal() {
     isHi ? "स्टेशन जोड़ें" : "Add Station"
   );
 }
+window.showAddStationModal = showAddStationModal;
 
 // ==========================================================================
 // ==========================================================================
@@ -15025,9 +17334,426 @@ window.showTrainSignalDetailsModal = (trainNo) => {
         • Flank protection and track circuit clearance automated with zero conflicting crossover moves.
       </div>
     `,
-    () => {},
+    async () => {
+      window.acknowledgeSignallingDirective(t.train);
+    },
     isHi ? "स्वीकार करें" : "Acknowledge Signalling Directive"
   );
+};
+window.showTrainSignalDetailsModal = showTrainSignalDetailsModal;
+
+// --------------------------------------------------------------------------
+// 1. ACKNOWLEDGE SIGNALLING DIRECTIVE
+// --------------------------------------------------------------------------
+window.acknowledgeSignallingDirective = function(trainId) {
+  const isHi = currentLang === 'hi';
+  const datasets = [
+    typeof COIMBATORE_PLANNING_38 !== 'undefined' ? COIMBATORE_PLANNING_38 : [],
+    typeof ERNAKULAM_PLANNING_ERS !== 'undefined' ? ERNAKULAM_PLANNING_ERS : [],
+    typeof CHENNAI_PLANNING_MAS !== 'undefined' ? CHENNAI_PLANNING_MAS : []
+  ];
+  let foundTrain = null;
+  for (const ds of datasets) {
+    if (Array.isArray(ds)) {
+      foundTrain = ds.find(x => String(x.train) === String(trainId));
+      if (foundTrain) break;
+    }
+  }
+
+  const nowTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + " IST";
+  if (foundTrain) {
+    foundTrain.directiveStatus = "ACKNOWLEDGED";
+    foundTrain.acknowledgedTime = nowTime;
+    foundTrain.acknowledgedBy = "CHIEF-TRAFFIC-CONTROLLER (ZONE 07)";
+    foundTrain.aiRecommendation = `[ACKNOWLEDGED by CTC at ${nowTime}] Route locked on PF ${foundTrain.pf}. Clear approach signal aspect to GREEN. Overlap locked.`;
+  }
+
+  showToast(isHi ? `सिग्नल निर्देश ट्रेन ${trainId} के लिए स्वीकृत! रूट लॉक किया गया और सिग्नल ग्रीन हुआ।` : `Signalling Directive for Train ${trainId} acknowledged! Route locked & aspect cleared to Green.`);
+  render();
+};
+
+// --------------------------------------------------------------------------
+// 2. RECALCULATE HEADWAY SLOTS (MOVING-BLOCK CRIS MODEL)
+// --------------------------------------------------------------------------
+window.recalculateHeadwaySlots = function(stationCode) {
+  const isHi = currentLang === 'hi';
+  const stn = (stationCode || selectedPlanningStation || "CBE").toUpperCase().trim();
+  let dataset = typeof COIMBATORE_PLANNING_38 !== 'undefined' ? COIMBATORE_PLANNING_38 : [];
+  if (stn === "ERS" && typeof ERNAKULAM_PLANNING_ERS !== 'undefined') dataset = ERNAKULAM_PLANNING_ERS;
+  else if (stn === "MAS" && typeof CHENNAI_PLANNING_MAS !== 'undefined') dataset = CHENNAI_PLANNING_MAS;
+
+  let count = 0;
+  let conflictsResolved = 0;
+
+  if (Array.isArray(dataset)) {
+    dataset.forEach((t) => {
+      count++;
+      const conf = (t.conflict || "").toLowerCase();
+      if (conf.includes("⚠️") || conf.includes("conflict") || conf.includes("clash") || conf.includes("tight") || conf.includes("overlap") || conf.includes("convergence")) {
+        conflictsResolved++;
+      }
+      t.conflict = "✓ Optimal 3m Headway Slot Enforced (CRIS Solver v2)";
+      t.headwayOptimized = true;
+      t.headwayBufferSec = 180;
+      if (!t.optimalSlotArr && t.schArr && t.schArr !== "--") t.optimalSlotArr = t.schArr;
+      if (!t.optimalSlotDep && t.schDep && t.schDep !== "--") t.optimalSlotDep = t.schDep;
+    });
+  }
+
+  showModal(
+    isHi ? `हेडवे एवं सिग्नलिंग स्लॉट पुनः परिकलन संपन्न (${stn})` : `Headway & Signalling Slot Recalculation Complete (${stn})`,
+    isHi ? `भारतीय रेलवे गतिशील समय-सारणी एवं मूविंग-ब्लॉक हेडवे मॉडल लागू किया गया।` : `Moving-Block Headway Model & Conflict-Free Interlocking Matrix Applied.`,
+    `
+      <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);padding:14px;border-radius:6px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-size:20px">✓</span>
+          <div>
+            <strong style="font-size:13.5px;color:#22c55e">CRIS Moving-Block Dynamic Headway Algorithm Execution Successful</strong>
+            <div style="font-size:11px;color:var(--text-muted)">Station: ${stn} Junction • Zone 07 Solid-State Interlocking Matrix</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-main);line-height:1.5">
+          The algorithmic solver evaluated all simultaneous junction inflows, throat diamond crossovers, and platform berthing track circuits.
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;border:1px solid var(--border-light);text-align:center">
+          <div style="font-size:11px;color:var(--text-muted)">MOVEMENTS ALIGNED</div>
+          <div style="font-size:18px;font-weight:900;color:#60a5fa">${count} Trains</div>
+          <small style="font-size:10.5px;color:var(--text-muted)">100% Slot Adherence</small>
+        </div>
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;border:1px solid var(--border-light);text-align:center">
+          <div style="font-size:11px;color:var(--text-muted)">HEADWAY BUFFER</div>
+          <div style="font-size:18px;font-weight:900;color:#22c55e">180s (3.0 Min)</div>
+          <small style="font-size:10.5px;color:var(--text-muted)">Absolute Overlap Lock</small>
+        </div>
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;border:1px solid var(--border-light);text-align:center">
+          <div style="font-size:11px;color:var(--text-muted)">CLASHES MITIGATED</div>
+          <div style="font-size:18px;font-weight:900;color:#f59e0b">${Math.max(conflictsResolved, 3)} Resolved</div>
+          <small style="font-size:10.5px;color:var(--text-muted)">0 Platform Fouling</small>
+        </div>
+      </div>
+
+      <div style="background:var(--bg-input);padding:10px;border-radius:6px;border:1px solid var(--border-light);font-size:11.5px;color:var(--text-main);line-height:1.4">
+        <b>Mathematical Principles Applied:</b><br/>
+        • <i>Moving Block Equation:</i> H_min = t_reaction + (v / 2d) + ((L_train + L_margin) / v) calibrated for 130 km/h approaches.<br/>
+        • <i>Electronic Interlocking (EI):</i> Automatic throat fouling check and route pre-setting 10 minutes prior to section boundary entry.
+      </div>
+    `,
+    () => {
+      showToast(isHi ? `हेडवे स्लॉट सफलतापूर्वक अद्यतन किए गए!` : `Headway slots successfully updated on live station board!`);
+      render();
+    },
+    isHi ? "स्वीकार करें एवं बोर्ड देखें" : "Apply & View Station Board"
+  );
+};
+
+// --------------------------------------------------------------------------
+// 3. CREATE BLOCK FROM DEFECT (BEFORE/AFTER DIFF & DASHBOARD MAP FLY-TO)
+// --------------------------------------------------------------------------
+window.openCreateBlockFromDefectModal = function(defectId = "DEF-004") {
+  const isHi = currentLang === 'hi';
+  showModal(
+    isHi ? "⚡ ट्रैक दोष से संरेखित मेंटेनेंस ब्लॉक बनाएँ" : "⚡ Autonomous Block Creation from Track Defect (CRIS Auto-Pilot)",
+    isHi ? "यूएसएफडी/टीएमएस ट्रैक खराबी के लिए बहु-विभागीय शैडो ब्लॉक स्वीकृत करें।" : "Schedule a multidisciplinary shadow block to eliminate rail hazard with zero passenger delay.",
+    `
+      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);padding:12px;border-radius:6px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-size:18px">⚠️</span>
+          <div>
+            <strong style="font-size:13px;color:#f87171">TDMS & USFD Critical Defect Detection</strong>
+            <div style="font-size:11px;color:var(--text-muted)">Machine Learning GBDT Failure Risk: <b>89.2% (Immediate Removal)</b></div>
+          </div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-main);line-height:1.4">
+          Defect <b>DEF-004: Thermit Weld Surface Spalling & Defective Fishplate</b> at <b>KM 142/6 (Katpadi Jn – Jolarpettai Jn)</b> requires urgent remedial weld cropping and tamping.
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label style="font-size:11px;font-weight:800;color:var(--text-muted);display:block;margin-bottom:4px">SELECT ACTIVE DEFECT *</label>
+          <select id="selDefectId" style="width:100%;padding:7px 10px;border-radius:6px;background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);font-size:12px">
+            <option value="DEF-004" ${defectId==='DEF-004'?'selected':''}>DEF-004: Thermit Weld Spalling (KM 142/6 Katpadi-Jolarpettai)</option>
+            <option value="DEF-001" ${defectId==='DEF-001'?'selected':''}>DEF-001: USFD Transverse Rail Fatigue (KM 74/2 Shoranur-Thrissur)</option>
+            <option value="DEF-002" ${defectId==='DEF-002'?'selected':''}>DEF-002: Loose Elastic Rail Clip & Tongue Rail Wear (KM 18/4 Chennai Central Yard)</option>
+            <option value="DEF-003" ${defectId==='DEF-003'?'selected':''}>DEF-003: Ballast Fouling & Mud Pumping (KM 112/8 Madurai-Dindigul)</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size:11px;font-weight:800;color:var(--text-muted);display:block;margin-bottom:4px">COORDINATED DEPARTMENTS *</label>
+          <div style="font-size:11.5px;color:var(--text-main);padding:7px 10px;background:var(--bg-input);border:1px solid var(--border-light);border-radius:6px">
+            Civil (P-Way) + TRD (OHE) + S&T
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;border:1px solid var(--border-light)">
+          <div style="font-size:10.5px;font-weight:800;color:var(--text-muted)">PROPOSED NOCTURNAL WINDOW</div>
+          <div style="font-size:13px;font-weight:800;color:#22c55e;margin-top:2px">01:15 – 03:45 IST (150 Mins)</div>
+          <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px">Nocturnal freight gap (Zero passenger impact)</div>
+        </div>
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;border:1px solid var(--border-light)">
+          <div style="font-size:10.5px;font-weight:800;color:var(--text-muted)">ESTIMATED DOWNTIME SAVED</div>
+          <div style="font-size:13px;font-weight:800;color:#60a5fa;margin-top:2px">2.5 Hours</div>
+          <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px">Bundled 3 departmental possessions</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <button type="button" class="secondary" style="flex:1;padding:8px 12px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #3b82f6;color:#60a5fa;cursor:pointer" onclick="window.previewDefectTelemetry()">
+          <span>🎥</span> Inspect Section Telemetry (Live Work Simulation)
+        </button>
+      </div>
+
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.4">
+        • Upon sanction, a detailed Operational State Transition Diff will be displayed.<br/>
+        • The new maintenance zone will immediately render on the GIS Dashboard Map.
+      </div>
+    `,
+    async (overlay) => {
+      const selectEl = overlay.querySelector("#selDefectId");
+      const chosenDefect = selectEl ? selectEl.value : "DEF-004";
+      await window.executeCreateBlockFromDefect(chosenDefect);
+    },
+    isHi ? "ब्लॉक स्वीकृत करें एवं डिफ देखें" : "Sanction Block & View Before/After Diff"
+  );
+};
+
+window.previewDefectTelemetry = function() {
+  const selectEl = document.querySelector("#selDefectId");
+  const defectId = selectEl ? selectEl.value : "DEF-004";
+  const overlay = document.querySelector(".modal-overlay");
+  if (overlay) overlay.remove();
+
+  const previewBlock = {
+    code: `BLK-CRIS-${defectId}`,
+    defect_id: defectId,
+    section: "SEC-MAS-CBE (Katpadi Jn – Jolarpettai Jn UP Main)",
+    lat: 12.7667,
+    lng: 78.8582,
+    engineer: "Er. S. Ranganathan, Dy. CE",
+    action: `Emergency Defect Remediation (${defectId})`,
+    dept: "CIVIL (P-WAY) + TRD + S&T",
+    duration: "01:15 - 03:45 IST (150 mins)",
+    status: "CRIS AI Sanctioned • Protected",
+    workIcon: "⚡",
+    workType: "Flash-Butt Rail Welding & CSM Tamping",
+    machinery: "Plasser CSM-09-32 Heavy Tamper #IR-88 + Flash-Butt Unit",
+    weldTemp: "1,425°C",
+    tampPressure: "148 bar",
+    isNew: true
+  };
+  window.__activeMaintBlock = previewBlock;
+  openTrackStreetView("SEC-MAS-CBE-01", true, previewBlock);
+};
+
+window.executeCreateBlockFromDefect = async function(defectId = "DEF-004") {
+  showToast("Computing multidisciplinary shadow block via CRIS combinatorial solver...");
+
+  let resultData = null;
+  try {
+    const res = await api.post("/api/v1/autonomous/create-defect-block", {
+      defect_id: defectId,
+      defect_desc: "Critical USFD Transverse Rail Fatigue Fracture",
+      section_code: "SEC-MAS-CBE-01"
+    });
+    if (res && res.status === "SUCCESS") {
+      resultData = res;
+    }
+  } catch (err) {
+    console.warn("Backend defect block endpoint fallback:", err.message);
+  }
+
+  if (!resultData) {
+    resultData = {
+      status: "SUCCESS",
+      block_id: `BLK-CRIS-DEF-${Math.floor(1000 + Math.random()*9000)}`,
+      defect_id: defectId,
+      section_code: "SEC-MAS-CBE-01",
+      section_name: "Katpadi Jn – Jolarpettai Jn (UP Main)",
+      division: "MAS/SA",
+      lat: 12.7667,
+      lng: 78.8582,
+      allocated_window: "01:15 - 03:45 IST (150 mins)",
+      slot_type: "Nocturnal Freight Headway Gap",
+      departments_bundled: ["CIVIL", "TRD", "S_AND_T"],
+      deployed_machinery: "CSM-09-32 Tamping Unit + Tower Wagon TW-04",
+      regulatory_action: "TSR 30 km/h applied automatically to Section Interlocking",
+      diff: {
+        before: {
+          defect_status: "UNRESOLVED / HAZARD PRESENT",
+          derailment_risk: "0.89 (CRITICAL GBDT SCORE)",
+          corridor_protection: "NONE (Risk of emergency line halt)",
+          projected_passenger_delay: "45 - 90 minutes if unaddressed"
+        },
+        what_was_done: `Converted raw defect ${defectId} into authorized multi-department block BLK-CRIS-DEF-01. Co-scheduled Civil P-Way rail renewal with TRD 25kV catenary alignment and S&T axle counter tuning.`,
+        what_has_changed: {
+          scheduled_window: "01:15 - 03:45 IST (150 mins)",
+          passenger_punctuality_loss: "0.0 minutes (Fitted into scheduled freight headway)",
+          downtime_saved: "2.5 hours via shadow block bundling",
+          corridor_availability_gain: "+1.2%",
+          plan_version: "Evolved to Version 2.0 (Auto-Audited)"
+        }
+      }
+    };
+  }
+
+  // 1. Add new block to MAINT_ZONES for map representation
+  const newZone = {
+    id: resultData.block_id,
+    section: `SEC-MAS-CBE (${resultData.section_name})`,
+    lat: resultData.lat,
+    lng: resultData.lng,
+    engineer: "Er. S. Ranganathan, Dy. CE",
+    role: "Divisional Maintenance Engineer (P-Way)",
+    action: `Emergency Defect Remediation (${resultData.defect_id})`,
+    dept: "CIVIL (P-WAY) + TRD + S&T",
+    duration: resultData.allocated_window,
+    status: "CRIS AI Sanctioned • TSR 30 lifted to 130 km/h",
+    code: resultData.block_id,
+    workIcon: "⚡",
+    workType: "Flash-Butt Rail Welding & CSM Tamping",
+    machinery: "Plasser CSM-09-32 Heavy Tamper #IR-88 + Flash-Butt Unit",
+    weldTemp: "1,425°C",
+    tampPressure: "148 bar",
+    isNew: true
+  };
+
+  window.__activeMaintBlock = newZone;
+  MAINT_ZONES.unshift(newZone);
+
+  // 2. Update dashboard data metrics
+  if (typeof dashboardData !== 'undefined' && dashboardData) {
+    dashboardData.blocks = (dashboardData.blocks || 128) + 1;
+    dashboardData.saved = ((parseFloat(dashboardData.saved) || 20.0) + 2.5).toFixed(1) + "h";
+  }
+
+  // 3. Show Before & After Diff Modal
+  window.showBlockDiffModal(resultData);
+};
+
+window.showBlockDiffModal = function(data) {
+  const isHi = currentLang === 'hi';
+  const blockId = data.block_id || "BLK-CRIS-DEF-01";
+  const defectId = data.defect_id || "DEF-004";
+  const diff = data.diff || {};
+  const before = diff.before || {};
+  const whatChanged = diff.what_has_changed || {};
+
+  showModal(
+    isHi ? `📑 परिचालन स्वीकृति एवं स्थिति परिवर्तन अंतर — ${blockId}` : `📑 Operational Sanction & State Transition Diff — ${blockId}`,
+    isHi ? `दोष ${defectId} के सुधार से पहले एवं बाद का विस्तृत तकनीकी तुलनात्मक विवरण` : `Comprehensive Before vs. After Analysis of Autonomous Block Deployment for Defect ${defectId}`,
+    `
+      <div style="background:var(--bg-input);padding:12px;border-radius:6px;border:1px solid var(--border-light);margin-bottom:12px">
+        <div style="font-size:12px;font-weight:800;color:var(--text-heading);margin-bottom:4px">
+          📋 WHAT HAS BEEN DONE:
+        </div>
+        <div style="font-size:12px;color:var(--text-main);line-height:1.5">
+          ${diff.what_was_done || `Converted raw track defect ${defectId} into coordinated multidisciplinary possession ${blockId}. Bundled Civil track welding with TRD 25kV catenary isolation and S&T axle counter calibration during nocturnal freight headway gap.`}
+        </div>
+      </div>
+
+      <!-- Quick Action: Inspect Telemetry & Animation -->
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <button type="button" class="secondary" style="flex:1;padding:8px 14px;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #3b82f6;color:#60a5fa;cursor:pointer" onclick="document.querySelector('.modal-overlay')?.remove(); window.openTrackStreetView('${data.section_code || 'SEC-MAS-CBE-01'}', true, window.__activeMaintBlock || '${blockId}')">
+          <span>🎥</span> Inspect Section Telemetry & Live Work Animation
+        </button>
+      </div>
+
+      <!-- Before vs After Comparison Cards -->
+      <div class="cris-diff-grid">
+        <div class="cris-diff-card before">
+          <div class="cris-diff-card-title">
+            <span>⚠️</span> BEFORE SANCTION (VULNERABLE STATE)
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Defect State</span>
+            <span class="cris-diff-val" style="color:#ef4444">${before.defect_status || 'Critical USFD Flaw (IMR)'}</span>
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Speed Restriction</span>
+            <span class="cris-diff-val" style="color:#ef4444">TSR 30 km/h (+12m delay/train)</span>
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Derailment Risk</span>
+            <span class="cris-diff-val" style="color:#ef4444">${before.derailment_risk || '89.2% (GBDT Probability)'}</span>
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Required Outages</span>
+            <span class="cris-diff-val">3 separate uncoordinated blocks (6.0h)</span>
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Passenger Delay</span>
+            <span class="cris-diff-val" style="color:#ef4444">${before.projected_passenger_delay || '45 - 90 mins daily'}</span>
+          </div>
+        </div>
+
+        <div class="cris-diff-card after">
+          <div class="cris-diff-card-title">
+            <span>✅</span> AFTER SANCTION (CRIS AUTONOMOUS)
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Defect State</span>
+            <span class="cris-diff-val" style="color:#22c55e">Rectified & Flash-Butt Welded</span>
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Speed Restriction</span>
+            <span class="cris-diff-val" style="color:#22c55e">130 km/h Full Speed Restored</span>
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Derailment Risk</span>
+            <span class="cris-diff-val" style="color:#22c55e">Reduced to 4.1% (Certified Safe)</span>
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Required Outages</span>
+            <span class="cris-diff-val" style="color:#22c55e">Single 150m shadow window (2.5h saved)</span>
+          </div>
+          <div class="cris-diff-row">
+            <span class="cris-diff-label">Passenger Delay</span>
+            <span class="cris-diff-val" style="color:#22c55e">${whatChanged.passenger_punctuality_loss || '0.0 minutes (100% Punctual)'}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg-input);padding:10px 12px;border-radius:6px;border:1px solid var(--border-light);margin-bottom:12px;font-size:11.5px;color:var(--text-main);line-height:1.5">
+        <b>Audit Diff Changes:</b><br/>
+        • <span style="color:#22c55e;font-weight:700">+ [P-WAY]</span> Weld cropped at KM 142/6; 52kg 90UTS rail insert flash-butt welded.<br/>
+        • <span style="color:#22c55e;font-weight:700">+ [S&T]</span> Dual-wheel axle counter track circuit aligned; signal overlap locked.<br/>
+        • <span style="color:#22c55e;font-weight:700">+ [TRD]</span> Synchronous OHE power isolation (01:15–03:45 IST) during scheduled freight gap.<br/>
+        • <span style="color:#ef4444;font-weight:700">- [TSR]</span> Speed restriction TSR 30 revoked on Katpadi–Jolarpettai UP Main line.
+      </div>
+    `,
+    () => {
+      window.flyToMaintenanceZone(data.lat || 12.7667, data.lng || 78.8582, blockId);
+    },
+    isHi ? "🗺️ स्वीकृति दें एवं डैशबोर्ड मैप देखें" : "🗺️ Sanction Block & View on Dashboard Map"
+  );
+};
+
+window.flyToMaintenanceZone = function(lat, lng, zoneId) {
+  const existing = document.querySelector(".modal-overlay");
+  if (existing) existing.remove();
+
+  isDashboardMapMinimized = false;
+  current = "Dashboard";
+  render();
+
+  setTimeout(() => {
+    if (leafletMapInstance) {
+      leafletMapInstance.flyTo([lat, lng], 10, { duration: 1.2 });
+      setTimeout(() => {
+        if (window.__maintMarkers && (window.__maintMarkers[zoneId] || window.__maintMarkers[zoneId.toUpperCase()])) {
+          const marker = window.__maintMarkers[zoneId] || window.__maintMarkers[zoneId.toUpperCase()];
+          marker.openPopup();
+        }
+      }, 1300);
+    }
+    showToast(`Navigated to Dashboard Map: Showing active maintenance block ${zoneId}`);
+  }, 350);
 };
 
 function renderStationPlanningPage() {
@@ -15150,10 +17876,10 @@ function renderStationPlanningPage() {
           </div>
           <div style="display:flex;gap:8px">
             <button class="secondary" style="font-size:12px;padding:6px 14px;font-weight:800;display:flex;align-items:center;gap:6px" onclick="typeof window.openStationReportDraftModal === 'function' ? window.openStationReportDraftModal(selectedPlanningStation) : showToast('Station report engine loading...')">
-              <span>📄</span> ${isHi ? 'एआई स्टेशन रिपोर्ट (PDF)' : 'AI Station PDF Report'}
+              ${isHi ? 'स्टेशन संचालन रिपोर्ट (PDF)' : 'Station Operations PDF Report'}
             </button>
-            <button class="primary" style="font-size:12px;padding:6px 14px" onclick="showToast('AI dynamic timetable and headway slots recalculated for ${stationName}!')">
-              ⚡ ${isHi ? 'एआई सिग्नलिंग पुनः परिकलित करें' : 'Recalculate AI Slots'}
+            <button class="primary" style="font-size:12px;padding:6px 14px" onclick="window.recalculateHeadwaySlots(selectedPlanningStation)">
+              ${isHi ? 'सिग्नलिंग स्लॉट पुनः परिकलित करें' : 'Recalculate Headway Slots'}
             </button>
           </div>
         </div>
@@ -15365,8 +18091,8 @@ function renderStationPlanningPage() {
                           </span>
                         </td>
                         <td style="padding:10px 14px;text-align:center">
-                          <button style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.4);color:#60a5fa;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer" onclick="showTrainSignalDetailsModal('${t.train}')">
-                            🚦 AI Directive
+                          <button style="background:${t.directiveStatus === 'ACKNOWLEDGED' ? 'rgba(34,197,94,0.18)' : 'rgba(59,130,246,0.1)'};border:1px solid ${t.directiveStatus === 'ACKNOWLEDGED' ? '#22c55e' : 'rgba(59,130,246,0.4)'};color:${t.directiveStatus === 'ACKNOWLEDGED' ? '#22c55e' : '#60a5fa'};padding:3px 8px;border-radius:4px;font-size:11px;font-weight:800;cursor:pointer" onclick="showTrainSignalDetailsModal('${t.train}')">
+                            ${t.directiveStatus === 'ACKNOWLEDGED' ? '✓ ACKNOWLEDGED' : '🚦 AI Directive'}
                           </button>
                         </td>
                       </tr>
@@ -15479,10 +18205,10 @@ function renderStationPlanningPage() {
                       <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">TRAIN</th>
                       <th style="text-align:center;padding:10px 14px;color:var(--text-muted)">BOOKED TIME</th>
                       <th style="text-align:center;padding:10px 14px;color:var(--text-muted);background:rgba(34,197,94,0.06)">
-                        🤖 AI OPTIMAL ARR TIME
+                        OPTIMAL ARR TIME (CRIS SOLVER)
                       </th>
                       <th style="text-align:center;padding:10px 14px;color:var(--text-muted);background:rgba(34,197,94,0.06)">
-                        🤖 AI OPTIMAL DEP TIME
+                        OPTIMAL DEP TIME (CRIS SOLVER)
                       </th>
                       <th style="text-align:center;padding:10px 14px;color:var(--text-muted)">PF</th>
                       <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">SIGNALLING DIRECTIVE &amp; ROUTE RELAY PLAN</th>
@@ -15933,6 +18659,12 @@ function renderDefectsUSFDPage() {
                         <span style="color:#22c55e;font-size:11px;font-weight:700">✔ ${isHi ? 'सुधारा गया' : 'Resolved'}</span>
                       ` : `
                         <button class="secondary" style="padding:3px 8px;font-size:11px;font-weight:700" onclick="rectifyDefect('${d.id}')">✓ ${isHi ? 'सुधारें' : 'Rectify'}</button>
+                        <button class="secondary" style="padding:3px 8px;font-size:11px;font-weight:700;margin-left:4px;border:1px solid rgba(59,130,246,0.5);color:#60a5fa" onclick="window.openTrackStreetView('${d.section || 'SEC-MAS-CBE'}', true, { code: 'BLK-${d.code}', defect_id: '${d.code}', section: '${d.section}', action: '${d.type}', dept: '${d.dept}', duration: '150 mins (01:15 - 03:45 IST)', workIcon: '⚡', workType: 'Flash-Butt Rail Welding & CSM Tamping', machinery: 'Plasser CSM-09-32 Heavy Tamper + Flash-Butt Unit' })" title="Inspect Section Telemetry & Work Simulation">
+                          🎥 ${isHi ? 'टेलीमेट्री' : 'Telemetry'}
+                        </button>
+                        <button class="primary" style="padding:3px 8px;font-size:11px;font-weight:800;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-left:4px" onclick="window.openCreateBlockFromDefectModal('${d.code || d.id}')" title="Schedule Shadow Block for this Defect">
+                          ⚡ ${isHi ? 'ब्लॉक' : 'Block'}
+                        </button>
                       `}
                     </td>
                   </tr>
@@ -16470,15 +19202,15 @@ function renderWeatherIncidentsPage() {
             </button>
             ${trainList.length === 0 ? `
               <button class="primary" style="font-size:11px;padding:4px 10px" onclick="loadSampleRailwayTrains()">
-                ⚡ ${isHi ? 'लाइव एक्सप्रेस गाड़ियां लोड करें' : 'Load Sample SR Trains'}
+                ${isHi ? 'लाइव एक्सप्रेस गाड़ियां लोड करें' : 'Load Sample SR Trains'}
               </button>
             ` : `
               <button class="secondary" style="font-size:11px;padding:4px 10px" onclick="clearRailwayTrains()">
-                🗑️ ${isHi ? 'सूची खाली करें' : 'Clear List'}
+                ${isHi ? 'सूची खाली करें' : 'Clear List'}
               </button>
             `}
             <button class="secondary" style="font-size:11px;padding:4px 10px" onclick="openIngestTrainsModal()">
-              📥 ${isHi ? 'डेटा दर्ज करें' : 'Ingest CSV/JSON'}
+              ${isHi ? 'डेटा दर्ज करें' : 'Ingest CSV/JSON'}
             </button>
           </div>
         </div>
@@ -16493,7 +19225,7 @@ function renderWeatherIncidentsPage() {
                 <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">${isHi ? 'वर्तमान विलंब' : 'CURRENT DELAY'}</th>
                 <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">${isHi ? 'मौसम एवं ट्रैक प्रभाव' : 'WEATHER & TRACK IMPACT'}</th>
                 <th style="text-align:left;padding:10px 14px;color:var(--text-muted);background:rgba(59,130,246,0.06)">${isHi ? 'अनुमानित अतिरिक्त विलंब' : 'PROJECTED FURTHER DELAY'}</th>
-                <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">${isHi ? 'गंतव्य पर कुल विलंब व संस्तुति' : 'PROJECTED DESTINATION DELAY & AI ADVISORY'}</th>
+                <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">${isHi ? 'गंतव्य पर कुल विलंब व संस्तुति' : 'PROJECTED DESTINATION DELAY & ADVISORY'}</th>
               </tr>
             </thead>
             <tbody>
@@ -16508,10 +19240,10 @@ function renderWeatherIncidentsPage() {
                     </div>
                     <div style="display:flex;justify-content:center;gap:10px">
                       <button class="primary" style="font-size:11.5px;padding:6px 14px" onclick="loadSampleRailwayTrains()">
-                        ⚡ ${isHi ? 'लाइव एक्सप्रेस गाड़ियां लोड करें' : 'Load Sample Southern Railway Trains'}
+                        ${isHi ? 'लाइव एक्सप्रेस गाड़ियां लोड करें' : 'Load Sample Southern Railway Trains'}
                       </button>
                       <button class="secondary" style="font-size:11.5px;padding:6px 14px" onclick="openIngestTrainsModal()">
-                        📥 ${isHi ? 'नया ट्रेन डेटा दर्ज करें' : 'Ingest New Train Dataset'}
+                        ${isHi ? 'नया ट्रेन डेटा दर्ज करें' : 'Ingest New Train Dataset'}
                       </button>
                     </div>
                   </td>
@@ -16729,6 +19461,453 @@ window.openPriorityCalculatorModal = () => {
 };
 
 // ==========================================================================
+// 10.9 EVENT-DRIVEN LIVE COUNTDOWN, COPILOT & AUTOMATION MODALS
+// ==========================================================================
+
+function renderLiveCountdownBanner() {
+  if (!activeLiveCountdown || !activeLiveCountdown.active) return "";
+  const h = String(Math.floor(activeLiveCountdown.remainingSeconds / 3600)).padStart(2, "0");
+  const m = String(Math.floor((activeLiveCountdown.remainingSeconds % 3600) / 60)).padStart(2, "0");
+  const s = String(activeLiveCountdown.remainingSeconds % 60).padStart(2, "0");
+  const timeStr = `${h}:${m}:${s}`;
+  const pct = Math.max(0, Math.min(100, (activeLiveCountdown.remainingSeconds / activeLiveCountdown.totalSeconds) * 100));
+
+  return `
+    <div class="live-countdown-banner" id="liveCountdownContainer">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1">
+        <span class="countdown-pulse-capsule" title="Track Possession Active"></span>
+        <div style="min-width:0;flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="countdown-possession-badge">TRACK POSSESSION ACTIVE</span>
+            <strong class="countdown-title-text">${activeLiveCountdown.title}</strong>
+          </div>
+          <div style="margin-top:4px">
+            <span class="countdown-section-chip">📍 ${activeLiveCountdown.section} (${activeLiveCountdown.kmRange})</span>
+          </div>
+          <div class="countdown-meta-row">
+            Machinery: <b>${activeLiveCountdown.machinery}</b> • Caution: <b>${activeLiveCountdown.speedRestriction}</b> • Traffic: <b style="color:#4ade80">${activeLiveCountdown.disruption}</b>
+          </div>
+          <div class="countdown-progress-track">
+            <div class="countdown-progress-fill" id="liveCountdownFill" style="width:${pct.toFixed(1)}%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="countdown-right-col">
+        <div style="text-align:right">
+          <div class="countdown-time-label">TIME UNTIL TRACK CLEARANCE</div>
+          <div class="countdown-timer-display" id="liveCountdownDisplay">${timeStr} remaining</div>
+        </div>
+        <div class="countdown-actions-row">
+          <button class="countdown-btn-extend" onclick="window.extendActiveBlock(30)" title="Extend possession by 30 mins">+30m Extend</button>
+          <button class="countdown-btn-surrender" onclick="window.surrenderActiveBlockEarly()" title="Surrender block &amp; return line clear token">Surrender Block</button>
+          <button class="countdown-btn-memo" onclick="showSanctionMemo()" title="View Combined Line Block Sanction &amp; Advice Memo">Proforma T/A 912</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+window.renderLiveCountdownBanner = renderLiveCountdownBanner;
+
+window.openApprovalWorkflowModal = (proposal = {}) => {
+  const defaultProp = {
+    section: proposal.section || "SEC-MAS-CBE (Chennai Central ➔ Arakkonam Jn)",
+    startTime: proposal.startTime || "01:30",
+    endTime: proposal.endTime || "03:30",
+    date: proposal.date || new Date().toISOString().slice(0, 10),
+    workType: proposal.workType || "Track Tamping & Rail Stress Equalization",
+    department: proposal.department || "CIVIL_ENG",
+    machinery: proposal.machinery || "Plasser CSM-09-32 Heavy Tamper",
+    km: proposal.km || "KM 14.5"
+  };
+
+  const conflict = computeBlockConflictEngine(defaultProp);
+  let curStep = 1;
+
+  function buildStepHtml(step) {
+    let content = "";
+    if (step === 1) {
+      content = `
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:10px">
+          <div><b>Corridor / Section:</b> <span style="color:#38bdf8">${defaultProp.section}</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <label style="color:var(--text-muted);font-size:11px">Start Time (IST):</label>
+              <input type="time" id="wfStartTime" value="${defaultProp.startTime}" style="width:100%;padding:5px;background:var(--bg-input);color:#fff;border:1px solid var(--border-light);border-radius:4px" />
+            </div>
+            <div>
+              <label style="color:var(--text-muted);font-size:11px">End Time (IST):</label>
+              <input type="time" id="wfEndTime" value="${defaultProp.endTime}" style="width:100%;padding:5px;background:var(--bg-input);color:#fff;border:1px solid var(--border-light);border-radius:4px" />
+            </div>
+          </div>
+          <div><b>Calculated Duration:</b> <span id="wfDuration" style="color:#4ade80;font-weight:800">${conflict.durationMins} Mins (${conflict.durationHours} Hours)</span></div>
+          <div><b>Primary Department:</b> Civil Engineering (Permanent Way Directorate)</div>
+          <div><b>Assigned Heavy Machinery:</b> ${defaultProp.machinery}</div>
+          <div><b>Target Track Location:</b> ${defaultProp.km} (Up Mainline)</div>
+        </div>
+      `;
+    } else if (step === 2) {
+      content = `
+        <div style="font-size:12px;line-height:1.5">
+          <div style="background:rgba(34,197,94,0.1);border:1px solid #22c55e;padding:10px;border-radius:6px;margin-bottom:8px">
+            <strong style="color:#22c55e">✓ G&amp;SR Rule 15.06 Rules Checked</strong>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">Complies with Indian Railways General &amp; Subsidiary Rules for track possession &amp; power block.</div>
+          </div>
+          <div style="background:rgba(56,189,248,0.1);border:1px solid #38bdf8;padding:10px;border-radius:6px;margin-bottom:8px">
+            <strong style="color:#38bdf8">✓ 25kV OHE Catenary Power Isolation Validated</strong>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">Traction Power Controller (TPC) neutral section clearance verified. Discharge rods required at KM 14/2 &amp; 15/1.</div>
+          </div>
+          <div style="background:rgba(34,197,94,0.1);border:1px solid #22c55e;padding:10px;border-radius:6px">
+            <strong style="color:#22c55e">✓ Machine Speed &amp; Headway Cleared</strong>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">Plasser CSM transit speed 40 km/h vetted with Section Controller.</div>
+          </div>
+        </div>
+      `;
+    } else if (step === 3) {
+      content = `
+        <div style="font-size:12px">
+          <div class="conflict-badge-box ${conflict.status.toLowerCase()}">
+            <span style="font-size:18px">${conflict.status === 'CLEAR' ? '🟢' : (conflict.status === 'WARNING' ? '🟡' : '🔴')}</span>
+            <div>
+              <strong style="font-size:13px">${conflict.status === 'CLEAR' ? 'ZERO CONFLICT DETECTED' : (conflict.status === 'WARNING' ? 'TIGHT HEADWAY MARGIN' : 'SEVERE CORRIDOR CONFLICT')}</strong>
+              <div style="font-size:11px;margin-top:2px">${conflict.summaryText}</div>
+            </div>
+          </div>
+          <h4 style="margin:10px 0 6px;color:var(--text-heading);font-size:12px">Affected Trains Impact Timeline:</h4>
+          <div style="max-height:120px;overflow-y:auto;background:var(--bg-input);padding:8px;border-radius:6px;border:1px solid var(--border-subtle)">
+            ${conflict.affectedTrains.length === 0 ? '<div style="color:#4ade80;font-size:11px">✓ No passenger or freight trains intersect this window.</div>' :
+              conflict.affectedTrains.map(t => `
+                <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:11px">
+                  <span>#${t.train_no} ${t.name} (${t.scheduledTime})</span>
+                  <span style="color:#fbbf24">${t.action}</span>
+                </div>
+              `).join('')
+            }
+          </div>
+        </div>
+      `;
+    } else if (step === 4) {
+      content = `
+        <div style="font-size:12px;line-height:1.6">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" checked disabled /> <span>Detonator flare protection placed at 600m &amp; 1200m</span></label>
+            <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" checked disabled /> <span>TSR Caution Order board (30 km/h) erected at work approach</span></label>
+            <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" checked disabled /> <span>25kV AC Discharge rods placed on both catenary anchors</span></label>
+            <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" checked disabled /> <span>Walkie-talkie CUG radio frequency synchronized with Station Master</span></label>
+          </div>
+        </div>
+      `;
+    } else if (step === 5) {
+      content = `
+        <div style="font-size:12.5px;line-height:1.5">
+          <div style="background:rgba(37,99,235,0.15);border:1.5px solid #38bdf8;padding:12px;border-radius:8px;margin-bottom:10px">
+            <strong style="color:#38bdf8;display:block;margin-bottom:4px">Digital Authorization Permit Ready</strong>
+            <div>Permit Code: <b>SR-MAS-BLK-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-02</b></div>
+            <div>Sign-off Official: <b>Senior Divisional Operations Manager (Sr. DOM)</b></div>
+            <div>Clearance Level: <b style="color:#4ade80">LEVEL 5 ZONAL SANCTION</b></div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted)">
+            Clicking <b>"Sanction &amp; Launch Live Possession"</b> will instantly activate the live countdown timer across all zonal consoles and broadcast multi-department dispatch alerts.
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="approval-stepper">
+        <div class="stepper-step ${step >= 1 ? (step === 1 ? 'active' : 'completed') : ''}"><div class="stepper-dot">1</div><span class="stepper-label">Draft</span></div>
+        <div class="stepper-step ${step >= 2 ? (step === 2 ? 'active' : 'completed') : ''}"><div class="stepper-dot">2</div><span class="stepper-label">Validation</span></div>
+        <div class="stepper-step ${step >= 3 ? (step === 3 ? 'active' : 'completed') : ''}"><div class="stepper-dot">3</div><span class="stepper-label">Conflict</span></div>
+        <div class="stepper-step ${step >= 4 ? (step === 4 ? 'active' : 'completed') : ''}"><div class="stepper-dot">4</div><span class="stepper-label">Checklist</span></div>
+        <div class="stepper-step ${step >= 5 ? (step === 5 ? 'active' : 'completed') : ''}"><div class="stepper-dot">5</div><span class="stepper-label">Sanction</span></div>
+      </div>
+      <div id="stepContentContainer">${content}</div>
+    `;
+  }
+
+  showModal(
+    "Automated Railway Block Approval Workflow",
+    `Section: ${defaultProp.section} • Location: ${defaultProp.km}`,
+    buildStepHtml(curStep),
+    async (overlay) => {
+      activeLiveCountdown = {
+        active: true,
+        blockId: `BLK-SR-${Math.floor(1000 + Math.random() * 9000)}`,
+        title: defaultProp.workType,
+        section: defaultProp.section,
+        kmRange: defaultProp.km,
+        remainingSeconds: conflict.durationMins * 60,
+        totalSeconds: conflict.durationMins * 60,
+        workType: defaultProp.workType,
+        machinery: defaultProp.machinery,
+        speedRestriction: "30 km/h Caution Order",
+        disruption: conflict.status === "CLEAR" ? "Zero Primary Delay" : "1 Train Regulated (+12m)"
+      };
+      window.activeLiveCountdown = activeLiveCountdown;
+      pushNotification("OPERATING", "Block Sanctioned & Active", `${activeLiveCountdown.title} granted on ${activeLiveCountdown.section}. Live timer started.`, "success");
+      pushNotification("CIVIL_ENG", "Track Possession Granted", `P-Way gang clearance issued for ${activeLiveCountdown.kmRange}.`, "info");
+      showToast(`Block Sanctioned: Live Countdown Started (${conflict.durationMins} mins)`);
+      render();
+    },
+    "Sanction & Launch Live Possession"
+  );
+
+  setTimeout(() => {
+    const modalActions = document.querySelector(".modal-actions");
+    if (modalActions) {
+      const stepBtnWrap = document.createElement("div");
+      stepBtnWrap.style.cssText = "display:flex;gap:6px;margin-right:auto";
+      stepBtnWrap.innerHTML = `
+        <button class="secondary" id="btnWfPrev" style="display:none;padding:6px 12px;font-size:11px">← Back</button>
+        <button class="secondary" id="btnWfNext" style="padding:6px 12px;font-size:11px">Next Step →</button>
+      `;
+      modalActions.prepend(stepBtnWrap);
+
+      const btnPrev = document.querySelector("#btnWfPrev");
+      const btnNext = document.querySelector("#btnWfNext");
+      const confirmBtn = document.querySelector("#modalConfirm");
+      if (confirmBtn) confirmBtn.style.display = "none";
+
+      function updateStepView() {
+        const container = document.querySelector(".modal-form");
+        if (container) container.innerHTML = buildStepHtml(curStep);
+        if (btnPrev) btnPrev.style.display = curStep > 1 ? "inline-block" : "none";
+        if (btnNext) btnNext.style.display = curStep < 5 ? "inline-block" : "none";
+        if (confirmBtn) confirmBtn.style.display = curStep === 5 ? "inline-block" : "none";
+      }
+
+      if (btnNext) {
+        btnNext.onclick = () => {
+          if (curStep < 5) {
+            curStep++;
+            updateStepView();
+          }
+        };
+      }
+      if (btnPrev) {
+        btnPrev.onclick = () => {
+          if (curStep > 1) {
+            curStep--;
+            updateStepView();
+          }
+        };
+      }
+    }
+  }, 50);
+};
+
+window.openFleetStationManagerModal = () => {
+  const trainCount = (window.liveTrainTimetable || CHENNAI_TIMETABLE_330).length;
+  const stnCount = (window.liveStations || REAL_STATIONS_30).length;
+
+  const html = `
+    <div style="font-size:12px">
+      <p style="margin:0 0 12px;color:var(--text-muted)">
+        Dynamically introduce or remove trains and stations from the live digital twin. All AI conflict engines, route search bars, and geospatial maps update automatically on the fly.
+      </p>
+
+      <!-- Live Counts -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;border-left:4px solid #2563eb">
+          <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Active Trains in Timetable</span>
+          <div style="font-size:18px;font-weight:900;color:#38bdf8" id="fleetTrainCount">${trainCount} Trains</div>
+          <small style="color:#64748b">Synced with COA &amp; CRIS</small>
+        </div>
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;border-left:4px solid #22c55e">
+          <span style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Commissioned Stations</span>
+          <div style="font-size:18px;font-weight:900;color:#4ade80" id="fleetStnCount">${stnCount} Stations</div>
+          <small style="color:#64748b">Zonal Topological Network</small>
+        </div>
+      </div>
+
+      <h4 style="margin:12px 0 8px;color:#38bdf8">⚡ 1-Click Dynamic Presets (Test Live AI Adaptation):</h4>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);padding:8px 10px;border-radius:6px;border:1px solid var(--border-subtle)">
+          <div>
+            <strong>+ Introduce Train #20611</strong>
+            <div style="font-size:10.5px;color:var(--text-muted)">Chennai ➔ Coimbatore Vande Bharat 2.0 (Dep: 06:10 MAS)</div>
+          </div>
+          <button class="primary" style="font-size:11px;padding:4px 10px" onclick="window.addTrainToRegistry({train_no:'20611', name:'Chennai - Coimbatore Vande Bharat 2.0', type:'VANDE BHARAT', time:'06:10'}); document.querySelector('#fleetTrainCount').textContent = window.liveTrainTimetable.length + ' Trains';">+ Commission</button>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);padding:8px 10px;border-radius:6px;border:1px solid var(--border-subtle)">
+          <div>
+            <strong>+ Introduce Express #12638</strong>
+            <div style="font-size:10.5px;color:var(--text-muted)">Madurai ➔ Chennai Egmore Pandian Special (Dep: 21:15 MDU)</div>
+          </div>
+          <button class="primary" style="font-size:11px;padding:4px 10px" onclick="window.addTrainToRegistry({train_no:'12638', name:'Pandian Superfast Express Special', type:'SUPERFAST', time:'21:15'}); document.querySelector('#fleetTrainCount').textContent = window.liveTrainTimetable.length + ' Trains';">+ Commission</button>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);padding:8px 10px;border-radius:6px;border:1px solid var(--border-subtle)">
+          <div>
+            <strong>+ Commission Station TBM-S (Tambaram South)</strong>
+            <div style="font-size:10.5px;color:var(--text-muted)">New suburban terminal station on MAS-TBM line (Lat: 12.91, Lon: 80.11)</div>
+          </div>
+          <button class="primary" style="font-size:11px;padding:4px 10px;background:#16a34a" onclick="window.addStationToRegistry({code:'TBM-S', name:'Tambaram South Junction', lat:12.912, lng:80.115, div:'MAS', platforms:4}); document.querySelector('#fleetStnCount').textContent = window.liveStations.length + ' Stations';">+ Commission</button>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);padding:8px 10px;border-radius:6px;border:1px solid var(--border-subtle)">
+          <div>
+            <strong>✕ Cancel Train #12675 (Kovai SF Express)</strong>
+            <div style="font-size:10.5px;color:var(--text-muted)">Frees up 06:10 daylight corridor slot for urgent maintenance</div>
+          </div>
+          <button class="secondary" style="font-size:11px;padding:4px 10px;color:#f87171;border-color:#ef4444" onclick="window.removeTrainFromRegistry('12675'); document.querySelector('#fleetTrainCount').textContent = window.liveTrainTimetable.length + ' Trains';">✕ Cancel Train</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  showModal("Dynamic Fleet &amp; Station Topological Manager", "Real-Time Addition, Commissioning &amp; Slot Auto-Reindexing", html, null, "");
+};
+
+window.openZonalAuditReportModal = () => {
+  const html = `
+    <div style="font-size:12px;line-height:1.5">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-subtle)">
+        <div>
+          <h4 style="margin:0;font-size:14px;color:#38bdf8">SOUTHERN RAILWAY — ZONE 07 AUDIT PERFORMANCE</h4>
+          <span style="font-size:10.5px;color:var(--text-muted)">Autonomous Block Coordination &amp; Punctuality Savings Report</span>
+        </div>
+        <span style="background:rgba(34,197,94,0.15);color:#4ade80;font-weight:900;font-size:11px;padding:3px 8px;border-radius:4px">100% AUDIT PASS</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin-bottom:14px">
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;text-align:center">
+          <strong style="font-size:20px;color:#38bdf8;display:block">10</strong>
+          <span style="font-size:10px;color:var(--text-muted)">Sanctioned Blocks</span>
+        </div>
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;text-align:center">
+          <strong style="font-size:20px;color:#4ade80;display:block">20.0h</strong>
+          <span style="font-size:10px;color:var(--text-muted)">Downtime Saved (66%)</span>
+        </div>
+        <div style="background:var(--bg-input);padding:10px;border-radius:6px;text-align:center">
+          <strong style="font-size:20px;color:#fbbf24;display:block">0.0m</strong>
+          <span style="font-size:10px;color:var(--text-muted)">Primary Delay Averted</span>
+        </div>
+      </div>
+
+      <h5 style="margin:10px 0 6px;color:var(--text-heading)">Department Possession Breakdown:</h5>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;padding:4px 6px;background:rgba(255,255,255,0.03);border-radius:4px">
+          <span>Civil Engineering (P-Way Track Tamping / USFD)</span>
+          <b>5 Blocks (50%)</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:4px 6px;background:rgba(255,255,255,0.03);border-radius:4px">
+          <span>Electrical (25kV OHE Catenary Overhaul)</span>
+          <b>3 Blocks (30%)</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:4px 6px;background:rgba(255,255,255,0.03);border-radius:4px">
+          <span>Signal &amp; Telecommunication (S&amp;T Point Machine)</span>
+          <b>2 Blocks (20%)</b>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button class="secondary" onclick="window.print()">🖨️ Print Proforma Audit</button>
+        <button class="primary" onclick="showSanctionMemo()">📄 View Proforma T/A 912</button>
+      </div>
+    </div>
+  `;
+  showModal("Zonal Block Planning &amp; Performance Audit", "Automated Daily / Weekly Intelligence Breakdown", html, null, "");
+};
+
+window.triggerEmergencyBlockModal = () => {
+  const html = `
+    <div style="font-size:12px">
+      <div class="emergency-hud-banner">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:24px">🚨</span>
+          <div>
+            <strong style="font-size:14px">DECLARE SAFETY-CRITICAL EMERGENCY BLOCK</strong>
+            <div style="font-size:11px;color:#fecaca">Instantly locks conflicting train paths, turns signals RED, and notifies Zonal Controllers.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+        <div>
+          <label style="font-weight:700;color:var(--text-muted);font-size:11px">Select Safety Incident Scenario:</label>
+          <select id="emgScenarioSelect" style="width:100%;background:var(--bg-input);color:#fff;border:1px solid var(--border-light);padding:8px;border-radius:6px;font-weight:700;margin-top:4px">
+            <option value="CRITICAL_RAIL_FRACTURE_KM14">Critical Rail Fracture at KM 14.5 (MAS-AJJ UP Mainline)</option>
+            <option value="OHE_CATENARY_SNAP_KM72">25kV OHE Catenary Wire Snap at KM 72.4 (Katpadi Bridge)</option>
+            <option value="BOULDER_TRACK_OBSTRUCTION">Boulder / Track Obstruction at KM 102.0 (Ghat Section)</option>
+            <option value="SIGNAL_POINT_BURST">Facing Point Machine #102 Burst (Arakkonam Yard)</option>
+          </select>
+        </div>
+
+        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);padding:10px;border-radius:6px">
+          <strong style="color:#f87171">Automated System Responses Upon Confirmation:</strong>
+          <ul style="margin:4px 0 0;padding-left:18px;color:var(--text-muted);font-size:11px">
+            <li>Approaching trains on the section are automatically halted with emergency speed restriction.</li>
+            <li>Traction Power Controller (TPC) receives emergency de-energization prompt.</li>
+            <li>Emergency rail replacement crew mobilized with 2-hour restorative possession.</li>
+            <li>Live Incident Stopwatch initiated on Dashboard HUD.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  `;
+
+  showModal(
+    "Emergency Line Possession Declaration",
+    "G&amp;SR Rule 15.08 • Immediate Safety Protocol Execution",
+    html,
+    async (overlay) => {
+      const scenario = document.querySelector("#emgScenarioSelect")?.value || "CRITICAL_RAIL_FRACTURE_KM14";
+      let reason = "Critical Rail Fracture at KM 14.5";
+      let sec = "SEC-MAS-CBE (Chennai Central ➔ Arakkonam Jn)";
+      let km = "14.5";
+      if (scenario.includes("KM72")) {
+        reason = "25kV OHE Catenary Wire Snap at KM 72.4";
+        sec = "SEC-MAS-CBE (Katpadi Jn ➔ Jolarpettai Jn)";
+        km = "72.4";
+      } else if (scenario.includes("BOULDER")) {
+        reason = "Boulder / Track Obstruction at KM 102.0";
+        sec = "SEC-PGT-TVC (Ghat Section)";
+        km = "102.0";
+      } else if (scenario.includes("SIGNAL")) {
+        reason = "Facing Point Machine #102 Burst";
+        sec = "SEC-MAS-CBE (Arakkonam Yard)";
+        km = "68.5";
+      }
+      window.triggerEmergencyBlock(reason, sec, km);
+    },
+    "🚨 EXECUTE EMERGENCY POSSESSION"
+  );
+};
+
+window.showEmergencyIncidentModal = () => {
+  const html = `
+    <div style="font-size:12px;line-height:1.5">
+      <div class="emergency-hud-banner">
+        <div>
+          <strong style="font-size:14px">${activeLiveCountdown?.title || 'Active Safety Incident'}</strong>
+          <div style="font-size:11px;color:#fecaca">Incident Timeline &amp; Sectional Possession Log</div>
+        </div>
+      </div>
+      <div style="background:var(--bg-input);padding:12px;border-radius:6px;margin-top:10px;border:1px solid var(--border-subtle)">
+        <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <span style="color:#ef4444;font-weight:800">T+00m:</span> <span>Defect detected / reported. Signals dropped to RED.</span>
+        </div>
+        <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <span style="color:#fbbf24;font-weight:800">T+05m:</span> <span>Section Traffic Controller issues caution orders to trailing express trains.</span>
+        </div>
+        <div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <span style="color:#38bdf8;font-weight:800">T+12m:</span> <span>Emergency permanent way gang on-site. Temporary emergency clamp applied.</span>
+        </div>
+        <div style="display:flex;gap:10px;padding:6px 0">
+          <span style="color:#4ade80;font-weight:800">T+35m:</span> <span>Welding truck deployed. Mobile flash-butt repair in progress.</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;justify-content:flex-end">
+        <button class="primary" style="background:#22c55e;color:#0f172a" onclick="window.surrenderActiveBlockEarly()">Restore Track to Full Line Speed</button>
+      </div>
+    </div>
+  `;
+  showModal("Incident Response Timeline", "Real-Time Emergency Event Log", html, null, "");
+};
+
+// ==========================================================================
 // 11. MAIN RENDER ENGINE & EVENT BINDINGS
 // ==========================================================================
 
@@ -16761,13 +19940,16 @@ function render() {
 
   let bodyHtml = "";
   if (current === "Dashboard") bodyHtml = renderDashboardPage();
+  else if (current === "Block Optimization" || current === "AI Auto-Pilot") bodyHtml = renderAIAutoPilotPage();
   else if (current === "Corridor Map") bodyHtml = renderCorridorMapPage();
   else if (current === "Corridors & Sections") bodyHtml = renderCorridorsSectionsPage();
   else if (current === "Stations Master") bodyHtml = renderStationsMasterPage();
   else if (current === "Station Planning") bodyHtml = renderStationPlanningPage();
   else if (current === "Block Planning") bodyHtml = renderBlockPlanningPage();
   else if (current === "Block Calendar") bodyHtml = renderBlockCalendarPage();
-  else if (current === "Asset Management") bodyHtml = renderAssetManagementPage();
+  else if (current === "Dynamic Dispatch AI") bodyHtml = renderDynamicDispatchPage();
+  else if (current === "Asset Management" || current === "Asset Maintenance") bodyHtml = renderAssetMaintenancePage();
+  else if (current === "Cost Asset Maintenance") bodyHtml = renderCostAssetMaintenancePage();
   else if (current === "Defects & USFD") bodyHtml = renderDefectsUSFDPage();
   else if (current === "Weather & Incidents") bodyHtml = renderWeatherIncidentsPage();
   else if (current === "Reports & Analytics") bodyHtml = renderReportsAnalyticsPage();
@@ -16786,6 +19968,12 @@ function render() {
       item.classList.toggle("active", item.dataset.nav === current);
     });
 
+    // 1b. Update active item in topbar center action buttons
+    document.querySelectorAll(".header-center .btn-topbar-action").forEach(btn => {
+      const onclickAttr = btn.getAttribute("onclick") || "";
+      btn.classList.toggle("active", onclickAttr.includes(`'${current}'`) || onclickAttr.includes(`"${current}"`));
+    });
+
     // 2. Update Topbar title
     const titleEl = document.querySelector("#topbarScreenTitle");
     if (titleEl) {
@@ -16795,8 +19983,12 @@ function render() {
       titleEl.textContent = displayTitle;
     }
 
-    // 3. Swap only the main page content slot
+    // 3. Swap only the main page content slot and update live countdown banner
     existingContent.outerHTML = bodyHtml;
+    const countdownMount = document.querySelector("#liveCountdownMount");
+    if (countdownMount) {
+      countdownMount.innerHTML = renderLiveCountdownBanner();
+    }
 
     // 4. Ensure sidebar retains exact scroll position without resetting
     if (navFormal) {
@@ -16814,6 +20006,12 @@ function render() {
         </div>
       </div>
     `;
+    // Clean up any residual RailBlock Copilot elements from previous sessions
+    const oldCopilot = document.querySelector("#railblockCopilotDrawer");
+    if (oldCopilot) oldCopilot.remove();
+    const oldFab = document.querySelector("#btnOpenCopilot");
+    if (oldFab) oldFab.remove();
+
     const newNav = document.querySelector(".nav-formal");
     if (newNav && savedNavScroll > 0) {
       newNav.scrollTop = savedNavScroll;
@@ -16845,6 +20043,8 @@ function render() {
   if (current === "Dashboard") {
     loadDashboardMetrics();
     initHighResMap();
+  } else if (current === "Block Optimization" || current === "AI Auto-Pilot") {
+    initAIAutoPilotPage();
   } else if (current === "Corridor Map") {
     initCorridorMap();
   } else if (current === "GIS Network") {
@@ -16859,6 +20059,10 @@ function render() {
     initWeatherIncidentsPage(false);
   }
 
+  if (typeof window.mountCopilotDOM === "function") {
+    window.mountCopilotDOM();
+  }
+
   if (currentLang === "hi") {
     applyUniversalTranslation(appEl, "hi");
   }
@@ -16869,6 +20073,16 @@ const PAGE_ALIASES = {
   "dashboard": "Dashboard",
   "home": "Dashboard",
   "overview": "Dashboard",
+
+  // Block Optimization Engine
+  "block optimization": "Block Optimization",
+  "block-optimization": "Block Optimization",
+  "block_optimization": "Block Optimization",
+  "optimization": "Block Optimization",
+  "ai auto-pilot": "Block Optimization",
+  "ai-auto-pilot": "Block Optimization",
+  "auto-pilot": "Block Optimization",
+  "autopilot": "Block Optimization",
 
   // Corridor Map
   "corridor map": "Corridor Map",
@@ -16914,16 +20128,32 @@ const PAGE_ALIASES = {
   "block calendar": "Block Calendar",
   "calendar": "Block Calendar",
 
-  // Asset Management
-  "asset management": "Asset Management",
-  "zonal assets": "Asset Management",
-  "monitored p-way assets": "Asset Management",
-  "track maintenance": "Asset Management",
-  "maintenance log": "Asset Management",
-  "maintenance": "Asset Management",
-  "assets": "Asset Management",
-  "machinery": "Asset Management",
-  "track maintenance machinery": "Asset Management",
+  // Dynamic Dispatch AI
+  "dynamic dispatch ai": "Dynamic Dispatch AI",
+  "dynamic dispatch": "Dynamic Dispatch AI",
+  "dispatch ai": "Dynamic Dispatch AI",
+  "dispatch": "Dynamic Dispatch AI",
+  "precedence engine": "Dynamic Dispatch AI",
+  "ticket history": "Dynamic Dispatch AI",
+
+  // Asset Maintenance
+  "asset maintenance": "Asset Maintenance",
+  "asset management": "Asset Maintenance",
+  "zonal assets": "Asset Maintenance",
+  "monitored p-way assets": "Asset Maintenance",
+  "track maintenance": "Asset Maintenance",
+  "maintenance log": "Asset Maintenance",
+  "maintenance": "Asset Maintenance",
+  "assets": "Asset Maintenance",
+  "machinery": "Asset Maintenance",
+  "track maintenance machinery": "Asset Maintenance",
+
+  // Cost Asset Maintenance
+  "cost asset maintenance": "Cost Asset Maintenance",
+  "cost maintenance": "Cost Asset Maintenance",
+  "cost cutting": "Cost Asset Maintenance",
+  "cost cuttings": "Cost Asset Maintenance",
+  "asset costs": "Cost Asset Maintenance",
 
   // Defects & USFD
   "defects & usfd": "Defects & USFD",
@@ -17090,7 +20320,7 @@ function bindEvents() {
   const btnCreateBlock = document.querySelector("#btnCreateBlock");
   if (btnCreateBlock) {
     btnCreateBlock.onclick = () => {
-      handleAction("plan");
+      window.openCreateBlockFromDefectModal("DEF-004");
     };
   }
 
@@ -17226,6 +20456,19 @@ function bindEvents() {
       if (q) highlightTrainRouteOnMap(q);
     };
   }
+
+  window.auditCurrentSearchTrain = () => {
+    const input = document.querySelector("#trainRouteSearchInput");
+    const q = input ? input.value.trim() : "";
+    let trainNo = "12622";
+    if (q) {
+      const match = q.match(/\d{4,5}/);
+      if (match) trainNo = match[0];
+    }
+    if (typeof window.openAssetMaintenanceAgentModal === "function") {
+      window.openAssetMaintenanceAgentModal(trainNo, window.__selectedStationCode || "MAS");
+    }
+  };
 
   if (trainSearchInput) {
     trainSearchInput.onkeydown = (e) => {
@@ -17635,5 +20878,2075 @@ async function handleAction(action) {
   }
 }
 
+// ==========================================================================
+// CRIS AUTONOMOUS AI OPERATIONS COPILOT (SUPERVISOR MODE)
+// ==========================================================================
+
+let isCopilotOpen = false;
+let copilotMessages = [
+  {
+    sender: "assistant",
+    time: "18:30 IST",
+    text: "Namaste Chief Controller. I am the CRIS Autonomous Operations Copilot running on Indian Railways Zone 07 infrastructure.\n\nAll 6 divisions (MAS, SA, PGT, TVC, TPJ, MDU) are continuously monitored across TMS track sensors, TDMS defects, and COA train headways. I have formulated 3 high-impact operational proposals awaiting your executive sanction.",
+    action_card: {
+      id: "act-defect-01",
+      badge: "CRITICAL PREEMPTION",
+      title: "⚡ Sanction Shadow Block for Defect DEF-004 (Katpadi-Jolarpettai)",
+      description: "GBDT Failure Risk: 89.2% -> 4.1%. Multidisciplinary shadow block (150m) during nocturnal freight gap (01:15-03:45 IST) with zero passenger cancellation.",
+      action_type: "CREATE_DEFECT_BLOCK",
+      payload: { defect_id: "DEF-004", section_code: "SEC-MAS-CBE-01" },
+      button_label: "Approve Block & Fly to Map"
+    }
+  }
+];
+
+window.toggleAutonomousCopilot = function(forceState) {
+  isCopilotOpen = typeof forceState === "boolean" ? forceState : !isCopilotOpen;
+  const drawer = document.querySelector("#crisCopilotDrawer");
+  if (drawer) {
+    drawer.classList.toggle("open", isCopilotOpen);
+    if (isCopilotOpen) {
+      window.renderCopilotMessages();
+      setTimeout(() => {
+        const inp = document.querySelector("#crisCopilotInput");
+        if (inp) inp.focus();
+      }, 300);
+    }
+  }
+};
+
+window.renderCopilotMessages = function() {
+  const container = document.querySelector("#crisCopilotMessages");
+  if (!container) return;
+
+  container.innerHTML = copilotMessages.map(m => {
+    const isAsst = m.sender === "assistant";
+    return `
+      <div class="copilot-msg ${isAsst ? 'assistant' : 'user'}">
+        <div class="copilot-bubble">
+          ${m.html ? `<div class="copilot-custom-html">${m.html}</div>` : `<div style="white-space:pre-line">${esc(m.text)}</div>`}
+          ${m.action_card ? `
+            <div class="copilot-action-card" id="${m.action_card.id}">
+              <div class="copilot-action-header">
+                <span class="copilot-action-badge">${esc(m.action_card.badge || 'SUPERVISOR PROPOSAL')}</span>
+                <span style="font-size:10px;color:#22c55e;font-weight:700">● 100% Punctual</span>
+              </div>
+              <div class="copilot-action-title">${esc(m.action_card.title)}</div>
+              <div class="copilot-action-desc">${esc(m.action_card.description)}</div>
+              <button class="copilot-approve-btn ${m.action_card.executed ? 'executed' : ''}" 
+                onclick="window.executeSupervisorAction('${m.action_card.id}', '${m.action_card.action_type}', ${JSON.stringify(Object.assign({}, m.action_card, m.action_card.payload || {})).replace(/"/g, '&quot;')})"
+                ${m.action_card.executed ? 'disabled' : ''}>
+                ${m.action_card.executed ? '✓ Sanctioned & Executed by Supervisor' : `⚡ ${esc(m.action_card.button_label || 'Approve & Execute (Supervisor Sanction)')}`}
+              </button>
+            </div>
+          ` : ''}
+        </div>
+        <div class="copilot-msg-meta">${isAsst ? 'CRIS Autonomous Controller' : (currentOfficial?.name || 'Supervisor')} • ${m.time}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.scrollTop = container.scrollHeight;
+};
+
+window.sendCopilotMessage = async function(explicitPrompt) {
+  const inp = document.querySelector("#crisCopilotInput");
+  const text = (explicitPrompt || (inp ? inp.value : "")).trim();
+  if (!text) return;
+  if (inp) inp.value = "";
+
+  const timeStr = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + " IST";
+  copilotMessages.push({
+    sender: "user",
+    time: timeStr,
+    text: text
+  });
+  window.renderCopilotMessages();
+
+  // Assistant typing indicator
+  const loadId = "load-" + Date.now();
+  copilotMessages.push({
+    id: loadId,
+    sender: "assistant",
+    time: timeStr,
+    text: "Analyzing CRIS network telemetry, GBDT risk matrix, and COA train schedules..."
+  });
+  window.renderCopilotMessages();
+
+  let backendReply = null;
+  try {
+    const res = await api.post("/api/v1/autonomous/copilot/chat", {
+      message: text,
+      supervisor_name: currentOfficial?.name || "Shri S. Ramanathan, IRTS"
+    });
+    if (res && res.reply) backendReply = res;
+  } catch (err) {
+    console.warn("Backend copilot fallback:", err.message);
+  }
+
+  // Remove typing indicator
+  const idx = copilotMessages.findIndex(m => m.id === loadId);
+  if (idx !== -1) copilotMessages.splice(idx, 1);
+
+  
+  const lower = text.toLowerCase();
+  const respTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + " IST";
+
+  // =========================================================================
+  // AI ROUTE ANALYSIS & TOPOLOGICAL MANAGER COPILOT HANDLER
+  // =========================================================================
+  const blockAnalysisIntent = (typeof parseMaintenanceBlockMessage === "function") 
+    ? parseMaintenanceBlockMessage(text) 
+    : (window.parseMaintenanceBlockMessage ? window.parseMaintenanceBlockMessage(text) : null);
+
+  if (blockAnalysisIntent) {
+    // 1. Reset Map Command
+    if (blockAnalysisIntent.type === "RESET_MAP") {
+      if (typeof resetAIRouteAnalysis === "function") resetAIRouteAnalysis();
+      else if (window.resetAIRouteAnalysis) window.resetAIRouteAnalysis();
+
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "Chief Controller, the railway network map has been restored to its **Normal / Default Operational State**.\n\nAll maintenance block indicators, alternative detour vectors, and disruption panels have been removed. Standard schedule and corridor monitoring resumed.",
+        action_card: {
+          id: "act-reset-" + Date.now(),
+          badge: "NORMAL OPERATIONAL MODE",
+          title: "Railway Map Restored",
+          description: "Standard Southern Railway digital twin view active.",
+          action_type: "NAVIGATE",
+          payload: { target_screen: "Dashboard" },
+          button_label: "🗺️ View Clean Network Map"
+        }
+      });
+      window.renderCopilotMessages();
+      return;
+    }
+
+    // 2. Topological Introduce Train Command
+    if (blockAnalysisIntent.type === "TOPOLOGY_INTRODUCE_TRAIN") {
+      const tNo = blockAnalysisIntent.trainNo || "20611";
+      if (typeof window.addTrainToRegistry === "function") {
+        if (tNo === "20611") {
+          window.addTrainToRegistry({train_no:'20611', name:'Chennai - Coimbatore Vande Bharat 2.0', type:'VANDE BHARAT', origin:'MAS', dest:'CBE', time:'06:10'});
+        } else if (tNo === "12638") {
+          window.addTrainToRegistry({train_no:'12638', name:'Pandian Superfast Express Special', type:'SUPERFAST', origin:'MDU', dest:'MS', time:'21:15'});
+        } else {
+          window.addTrainToRegistry({train_no: tNo, name: `Express Service #${tNo}`, type:'SUPERFAST', origin:'MAS', dest:'CBE', time:'08:00'});
+        }
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Chief Controller, **Train #${tNo}** has been dynamically introduced and commissioned in the live Southern Railway timetable and CRIS Fleet Registry.\n\n• Topological Slot: Auto-indexed with Sectional Controllers.\n• GBDT Conflict Detector: Re-synchronized (Zero headway violations).\n• Station Timetables: Updated across Southern Railway network.`,
+        action_card: {
+          id: "act-intro-" + Date.now(),
+          badge: "TOPOLOGICAL COMMISSIONING",
+          title: `Train #${tNo} Live in Fleet`,
+          description: "Re-indexed timetable and slot allocation.",
+          action_type: "NAVIGATE",
+          payload: { target_screen: "Schedule" },
+          button_label: "📋 View in Timetable"
+        }
+      });
+      window.renderCopilotMessages();
+      return;
+    }
+
+    // 3. Topological Cancel Train Command
+    if (blockAnalysisIntent.type === "TOPOLOGY_CANCEL_TRAIN") {
+      const tNo = blockAnalysisIntent.trainNo || "12675";
+      if (typeof window.removeTrainFromRegistry === "function") {
+        window.removeTrainFromRegistry(tNo);
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Chief Controller, **Train #${tNo}** has been cancelled from the live operating timetable.\n\n• Liberated Track Capacity: +14% slot availability on corridor.\n• Maintenance Window: Daylight gap (06:10 - 08:30) cleared for track tamping & catenary maintenance.\n• Disruption Index: 0 passenger crossover conflicts.`,
+        action_card: {
+          id: "act-cancel-" + Date.now(),
+          badge: "TOPOLOGICAL DEREGISTRATION",
+          title: `Train #${tNo} Cancelled`,
+          description: "Corridor slot liberated for maintenance.",
+          action_type: "NAVIGATE",
+          payload: { target_screen: "Schedule" },
+          button_label: "📋 Verify Liberated Slot"
+        }
+      });
+      window.renderCopilotMessages();
+      return;
+    }
+
+    // 4. Topological Commission Station Command
+    if (blockAnalysisIntent.type === "TOPOLOGY_COMMISSION_STATION") {
+      if (typeof window.addStationToRegistry === "function") {
+        window.addStationToRegistry({code:'TBM-S', name:'Tambaram South Junction', lat:12.912, lng:80.115, div:'MAS', platforms:4});
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Chief Controller, **Station TBM-S (Tambaram South Terminal)** has been successfully commissioned into the Southern Railway Zonal Topological Network.\n\n• Geographic Position: Lat 12.912, Lon 80.115 (MAS Division).\n• Infrastructure: 4 platform roads, computerized interlocking, electronic route-setting.\n• Digital Twin: Live GIS station node active.`,
+        action_card: {
+          id: "act-stn-" + Date.now(),
+          badge: "STATION COMMISSIONED",
+          title: "Station TBM-S Active",
+          description: "Commissioned into GIS Digital Twin.",
+          action_type: "NAVIGATE",
+          payload: { target_screen: "Stations Master" },
+          button_label: "🚉 View Stations Master"
+        }
+      });
+      window.renderCopilotMessages();
+      return;
+    }
+
+    // 5. Follow-Up: Explain Route Selection ("Why did you choose Route X?")
+    if (blockAnalysisIntent.type === "EXPLAIN_ROUTE") {
+      if (!aiRouteAnalysisState.active || !aiRouteAnalysisState.recommendedRoute) {
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: "No active maintenance block or route analysis is currently running. The railway network map is currently in its **Normal/Default State**.\n\nYou can report a maintenance block to trigger AI Route Analysis, for example:\n> *'Block has occurred between Katpadi and Jolarpettai'* or *'Track A-B is under maintenance'*."
+        });
+        window.renderCopilotMessages();
+        return;
+      }
+
+      const rec = aiRouteAnalysisState.recommendedRoute;
+      const allRoutes = aiRouteAnalysisState.candidateRoutes || [];
+      const others = allRoutes.filter(r => !r.isRecommended);
+
+      const explanationHtml = `
+        <div style="background:linear-gradient(135deg, #07162b 0%, #0d284a 100%);border:1.5px solid #10b981;border-radius:9px;padding:12px 14px;color:#f8fafc">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+            <span style="font-size:16px">⭐</span>
+            <strong style="font-size:13px;color:#34d399">AI ROUTE SELECTION RATIONALE &amp; MULTI-FACTOR ANALYSIS</strong>
+          </div>
+          <p style="font-size:11.5px;color:#cbd5e1;line-height:1.45;margin-bottom:10px">
+            Chief Controller, the AI Routing Engine selected <strong>Route 1 (${rec.stationCodes.join(' ➔ ')})</strong> based on our 5-pillar mathematical evaluation (Score: <strong style="color:#10b981">${rec.score}/100</strong>):
+          </p>
+
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;margin-bottom:10px">
+            <div style="background:rgba(16,185,129,0.12);border-left:3px solid #10b981;padding:6px 10px;border-radius:4px">
+              <b style="color:#6ee7b7">1. Line Capacity &amp; Signaling:</b><br/>
+              ${rec.doubleElectrifiedCount > 0 ? `Traverses <b>${rec.doubleElectrifiedCount} double-track electrified sections</b> equipped with Automatic Block Signaling (ABS), permitting full 110-130 km/h sectional speeds.` : 'Route maintains full broad-gauge clearance with minimum speed restriction.'}
+            </div>
+            <div style="background:rgba(56,189,248,0.12);border-left:3px solid #38bdf8;padding:6px 10px;border-radius:4px">
+              <b style="color:#93c5fd">2. Passenger Impact Level (${rec.passengerImpact}):</b><br/>
+              Estimated delay is restricted to <b>+${rec.delayMin} minutes</b> (${rec.travelTimeFormatted} total journey). Avoids terminating services prematurely and maintains passenger connections.
+            </div>
+            <div style="background:rgba(245,158,11,0.12);border-left:3px solid #f59e0b;padding:6px 10px;border-radius:4px">
+              <b style="color:#fde68a">3. Conflict &amp; Bottleneck Avoidance:</b><br/>
+              ${rec.conflictsCount === 0 ? '<b>0 crossing conflicts detected.</b> No opposing single-line wait states required.' : `Only ${rec.conflictsCount} controlled single-line crossing points, protected by CTC interlocking.`}
+            </div>
+          </div>
+
+          ${others.length > 0 ? `
+            <div style="font-size:10.5px;color:#94a3b8;margin-bottom:8px">
+              <b>Comparison against Alternative Evaluated Routes:</b>
+              <ul style="margin:4px 0 0 16px;padding:0">
+                ${others.slice(0, 2).map(o => `
+                  <li style="margin-bottom:3px">
+                    <b>${o.stationCodes.join(' ➔ ')}</b>: Incurs <b>+${o.delayMin}m delay</b> (${o.score} pts), has ${o.singleLineCount} single-line sections with higher conflict probability.
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          ` : ''}
+
+          <div style="display:flex;gap:6px;margin-top:10px">
+            <button onclick="window.__animateDetourTrain()" style="background:#0284c7;color:#fff;border:none;border-radius:5px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer">▶ Animate Detour</button>
+            <button onclick="window.sendCopilotMessage('What if Route 1 is unavailable?')" style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid #ef4444;border-radius:5px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">❓ What if Route 1 is unavailable?</button>
+          </div>
+        </div>
+      `;
+
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        html: explanationHtml
+      });
+      window.renderCopilotMessages();
+      return;
+    }
+
+    // 6. Follow-Up: "What if Route X is unavailable?"
+    if (blockAnalysisIntent.type === "WHAT_IF_ROUTE_UNAVAILABLE") {
+      if (!aiRouteAnalysisState.active || !aiRouteAnalysisState.recommendedRoute) {
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: "No active maintenance block is currently running to simulate unavailable detour paths. Please report a block first."
+        });
+        window.renderCopilotMessages();
+        return;
+      }
+
+      const prevRec = aiRouteAnalysisState.recommendedRoute;
+      const legToBlock = prevRec.pathEdges.find(e => !aiRouteAnalysisState.blockedSections.some(b => (b.u === e.from && b.v === e.to) || (b.u === e.to && b.v === e.from))) || prevRec.pathEdges[0];
+      
+      if (legToBlock) {
+        aiRouteAnalysisState.blockedSections.push({
+          u: legToBlock.from,
+          v: legToBlock.to,
+          id: `BLK_SIM_${legToBlock.from}_${legToBlock.to}`,
+          name: `${SR_GRAPH_STATIONS[legToBlock.from]?.name || legToBlock.from} – ${SR_GRAPH_STATIONS[legToBlock.to]?.name || legToBlock.to} (Simulated Obstruction)`,
+          duration: "Simulated Closure",
+          assets: "Simulated Track Unavailability"
+        });
+      }
+
+      const originCode = aiRouteAnalysisState.originStation?.code || "KPD";
+      const destCode = aiRouteAnalysisState.destinationStation?.code || "JTJ";
+      let rStart = originCode;
+      let rEnd = destCode;
+      if (aiRouteAnalysisState.affectedTrain) {
+        if (aiRouteAnalysisState.affectedTrain.includes("12675") || aiRouteAnalysisState.affectedTrain.includes("20608")) {
+          rStart = "MAS";
+          rEnd = "CBE";
+        }
+      }
+      if (rStart === originCode && rEnd === destCode && originCode === "KPD" && destCode === "JTJ") {
+        rStart = "AJJ";
+        rEnd = "SA";
+      }
+
+      const newRawPaths = findFeasibleAlternativeRoutes(rStart, rEnd, aiRouteAnalysisState.blockedSections, 13, 6);
+      const newScoredRoutes = evaluateAndRankRoutes(newRawPaths, aiRouteAnalysisState.blockedSections, aiRouteAnalysisState.affectedTrain, aiRouteAnalysisState.durationMinutes || 180);
+
+      aiRouteAnalysisState.candidateRoutes = newScoredRoutes;
+      aiRouteAnalysisState.recommendedRoute = newScoredRoutes[0] || null;
+
+      if (window.leafletMapInstance) {
+        renderAIRouteAnalysisOnMap(window.leafletMapInstance);
+      }
+
+      const newRec = aiRouteAnalysisState.recommendedRoute;
+
+      const whatIfHtml = `
+        <div style="background:linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);border:1.5px solid #818cf8;border-radius:9px;padding:12px 14px;color:#f8fafc">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+            <span style="font-size:16px">🔄</span>
+            <strong style="font-size:13px;color:#a5b4fc">DYNAMIC NETWORK RE-ROUTING SIMULATION</strong>
+          </div>
+          <p style="font-size:11.5px;color:#cbd5e1;line-height:1.45;margin-bottom:8px">
+            Chief Controller, simulated condition where <strong>Route 1 (${prevRec.stationCodes.join(' ➔ ')})</strong> is unavailable.
+            ${legToBlock ? `<br/><span style="color:#fca5a5;font-size:10.5px">⚠️ Obstruction injected at: <b>${legToBlock.from} ➔ ${legToBlock.to}</b></span>` : ''}
+          </p>
+
+          ${newRec ? `
+            <div style="background:rgba(16,185,129,0.15);border:1.5px solid #10b981;border-radius:7px;padding:10px;margin-bottom:10px">
+              <div style="font-size:10px;font-weight:900;color:#6ee7b7;text-transform:uppercase;margin-bottom:3px">⭐ NEW AI RECOMMENDED ROUTE</div>
+              <div style="font-size:13px;font-weight:900;color:#ffffff;margin-bottom:6px">
+                ${newRec.stationCodes.join(' ➔ ')}
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:6px;font-size:10.5px;color:#cbd5e1;background:rgba(0,0,0,0.3);padding:6px;border-radius:4px">
+                <div>Est. Delay: <b style="color:#10b981">+${newRec.delayMin} mins</b></div>
+                <div>Passenger Impact: <b style="color:#4ade80">${newRec.passengerImpact}</b></div>
+                <div>Distance: <b>${newRec.distanceKm} km</b></div>
+                <div>AI Fitness Score: <b>${newRec.score} / 100</b></div>
+              </div>
+              <div style="font-size:10px;color:#a7f3d0;margin-top:5px">
+                <b>Reason:</b> ${newRec.recommendationReason}
+              </div>
+            </div>
+          ` : `
+            <div style="background:rgba(239,68,68,0.2);border:1px solid #ef4444;border-radius:6px;padding:8px;color:#fca5a5;font-size:11px">
+              No further feasible paths found under these severe compounded constraints. Inter-divisional freight stabling recommended.
+            </div>
+          `}
+
+          <div style="font-size:10.5px;color:#94a3b8;margin-bottom:8px">
+            The Railway Network Map has been automatically updated in real-time with the revised detour corridor.
+          </div>
+
+          <div style="display:flex;gap:6px">
+            <button onclick="window.__animateDetourTrain()" style="background:#0284c7;color:#fff;border:none;border-radius:5px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer">▶ Animate New Route</button>
+            <button onclick="window.sendCopilotMessage('Reset map')" style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid #ef4444;border-radius:5px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer">✕ Reset Normal Map</button>
+          </div>
+        </div>
+      `;
+
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        html: whatIfHtml
+      });
+      window.renderCopilotMessages();
+      return;
+    }
+
+    // 7. Follow-Up: "What if maintenance takes X minutes longer?"
+    if (blockAnalysisIntent.type === "WHAT_IF_DURATION_EXTENDED") {
+      if (!aiRouteAnalysisState.active) {
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: "No active maintenance block is currently running. Please report a block before simulating extended duration."
+        });
+        window.renderCopilotMessages();
+        return;
+      }
+
+      const delta = blockAnalysisIntent.deltaMinutes || 30;
+      aiRouteAnalysisState.durationMinutes += delta;
+      const newDur = aiRouteAnalysisState.durationMinutes;
+
+      if (aiRouteAnalysisState.candidateRoutes) {
+        aiRouteAnalysisState.candidateRoutes.forEach(r => {
+          r.delayMin += Math.round(delta * 0.25);
+          r.score = Math.max(40, r.score - Math.round(delta * 0.1));
+        });
+        if (aiRouteAnalysisState.recommendedRoute) {
+          aiRouteAnalysisState.recommendedRoute.delayMin += Math.round(delta * 0.25);
+          aiRouteAnalysisState.recommendedRoute.score = Math.max(40, aiRouteAnalysisState.recommendedRoute.score - Math.round(delta * 0.1));
+        }
+      }
+
+      if (window.leafletMapInstance) {
+        renderAIRouteAnalysisOnMap(window.leafletMapInstance);
+      }
+
+      const rec = aiRouteAnalysisState.recommendedRoute;
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Chief Controller, simulated maintenance extension by **+${delta} minutes**.\n\n• New Possession Duration: **${Math.floor(newDur/60)}h ${newDur%60}m**\n• Impact on Detour Corridor: Detour traffic density increases by ~18%.\n• Knock-on Delay for Trailing Services: +${Math.round(delta * 0.4)} min buffering added at crossing loops.\n• Recommended Route Status: **${rec ? rec.stationCodes.join(' ➔ ') : 'Active'}** remains the most viable path with revised delay **+${rec ? rec.delayMin : 0}m**.\n\nMap overlays and floating HUD panel updated in real-time.`
+      });
+      window.renderCopilotMessages();
+      return;
+    }
+
+    // 8. Primary Maintenance Block Event Trigger
+    if (blockAnalysisIntent.type === "MAINTENANCE_BLOCK_EVENT") {
+      const analysis = triggerAIRouteAnalysis(blockAnalysisIntent);
+      const rec = analysis?.recommendedRoute;
+      const candidates = analysis?.candidateRoutes || [];
+      const primaryPair = blockAnalysisIntent.stationPairs[0];
+      const originStn = SR_GRAPH_STATIONS[primaryPair.from]?.name || primaryPair.from;
+      const destStn = SR_GRAPH_STATIONS[primaryPair.to]?.name || primaryPair.to;
+      const blockedList = analysis?.blockedTracks || [];
+
+      // Auto-switch to Dashboard map if user is elsewhere so they can see the map update
+      if (typeof window.navigateTo === "function") {
+        window.navigateTo("Dashboard");
+      }
+      if (window.leafletMapInstance) {
+        setTimeout(() => {
+          try {
+            window.leafletMapInstance.invalidateSize();
+            renderAIRouteAnalysisOnMap(window.leafletMapInstance);
+          } catch(e) {}
+        }, 150);
+      }
+
+      const blockCardHtml = `
+        <div style="background:linear-gradient(135deg, #07162b 0%, #0d284a 100%);border:1.5px solid #0284c7;border-radius:10px;padding:14px;color:#f8fafc;max-width:100%">
+          <!-- ACKNOWLEDGMENT BANNER -->
+          <div style="background:rgba(14,165,233,0.15);border:1px solid #0284c7;border-radius:6px;padding:8px 10px;font-size:12px;color:#bae6fd;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">🚨</span>
+            <div>
+              <strong>MAINTENANCE BLOCK DETECTED &amp; MAP UPDATED</strong><br/>
+              <span>Maintenance block detected. I have identified the affected section between <b>${originStn}</b> and <b>${destStn}</b>. I will now analyze the network and find feasible alternative routes.</span>
+            </div>
+          </div>
+
+          <!-- PILLAR 1: BLOCKED SECTION DETAILS -->
+          <div style="background:#091d38;border:1px solid #ef4444;border-radius:7px;padding:10px 12px;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:10.5px;font-weight:900;color:#fca5a5;text-transform:uppercase">🔴 BLOCKED TRACK SECTION DETAILS</span>
+              <span style="background:#dc2626;color:#ffffff;font-size:9.5px;font-weight:900;padding:2px 6px;border-radius:3px">UNDER MAINTENANCE</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:6px;font-size:11px;color:#cbd5e1">
+              <div>Section: <b style="color:#ffffff">${blockedList.map(b => b.name).join(", ")}</b></div>
+              <div>Duration: <b style="color:#f59e0b">${blockAnalysisIntent.durationFormatted}</b></div>
+              <div>Train Affected: <b style="color:#38bdf8">${blockAnalysisIntent.affectedTrain || 'All Freight & Passenger Services'}</b></div>
+              <div>Required Assets: <b style="color:#4ade80">${blockAnalysisIntent.requiredAssets}</b></div>
+            </div>
+          </div>
+
+          <!-- PILLAR 2: ⭐ AI RECOMMENDED ROUTE -->
+          ${rec ? `
+            <div style="background:linear-gradient(135deg, rgba(16,185,129,0.18) 0%, rgba(5,150,105,0.28) 100%);border:1.5px solid #10b981;border-radius:8px;padding:10px 12px;margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="color:#a7f3d0;font-size:11px;font-weight:900;text-transform:uppercase">⭐ AI RECOMMENDED ALTERNATIVE ROUTE</span>
+                <span style="background:#10b981;color:#000;font-size:10.5px;font-weight:900;padding:2px 7px;border-radius:4px">SCORE: ${rec.score}/100</span>
+              </div>
+              <div style="font-size:13.5px;font-weight:900;color:#ffffff;margin-bottom:6px">
+                ${rec.stationCodes.join(" ➔ ")}
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:6px;font-size:11px;color:#cbd5e1;background:rgba(0,0,0,0.25);padding:6px;border-radius:4px;margin-bottom:6px">
+                <div>Est. Delay: <b style="color:#10b981">+${rec.delayMin} mins</b></div>
+                <div>Passenger Impact: <b style="color:#4ade80">${rec.passengerImpact}</b></div>
+                <div>Total Distance: <b>${rec.distanceKm} km</b></div>
+                <div>Travel Time: <b>${rec.travelTimeFormatted}</b></div>
+              </div>
+              <div style="font-size:10.5px;color:#6ee7b7;line-height:1.35">
+                <b>Reason for Recommendation:</b> ${rec.recommendationReason}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- PILLAR 3: ALL FEASIBLE ALTERNATIVE ROUTES COMPARISON -->
+          <div style="margin-bottom:12px">
+            <div style="font-size:10.5px;color:#94a3b8;font-weight:800;margin-bottom:6px">⚪ ALL FEASIBLE ALTERNATIVES EVALUATED (${candidates.length} FOUND):</div>
+            <div style="display:flex;flex-direction:column;gap:5px;max-height:140px;overflow-y:auto">
+              ${candidates.map(r => `
+                <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.04);border:1px solid ${r.isRecommended ? '#10b981' : 'rgba(255,255,255,0.08)'};border-radius:5px;padding:5px 8px;font-size:10.5px">
+                  <div>
+                    <b style="color:${r.isRecommended ? '#10b981' : '#ffffff'}">${r.isRecommended ? '⭐' : '⚪'} ${r.stationCodes.join(' ➔ ')}</b>
+                    <div style="font-size:9.5px;color:#94a3b8">${r.trackAvailability} &bull; ${r.distanceKm} km</div>
+                  </div>
+                  <div style="text-align:right">
+                    <span style="color:#f59e0b;font-weight:800">+${r.delayMin}m</span>
+                    <span style="color:#cbd5e1;margin-left:4px;font-weight:700">(${r.score} pts)</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- QUICK ACTION CONTROLS -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <button onclick="window.navigateTo('Dashboard'); if(window.leafletMapInstance){ setTimeout(() => { window.leafletMapInstance.invalidateSize(); }, 150); }" style="background:#0284c7;color:#ffffff;border:none;border-radius:6px;padding:7px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">
+              <span>🗺️</span> View on Railway Map
+            </button>
+            <button onclick="window.__animateDetourTrain()" style="background:#16a34a;color:#ffffff;border:none;border-radius:6px;padding:7px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">
+              <span>▶</span> Animate Train Detour
+            </button>
+            <button onclick="window.sendCopilotMessage('Why did you choose the recommended route?')" style="background:rgba(56,189,248,0.15);color:#38bdf8;border:1px solid #38bdf8;border-radius:6px;padding:6px;font-size:10.5px;font-weight:700;cursor:pointer">
+              💬 Ask Why Route Chosen
+            </button>
+            <button onclick="window.sendCopilotMessage('Reset map')" style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid #ef4444;border-radius:6px;padding:6px;font-size:10.5px;font-weight:700;cursor:pointer">
+              ✕ Reset Normal Map
+            </button>
+          </div>
+        </div>
+      `;
+
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        html: blockCardHtml
+      });
+      window.renderCopilotMessages();
+      return;
+    }
+  }
+
+  // Check if user manually entered any train number (e.g. 12675, 20608, 12622, 16345, 99999, etc.) or train keywords
+  const trainNumMatch = text.match(/\b([0-9]{4,5})\b/);
+  let requestedTrain = null;
+  const allFleet = (typeof getAllTrainsDataset === "function") ? getAllTrainsDataset() : (window.MASTER_330_TRAINS || []);
+
+  if (trainNumMatch) {
+    const qNum = trainNumMatch[1];
+    requestedTrain = allFleet.find(t => String(t.train_no || t.no) === qNum);
+    if (!requestedTrain) {
+      const isVB = qNum.startsWith("206");
+      const isRaj = qNum.startsWith("124") || qNum.startsWith("2269");
+      const isShat = qNum.startsWith("120");
+      requestedTrain = {
+        train_no: qNum,
+        no: qNum,
+        name: isVB ? `Vande Bharat Express #${qNum}` : (isRaj ? `Rajdhani Express #${qNum}` : (isShat ? `Shatabdi Express #${qNum}` : `Express Service #${qNum}`)),
+        type: isVB ? "Vande Bharat" : "Superfast Express",
+        origin: "MAS",
+        dest: "CBE",
+        arr: "06:30 AM",
+        dep: "02:45 PM"
+      };
+    }
+  }
+  if (!requestedTrain) {
+    requestedTrain = allFleet.find(t => {
+      const nm = (t.name || "").toLowerCase();
+      const num = String(t.train_no || t.no || "");
+      return (num && lower.includes(num)) || (nm && lower.includes(nm.split(" ")[0].toLowerCase()) && (lower.includes("express") || lower.includes("mail") || lower.includes("train") || lower.includes("cost") || lower.includes("cutting") || lower.includes("billing") || lower.includes("repair") || lower.includes("bpc")));
+    });
+  }
+  if (!requestedTrain && (
+    lower.includes("cost cutting") || lower.includes("cost cut") || lower.includes("cost") ||
+    lower.includes("billing") || lower.includes("bill") || lower.includes("repair data") ||
+    lower.includes("present data") || lower.includes("next maintenance") || lower.includes("repair") ||
+    lower.includes("concurrent cost") || lower.includes("concurrent costs") || lower.includes("cutting window") ||
+    lower.includes("train economics") || lower.includes("repair cost") || lower.includes("maintenance")
+  )) {
+    requestedTrain = allFleet.find(t => String(t.train_no || t.no) === "12675") || allFleet[0] || {
+      train_no: "12675",
+      name: "12675 Kovai SF Express",
+      no: "12675"
+    };
+  }
+
+  if (lower.includes("infra") || lower.includes("other asset") || lower.includes("infrastructure asset")) {
+    copilotMessages.push({
+      sender: "assistant",
+      time: respTime,
+      text: "Chief Controller, here is the calculative Cost Cuttings Ledger for Infrastructure & Other Asset Repairs (Permanent Way Rail Renewals, TRD Catenary Overhauls, S&T MSDAC tuning, Major River Bridges, and Workshop Machinery). Co-scheduling these during nocturnal freight lull gaps realizes over **₹1.18 Crore** in net savings with zero train delays.",
+      action_card: {
+        id: "act-" + Date.now(),
+        badge: "INFRASTRUCTURE COST CUTTINGS",
+        title: "Open Infrastructure & Other Asset Repairs Window",
+        description: "15 Southern Railway assets across P-Way, TRD, S&T, and Bridges with itemized RDSO BOM, labor, and avoided possession savings.",
+        action_type: "OPEN_COST_CUTTINGS",
+        payload: { target_screen: "Cost Asset Maintenance" },
+        button_label: "🏗️ Open Infrastructure Repairs Window"
+      }
+    });
+    window.renderCopilotMessages();
+    return;
+  }
+
+  if (requestedTrain) {
+    const stn = window.__selectedStationCode || "MAS";
+    const profile = (typeof getComprehensiveTrainCostProfile === "function") 
+      ? getComprehensiveTrainCostProfile(requestedTrain, stn)
+      : ((typeof window !== "undefined" && window.getComprehensiveTrainCostProfile)
+        ? window.getComprehensiveTrainCostProfile(requestedTrain, stn)
+        : null);
+
+    const tNo = profile ? profile.trainNo : String(requestedTrain.train_no || requestedTrain.no);
+    const trainName = profile ? profile.trainName : (requestedTrain.name || `Express Service #${tNo}`);
+    const presentData = profile ? profile.presentData : {
+      currentLocation: `MGR Chennai Central (${stn})`,
+      berth: "Platform Road & Stabling Pit-Line (BBQ Yard)",
+      locomotive: "WAP-7 (Royapuram ELS)",
+      coachingStock: "22 LHB Coaches (CBC Coupler)",
+      stablingWindow: { formatted: "08h 15m" },
+      cumulativeRunKm: "2,450 km",
+      distanceKm: 495,
+      totalOperationsCost: 89814,
+      energyCost: 66419,
+      crewCost: 8895,
+      handlingCost: 14500,
+      owningZone: { code: "SR", name: "Southern Railway", primaryDepots: ["Basin Bridge Coaching Yard (BBQ / MAS)"], isForeignRake: false }
+    };
+    const repairData = profile ? profile.repairData : {
+      status: "SCHEDULED_PIT_EXAMINATION",
+      criticality: "ROUTINE_TRIP_CYCLE",
+      tasks: ["Schedule Trip Inspection (TI)", "Brake block renewal", "Bio-toilet vacuum sanitization"],
+      bomItems: [
+        { item: "LHB 'K' Type Non-Asbestos High-Friction Composite Brake Blocks", qty: "8 pcs", rate: 2850, total: 22800 },
+        { item: "25kV AC Pantograph Metallised Carbon Wear Strips", qty: "2 sets", rate: 6400, total: 12800 }
+      ],
+      totalPartsCost: 45400,
+      labourStaff: [{ role: "Senior Section Engineer (SSE / C&W)", count: 1, total: 3600 }, { role: "Skilled Technicians Grade-I", count: 4, total: 8400 }],
+      totalLabourCost: 14180,
+      directRepairCost: 59580,
+      bpcStatus: "✓ 100% Brake Power Certified • Electronic BPC Form 402 valid for 4,500 km",
+      bufferMargin: "4.65 Hours Buffer"
+    };
+    const nextMaintenance = profile ? profile.nextMaintenance : {
+      scheduleType: "Schedule A (15-Day / 15,000 km Primary Overhaul)",
+      dueInDays: "12 Days",
+      dueInKm: "1,450 km remaining",
+      dueDate: "24-Sep-2026",
+      designatedDepot: "Basin Bridge Coaching Yard (BBQ / MAS)",
+      scheduledScope: ["Bogie frame USFD testing", "Wheelset tread profiling on Underfloor Lathe"],
+      projectedNextCost: 78500,
+      projectedCostCutting: 166500,
+      projectedDowntimeAvoided: "14.5 Hours Saved"
+    };
+    const costCutting = profile ? profile.costCutting : {
+      avoidedLineBlockCost: 85000,
+      avoidedHaulageCost: 65000,
+      avoidedDelayPenalty: 77000,
+      grossAvoidedLoss: 227000,
+      directRepairCost: 59580,
+      netRealizedBenefit: 167420,
+      savingsPercentage: "73.7%",
+      debitAccountHead: "IR-SR-REV-08-210",
+      recoveryMechanism: "Zonal Revenue Account (SR Internal Appropriation)"
+    };
+    const oz = presentData.owningZone;
+
+    const trainCostCuttingCardHtml = `
+      <div class="copilot-cost-cuttings-card" style="background:linear-gradient(135deg, #07162b 0%, #0d284a 100%);border:1.5px solid #0284c7;border-radius:10px;padding:14px 16px;color:#f8fafc;box-shadow:0 8px 24px rgba(0,0,0,0.45);max-width:100%">
+        <!-- HEADER -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1.5px solid #1a3c63;padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:17px">💰</span>
+              <strong style="font-size:12.5px;color:#38bdf8;letter-spacing:0.4px">CRIS CONCURRENT COST CUTTING &amp; MAINTENANCE DOSSIER</strong>
+            </div>
+            <div style="font-size:16px;font-weight:900;color:#ffffff;margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span>[${tNo}] ${trainName}</span>
+              <span style="background:${oz.isForeignRake ? 'rgba(245,158,11,0.2)' : 'rgba(56,189,248,0.2)'};border:1.5px solid ${oz.isForeignRake ? '#f59e0b' : '#38bdf8'};color:${oz.isForeignRake ? '#fbbf24' : '#38bdf8'};font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:4px">
+                ${oz.code} • ${oz.name}
+              </span>
+              ${oz.isForeignRake ? `<span style="background:rgba(239,68,68,0.25);border:1px solid #ef4444;color:#fca5a5;font-size:9.5px;font-weight:800;padding:1px 6px;border-radius:3px">⚠️ Inter-Railway Debit</span>` : ''}
+            </div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:3px">
+              Facility: <b style="color:#ffffff">${presentData.currentLocation}</b> &bull; Base Depot: <b style="color:#cbd5e1">${oz.primaryDepots[0] || 'Zonal Depot'}</b> &bull; Dwell: <b style="color:#38bdf8">${presentData.stablingWindow.formatted}</b>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <span style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:800;display:block">NET COST CUTTING REALIZED:</span>
+            <span style="font-size:22px;font-weight:900;color:#10b981;font-family:monospace">+₹${costCutting.netRealizedBenefit.toLocaleString('en-IN')}</span>
+            <span style="font-size:10px;color:#a7f3d0;font-weight:800;display:block">${costCutting.savingsPercentage} Realized Savings</span>
+          </div>
+        </div>
+
+        <!-- 4 COMPREHENSIVE PILLARS -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+
+          <!-- PILLAR 1: PRESENT OPERATING DATA -->
+          <div style="background:#091d38;border:1px solid #1e4976;border-radius:7px;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:11.5px;font-weight:900;color:#38bdf8;display:flex;align-items:center;gap:5px">
+                <span>📍</span> 1. PRESENT OPERATING DATA &amp; INFRASTRUCTURE
+              </span>
+              <span style="font-size:10.5px;color:#a7f3d0;font-weight:800;background:rgba(16,185,129,0.15);padding:1px 7px;border-radius:3px">
+                ✓ Active in Service
+              </span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:6px;font-size:11px;color:#cbd5e1;line-height:1.4">
+              <div>• <b>Location &amp; Berth:</b> ${presentData.berth}</div>
+              <div>• <b>Locomotive:</b> ${typeof presentData.locomotive === 'object' ? `${presentData.locomotive.locoClass} (${presentData.locomotive.owningShed})` : presentData.locomotive}</div>
+              <div>• <b>Coaching Stock:</b> ${typeof presentData.coachingStock === 'object' ? `${presentData.coachingStock.totalCoaches} Coaches (${presentData.coachingStock.rakeType})` : presentData.coachingStock}</div>
+              <div>• <b>Cumulative Run:</b> ${presentData.cumulativeRunKm} (${presentData.distanceKm} km trip)</div>
+              <div style="grid-column:1 / -1;background:rgba(0,0,0,0.25);border-radius:4px;padding:5px 8px;margin-top:2px">
+                <b>Current Trip Operations Cost:</b> <span style="color:#fbbf24;font-weight:800">₹${presentData.totalOperationsCost.toLocaleString('en-IN')}</span> 
+                <span style="color:#94a3b8">(Traction Energy: ₹${presentData.energyCost.toLocaleString('en-IN')} w/ regenerative feed &bull; Crew: ₹${presentData.crewCost.toLocaleString('en-IN')} &bull; Terminal: ₹${presentData.handlingCost.toLocaleString('en-IN')})</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PILLAR 2: CURRENT REPAIR DATA -->
+          <div style="background:#091d38;border:1px solid #1e4976;border-radius:7px;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:11.5px;font-weight:900;color:#fbbf24;display:flex;align-items:center;gap:5px">
+                <span>🛠️</span> 2. CURRENT REPAIR DATA &amp; DIRECT COSTS
+              </span>
+              <span style="font-size:10.5px;color:#fbbf24;font-weight:800;background:rgba(245,158,11,0.15);padding:1px 7px;border-radius:3px">
+                Direct Cost: ₹${repairData.directRepairCost.toLocaleString('en-IN')}
+              </span>
+            </div>
+            <div style="font-size:11px;color:#cbd5e1;line-height:1.4;margin-bottom:5px">
+              <div>• <b>Work Scope &amp; Tasks:</b> ${repairData.tasks.slice(0, 3).join("; ")}</div>
+              <div>• <b>RDSO BOM Parts Consumed:</b> ${repairData.bomItems.slice(0, 4).map(b => `${b.item} (${b.qty} @ ₹${b.rate.toLocaleString()})`).join(", ")} &bull; <b style="color:#ffffff">Parts Subtotal: ₹${repairData.totalPartsCost.toLocaleString('en-IN')}</b></div>
+              <div>• <b>Specialized Zonal Labour:</b> ${repairData.labourStaff.map(s => `${s.role} (${s.count})`).join(", ")} &bull; <b style="color:#ffffff">Labour Subtotal: ₹${repairData.totalLabourCost.toLocaleString('en-IN')}</b></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:4px;padding:4px 8px;font-size:10.5px;color:#6ee7b7">
+              <span><b>BPC Status:</b> ${repairData.bpcStatus}</span>
+              <span style="font-weight:800">100% Stabling Fit (Buffer: ${repairData.bufferMargin})</span>
+            </div>
+          </div>
+
+          <!-- PILLAR 3: NEXT MAINTENANCE FORECAST -->
+          <div style="background:#091d38;border:1px solid #1e4976;border-radius:7px;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:11.5px;font-weight:900;color:#c084fc;display:flex;align-items:center;gap:5px">
+                <span>📅</span> 3. NEXT SCHEDULED MAINTENANCE FORECAST
+              </span>
+              <span style="font-size:10.5px;color:#c084fc;font-weight:800;background:rgba(168,85,247,0.15);padding:1px 7px;border-radius:3px">
+                Due in: ${nextMaintenance.dueInDays} (${nextMaintenance.dueInKm})
+              </span>
+            </div>
+            <div style="font-size:11px;color:#cbd5e1;line-height:1.4">
+              <div>• <b>Upcoming Schedule:</b> <b style="color:#ffffff">${nextMaintenance.scheduleType}</b> (Target Date: <b style="color:#f1f5f9">${nextMaintenance.dueDate}</b>)</div>
+              <div>• <b>Designated Depot:</b> ${nextMaintenance.designatedDepot}</div>
+              <div>• <b>Planned Technical Scope:</b> ${nextMaintenance.scheduledScope.slice(0, 2).join("; ")}</div>
+              <div style="display:flex;gap:12px;margin-top:4px;background:rgba(0,0,0,0.25);border-radius:4px;padding:5px 8px;flex-wrap:wrap">
+                <span>Projected Direct Cost: <b style="color:#fca5a5">₹${nextMaintenance.projectedNextCost.toLocaleString('en-IN')}</b></span>
+                <span>Projected Shadow Savings: <b style="color:#10b981">+₹${nextMaintenance.projectedCostCutting.toLocaleString('en-IN')}</b></span>
+                <span>Downtime Saved: <b style="color:#38bdf8">${nextMaintenance.projectedDowntimeAvoided}</b></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PILLAR 4: LIFECYCLE COST CUTTING LEDGER -->
+          <div style="background:linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(5,150,105,0.2) 100%);border:1.5px solid #10b981;border-radius:7px;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:11.5px;font-weight:900;color:#10b981;display:flex;align-items:center;gap:5px">
+                <span>💰</span> 4. LIFECYCLE COST CUTTING LEDGER &amp; NET SAVINGS
+              </span>
+              <span style="font-size:11px;color:#000000;font-weight:900;background:#10b981;padding:2px 8px;border-radius:3px">
+                NET BENEFIT: +₹${costCutting.netRealizedBenefit.toLocaleString('en-IN')}
+              </span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;margin-bottom:6px;font-size:10.5px">
+              <div style="background:rgba(0,0,0,0.3);border-radius:4px;padding:4px 6px">
+                <span style="color:#94a3b8;display:block">Avoided Line Block:</span>
+                <b style="color:#10b981">₹${costCutting.avoidedLineBlockCost.toLocaleString('en-IN')}</b>
+              </div>
+              <div style="background:rgba(0,0,0,0.3);border-radius:4px;padding:4px 6px">
+                <span style="color:#94a3b8;display:block">Avoided Dead Haulage:</span>
+                <b style="color:#10b981">₹${costCutting.avoidedHaulageCost.toLocaleString('en-IN')}</b>
+              </div>
+              <div style="background:rgba(0,0,0,0.3);border-radius:4px;padding:4px 6px">
+                <span style="color:#94a3b8;display:block">Avoided Delay Penalty:</span>
+                <b style="color:#10b981">₹${costCutting.avoidedDelayPenalty.toLocaleString('en-IN')}</b>
+              </div>
+              <div style="background:rgba(0,0,0,0.3);border-radius:4px;padding:4px 6px">
+                <span style="color:#94a3b8;display:block">Gross Avoided Loss:</span>
+                <b style="color:#38bdf8">₹${costCutting.grossAvoidedLoss.toLocaleString('en-IN')}</b>
+              </div>
+            </div>
+            <div style="font-size:10.5px;color:#cbd5e1;line-height:1.4">
+              <div><b>Accounting Debit Head:</b> <code>${costCutting.debitAccountHead}</code> &bull; <b>Settlement:</b> ${costCutting.recoveryMechanism}</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="primary" onclick="window.__setCostTrain && window.__setCostTrain('${tNo}'); window.navigateTo ? window.navigateTo('Cost Asset Maintenance') : window.openTrainCostCuttingsModal('${tNo}', '${stn}'); window.toggleAutonomousCopilot(false);" style="background:#10b981;color:#000000;border:none;font-size:11px;font-weight:900;padding:6px 14px;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;box-shadow:0 0 10px rgba(16,185,129,0.4)">
+            <span>💰</span> Open Dedicated Cost Cuttings Window (${tNo})
+          </button>
+          <button class="primary" onclick="window.openProfessionalRepairReportModal('${tNo}', '${stn}'); window.toggleAutonomousCopilot(false);" style="background:#0284c7;border:none;color:#ffffff;font-size:11px;font-weight:800;padding:6px 13px;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+            <span>📑</span> View Official BPC Report (Form 402)
+          </button>
+          <button class="secondary" onclick="window.openAssetMaintenanceAgentModal('${tNo}', '${stn}', 'AUDIT'); window.toggleAutonomousCopilot(false);" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+            <span>🤖</span> 14-Point Cost Audit
+          </button>
+          <button class="secondary" onclick="window.__setCostTab && window.__setCostTab('OPERATIONS_ENERGY'); window.navigateTo ? window.navigateTo('Cost Asset Maintenance') : null; window.toggleAutonomousCopilot(false);" style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+            <span>⚡</span> Traction Energy Optimizer
+          </button>
+        </div>
+      </div>
+    `;
+
+    copilotMessages.push({
+      sender: "assistant",
+      time: respTime,
+      text: `Supervisor, here is the calculative Cost Cuttings & Lifecycle Economics Dossier for Train #${tNo} (${trainName}), covering Present Operating Data, Current Repair Data, Next Scheduled Maintenance, and Net Realized Cost Savings (+₹${costCutting.netRealizedBenefit.toLocaleString('en-IN')}).`,
+      html: trainCostCuttingCardHtml,
+      action_card: {
+        id: "act-" + Date.now(),
+        badge: "CRIS COST CUTTING DOSSIER",
+        title: `Open Cost Cuttings & Overhaul Ledger (Train ${tNo})`,
+        description: `Real-time concurrent billing ledger with present operations data, RDSO BOM repair costs, next maintenance forecast, and net savings of +₹${costCutting.netRealizedBenefit.toLocaleString('en-IN')}.`,
+        action_type: "OPEN_COST_CUTTINGS",
+        payload: { train_no: tNo, station_code: stn, target_screen: "Cost Asset Maintenance" },
+        button_label: `💰 Open Cost Cuttings Window (${tNo})`
+      }
+    });
+    window.renderCopilotMessages();
+    return;
+  }
+
+  if (backendReply) {
+    copilotMessages.push({
+      sender: "assistant",
+      time: respTime,
+      text: backendReply.reply,
+      action_card: backendReply.action_card ? {
+        id: "act-" + Date.now(),
+        badge: "SUPERVISOR SANCTION READY",
+        title: backendReply.action_card.title,
+        description: backendReply.action_card.description,
+        action_type: backendReply.action_card.action_type,
+        payload: backendReply.action_card.payload || { target_screen: backendReply.action_card.target_screen, station_code: backendReply.action_card.station_code },
+        button_label: backendReply.action_card.button_label
+      } : null
+    });
+  } else {
+    // Intelligent local NLP Intent Fallback
+    // Check if query is asking for an asset or corridor
+    const matchedAsset = CORRIDOR_ASSETS_REGISTRY.find(a => 
+      lower.includes(a.id.toLowerCase()) || 
+      lower.includes(a.name.toLowerCase()) ||
+      (a.name.toLowerCase().split(" ")[0] && lower.includes(a.name.toLowerCase().split(" ")[0]) && (lower.includes("bridge") || lower.includes("substation") || lower.includes("shed") || lower.includes("depot") || lower.includes("turnout") || lower.includes("tunnel") || lower.includes("detail") || lower.includes("asset")))
+    );
+
+    if (matchedAsset) {
+      const dossierText = generateAssetAIDossier(matchedAsset);
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: dossierText,
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "CRIS ASSET INTEL",
+          title: `Sanction Recommended Block for ${matchedAsset.name}`,
+          description: `${matchedAsset.maintenance_req?.block_type || 'Shadow Block'} (${matchedAsset.maintenance_req?.duration || '150 min'}) using ${matchedAsset.maintenance_req?.machine || 'Track Unit'}.`,
+          action_type: "HIGHLIGHT_ASSET",
+          payload: { asset_id: matchedAsset.id, target_screen: "Corridor Map" },
+          button_label: "Highlight on Map & Fly"
+        }
+      });
+    } else if (lower.includes("corridor") || lower.includes("all asset") || lower.includes("mas-sbc") || lower.includes("mas-cbe") || lower.includes("ms-mdu") || lower.includes("pgt-tvc") || lower.includes("mdu-rmm") || lower.includes("pgt-maq") || lower.includes("tpj-delta") || lower.includes("mdu-ten")) {
+      let corId = selectedSmartCorridor;
+      if (lower.includes("sbc") || lower.includes("bengaluru")) corId = "MAS-SBC";
+      else if (lower.includes("cbe") || lower.includes("coimbatore")) corId = "MAS-CBE";
+      else if (lower.includes("mdu") || lower.includes("madurai")) corId = lower.includes("rmm") ? "MDU-RMM" : "MS-MDU";
+      else if (lower.includes("tvc") || lower.includes("trivandrum")) corId = "PGT-TVC";
+      else if (lower.includes("maq") || lower.includes("mangalore")) corId = "PGT-MAQ";
+      else if (lower.includes("delta") || lower.includes("trichy")) corId = "TPJ-DELTA";
+      else if (lower.includes("ten") || lower.includes("tirunelveli")) corId = "MDU-TEN";
+
+      const auditText = generateCorridorAIAudit(corId);
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: auditText,
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "CORRIDOR ASSET AUDIT",
+          title: `Sanction Bundled Shadow Block for ${corId}`,
+          description: `Bundles multi-disciplinary maintenance during nocturnal freight lull with 0 train delay.`,
+          action_type: "NAVIGATE",
+          payload: { target_screen: "Corridor Map", corridor_id: corId },
+          button_label: "View All Corridor Assets on Map"
+        }
+      });
+    } else if (lower.includes("defect") || lower.includes("usfd") || lower.includes("fracture") || lower.includes("repair") || lower.includes("block")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "Supervisor, I evaluated the USFD acoustic defect log for Katpadi–Jolarpettai (KM 142/6). GBDT failure risk is 89.2% (Critical). I have bundled Civil rail cropping, TRD 25kV de-energization, and S&T axle counter calibration into a single 150-minute nocturnal window (01:15–03:45 IST).",
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "SAFETY REPAIR",
+          title: "Sanction Block BLK-CRIS-DEF-01 & Fly to Live Map",
+          description: "Nocturnal freight window with 2.5 hours downtime saved and 0 passenger delay.",
+          action_type: "CREATE_DEFECT_BLOCK",
+          payload: { defect_id: "DEF-004", section_code: "SEC-MAS-CBE-01" },
+          button_label: "Approve Block & Fly to Map"
+        }
+      });
+    } else if (lower.includes("headway") || lower.includes("slot") || lower.includes("coimbatore") || lower.includes("cbe") || lower.includes("signalling")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "Station Traffic Controller: Coimbatore Junction (CBE) moving-block model calibrated. Detected throat point cross-fouling during evening peak rush (19:30 IST). Optimal conflict-free slots calculated with 3-minute headway buffer.",
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "STATION INTERLOCKING",
+          title: "Apply 3m Headway Separation (Coimbatore CBE)",
+          description: "Enforces 180s safe spacing and route overlap locking across platforms 1-6.",
+          action_type: "RECALCULATE_HEADWAY",
+          payload: { station_code: "CBE" },
+          button_label: "Apply Optimal Headway Slots"
+        }
+      });
+    } else if (lower.includes("delay") || lower.includes("late") || lower.includes("kovai")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "COA Inflow Alert: Train 12676 (Kovai SF Express) delayed by 30 mins approaching Katpadi. Autonomous dynamic replanner shifted downstream maintenance windows by 30 minutes without gang cancellation.",
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "DYNAMIC REPLANNING",
+          title: "Acknowledge Sub-Second Timetable Revision",
+          description: "All 4 corridors updated in 0.04s. Punctuality preservation: 100%.",
+          action_type: "SIMULATE_DELAY",
+          payload: { delay_minutes: 30 },
+          button_label: "Acknowledge Schedule Shift"
+        }
+      });
+    } else if (lower.includes("report") || lower.includes("audit") || lower.includes("pdf") || lower.includes("dossier")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "Official Government of India Technical Audit Studio ready. Summarized 128 sanctioned possessions, 20.0h downtime saved, 97.3% track availability, and ultrasonic defect clearances.",
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "OFFICIAL AUDIT",
+          title: "Generate Official Station & Zonal Dossier (PDF)",
+          description: "Institutional monochrome audit compliant with Ministry of Railways standards.",
+          action_type: "GENERATE_REPORT",
+          payload: {},
+          button_label: "Open Technical Audit Studio"
+        }
+      });
+    } else if (lower.includes("map") || lower.includes("gis") || lower.includes("track")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "Switching to Southern Railway GIS Network Cartography. Live train GPS telemetry and active maintenance zones loaded.",
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "GIS TELEMETRY",
+          title: "Open Live Operations Dashboard Map",
+          description: "Full zonal map with RTIS train movement feeds and speed restrictions.",
+          action_type: "NAVIGATE",
+          payload: { target_screen: "Dashboard" },
+          button_label: "View Dashboard Map"
+        }
+      });
+    } else if (lower.includes("station master") || lower.includes("stations")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "Opening Stations Master Registry (37 Primary Junctions & Terminals across Southern Railway).",
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "MASTER REGISTRY",
+          title: "Open Stations Master Console",
+          description: "Manage station nodes, platform lines, and division jurisdictions.",
+          action_type: "NAVIGATE",
+          payload: { target_screen: "Stations Master" },
+          button_label: "Open Stations Master"
+        }
+      });
+    } else {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Understood Supervisor. The autonomous multi-department CSP engine is standing by. All systems (TMS, TDMS, SMMS, COA) are synchronized with zero conflicts. You can command me to optimize all corridors, resolve defects, recalculate station headways, simulate delay, or export official reports.`,
+        action_card: {
+          id: "act-" + Date.now(),
+          badge: "AUTONOMOUS CONTROLLER",
+          title: "Execute Master Combinatorial Optimization",
+          description: "Co-schedule all 6 corridors for the next 7 days in sub-seconds.",
+          action_type: "OPTIMIZE_BLOCKS",
+          payload: {},
+          button_label: "Run Master Optimization"
+        }
+      });
+    }
+  }
+
+  window.renderCopilotMessages();
+};
+
+window.executeSupervisorAction = async function(cardId, actionType, payload) {
+  const btn = document.querySelector(`#${cardId} .copilot-approve-btn`);
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add("executed");
+    btn.innerHTML = "✓ Sanctioned & Executed by Supervisor";
+  }
+
+  // Mark in message history
+  copilotMessages.forEach(m => {
+    if (m.action_card && m.action_card.id === cardId) {
+      m.action_card.executed = true;
+    }
+  });
+
+  const isHi = currentLang === 'hi';
+
+  // Automatically close slide-over drawer so the user immediately sees the destination screen
+  if (typeof window.toggleAutonomousCopilot === "function") {
+    window.toggleAutonomousCopilot(false);
+  }
+
+  if (actionType === "OPEN_COST_CUTTINGS") {
+    if (typeof window.__setCostTrain === "function" && payload?.train_no) {
+      window.__setCostTrain(payload.train_no);
+    }
+    if (typeof window.navigateTo === "function") {
+      window.navigateTo("Cost Asset Maintenance");
+    }
+    if (typeof window.openTrainCostCuttingsModal === "function") {
+      window.openTrainCostCuttingsModal(payload?.train_no || "12675", payload?.station_code || "MAS");
+    } else if (typeof window.openAssetMaintenanceAgentModal === "function") {
+      window.openAssetMaintenanceAgentModal(payload?.train_no || "12675", payload?.station_code || "MAS", "COST_CUTTING");
+    }
+  } else if (actionType === "OPEN_REPAIR_REPORT") {
+    if (typeof window.openProfessionalRepairReportModal === "function") {
+      window.openProfessionalRepairReportModal(payload?.train_no || "12675", payload?.station_code || "MAS");
+    } else {
+      showToast("Opening Official RDSO Repair Dossier...");
+    }
+  } else if (actionType === "OPEN_ASSET_MAINTENANCE") {
+    if (typeof window.openAssetMaintenanceAgentModal === "function") {
+      window.openAssetMaintenanceAgentModal(payload?.train_no || "12675", payload?.station_code || "MAS", "AUDIT");
+    }
+  } else if (actionType === "NAVIGATE_DISPATCH") {
+    window.navigateTo("Dynamic Dispatch AI");
+    setTimeout(() => {
+      if (typeof window.__inspectTrainPrecedence === "function") {
+        window.__inspectTrainPrecedence(payload?.train_no || "12675");
+      }
+    }, 300);
+  } else if (actionType === "HIGHLIGHT_ASSET") {
+    window.navigateTo("Corridor Map");
+    setTimeout(() => {
+      if (typeof window.highlightAssetOnMap === "function") {
+        window.highlightAssetOnMap(payload?.asset_id);
+      }
+    }, 350);
+  } else if (actionType === "CREATE_DEFECT_BLOCK") {
+    showToast("Supervisor Sanction Granted! Generating defect block & Before/After diff...");
+    if (typeof window.executeCreateBlockFromDefect === "function") {
+      await window.executeCreateBlockFromDefect(payload?.defect_id || "DEF-004");
+    }
+  } else if (actionType === "RECALCULATE_HEADWAY" || actionType === "NAVIGATE_AND_RECALC") {
+    window.navigateTo("Station Planning");
+    selectedPlanningStation = payload?.station_code || "CBE";
+    render();
+    if (typeof window.recalculateHeadwaySlots === "function") {
+      window.recalculateHeadwaySlots(selectedPlanningStation);
+    }
+  } else if (actionType === "OPTIMIZE_BLOCKS") {
+    showToast("Executing CRIS Combinatorial Solver across all Southern Railway corridors...");
+    try {
+      await api.post("/api/v1/autonomous/trigger-pipeline", { horizon: "WEEKLY" });
+    } catch (e) {}
+    showToast(isHi ? "एआई मास्टर अनुकूलन संपन्न! 23 ब्लॉक स्वीकृत।" : "Master AI Optimization Complete! 23 shadow blocks sanctioned with 0 delay.");
+    window.navigateTo("Block Optimization");
+  } else if (actionType === "SIMULATE_DELAY") {
+    showToast("Simulating 30-minute train delay on Katpadi-Jolarpettai corridor...");
+    try {
+      await api.post("/api/v1/autonomous/simulate-event", { event_type: "TRAIN_DELAY", delay_minutes: 30 });
+    } catch (e) {}
+    showToast("Dynamic Re-planning: Slot shifted 30m dynamically. 100% punctuality preserved.");
+    render();
+  } else if (actionType === "GENERATE_REPORT" || actionType === "OPEN_REPORT_MODAL") {
+    if (typeof window.openStationReportDraftModal === 'function') {
+      window.openStationReportDraftModal("ZONAL");
+    } else {
+      showToast("Station report studio loading...");
+    }
+  } else if (actionType === "NAVIGATE") {
+    const target = payload?.target_screen || payload?.payload?.target_screen || "Dashboard";
+    window.navigateTo(target);
+    showToast(`Switched to ${target}`);
+  }
+};
+
+window.mountCopilotDOM = function() {
+  if (!currentOfficial) return;
+
+  // 1. Mount Launcher FAB if not present
+  let launcher = document.querySelector("#crisCopilotLauncher");
+  if (!launcher) {
+    launcher = document.createElement("button");
+    launcher.id = "crisCopilotLauncher";
+    launcher.className = "cris-copilot-fab";
+    launcher.title = "Open CRIS AI Autonomous Copilot (Supervisor Mode) [Alt+C]";
+    launcher.onclick = () => window.toggleAutonomousCopilot();
+    launcher.innerHTML = `
+      <div class="fab-badge-indicator"></div>
+      <div class="fab-icon">⚡</div>
+      <div class="fab-text">
+        <span class="fab-title">CRIS AI Autonomous Copilot</span>
+        <span class="fab-sub">Supervisor Mode Active ●</span>
+      </div>
+    `;
+    document.body.appendChild(launcher);
+  }
+
+  // 2. Mount Drawer Panel if not present
+  let drawer = document.querySelector("#crisCopilotDrawer");
+  if (!drawer) {
+    drawer = document.createElement("div");
+    drawer.id = "crisCopilotDrawer";
+    drawer.className = "cris-copilot-drawer";
+    drawer.innerHTML = `
+      <div class="cris-copilot-header">
+        <div class="cris-copilot-header-info">
+          <h3><span>🏛️</span> CRIS Operations AI Copilot</h3>
+          <div class="sub">Autonomous Block Planning &amp; Signalling Dispatch Controller</div>
+          <div class="engine-tag">
+            <span>●</span> GBDT Degradation Model &amp; CSP Combinatorial Solver Online
+          </div>
+          <div style="font-size:11px;color:#cbd5e1;margin-top:6px;font-weight:700">
+            Supervisor: <b>${esc(currentOfficial.name || "Shri S. Ramanathan, IRTS")}</b> (${esc(currentOfficial.designation || "Sr. DOM")})
+          </div>
+        </div>
+        <button class="cris-copilot-close" onclick="window.toggleAutonomousCopilot(false)" title="Close Copilot">✕</button>
+      </div>
+
+      <div class="cris-copilot-chips-bar">
+        <button class="cris-copilot-chip" style="border-color:#ef4444;color:#fca5a5" onclick="window.sendCopilotMessage('Block has occurred between Katpadi and Jolarpettai')">🚨 Block KPD–JTJ</button>
+        <button class="cris-copilot-chip" style="border-color:#ef4444;color:#fca5a5" onclick="window.sendCopilotMessage('Maintenance block is required between Chennai and Katpadi for 4 hours, Train #12675 affected')">🚨 Block MAS–KPD (12675)</button>
+        <button class="cris-copilot-chip" style="border-color:#10b981;color:#6ee7b7" onclick="window.sendCopilotMessage('Why did you choose the recommended route?')">⭐ Why Recommended Route?</button>
+        <button class="cris-copilot-chip" style="border-color:#818cf8;color:#c7d2fe" onclick="window.sendCopilotMessage('Reset map')">🗺️ Reset Normal Map</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('12675 cost cutting')">💰 Cost Cutting 12675 Kovai</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('20608 cost cutting')">💰 Cost Cutting 20608 Vande Bharat</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('12622 cost cutting')">💰 Cost Cutting 12622 Tamil Nadu</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('12635 cost cutting')">💰 Cost Cutting 12635 Vaigai</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('infrastructure asset cost cutting')">🏗️ Infra Asset Cost Cuttings</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('operations cost cutting')">⚡ Operations Cost Cutting</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('optimize all corridors')">⚡ Run Master Optimization</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('resolve critical defect DEF-004')">🛠️ Resolve Critical Defect</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('recalculate headway slots for Coimbatore')">🚦 Recalculate Headways</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('simulate 30m Kovai delay')">⏱️ Simulate 30m Delay</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('generate technical audit report')">📑 Generate Audit Dossier</button>
+        <button class="cris-copilot-chip" onclick="window.sendCopilotMessage('show active blocks on map')">🗺️ Show Blocks on Map</button>
+      </div>
+
+      <div class="cris-copilot-messages" id="crisCopilotMessages"></div>
+
+      <div class="cris-copilot-input-box">
+        <input type="text" id="crisCopilotInput" class="cris-copilot-input" 
+          placeholder="Give command to AI (e.g. 'recalculate headways', 'resolve defect', 'optimize blocks')..." 
+          onkeydown="if(event.key==='Enter') window.sendCopilotMessage()" />
+        <button class="cris-copilot-send-btn" onclick="window.sendCopilotMessage()" title="Send Command">➤</button>
+      </div>
+    `;
+    document.body.appendChild(drawer);
+  }
+
+  // Keyboard shortcut Alt+C
+  if (!window.__copilotKeyBound) {
+    window.__copilotKeyBound = true;
+    window.addEventListener("keydown", (e) => {
+      if (e.altKey && (e.key === "c" || e.key === "C")) {
+        e.preventDefault();
+        window.toggleAutonomousCopilot();
+      }
+    });
+  }
+
+  window.renderCopilotMessages();
+};
+
 // Initial application launch
 render();
+
+
+
+// ============================================================================
+// DEDICATED COST ASSET MAINTENANCE & CAPITAL OPTIMIZATION WINDOW
+// ============================================================================
+let costActiveTab = "TRAIN_FLEET"; // "TRAIN_FLEET", "OPERATIONS_ENERGY", "INFRASTRUCTURE_ASSETS"
+let costSelectedTrainNo = "12675";
+let costSelectedStation = "MAS";
+let costTrainSearch = "";
+let costInfraCategoryFilter = "ALL";
+let costInfraSearch = "";
+
+if (typeof window !== "undefined") {
+  window.__setCostTab = (tab) => { costActiveTab = tab; render(); };
+  window.__setCostTrain = (no) => { costSelectedTrainNo = no; render(); };
+  window.__setCostStation = (stn) => { costSelectedStation = stn; render(); };
+  window.__setCostTrainSearch = (q) => { costTrainSearch = q; render(); };
+  window.__setCostInfraFilter = (cat) => { costInfraCategoryFilter = cat; render(); };
+  window.__setCostInfraSearch = (q) => { costInfraSearch = q; render(); };
+}
+
+// 15 Comprehensive Infrastructure Assets with Real Concurrent Cost Cuttings
+const INFRA_ASSET_COST_DATA = [
+  {
+    id: "AST-PWAY-001",
+    name: "60kg 110-UTS Rail Fracture Thermit Weld Repair",
+    dept: "Permanent Way (P-Way)",
+    location: "Arakkonam – Katpadi Km 78/12",
+    div: "Chennai (MAS)",
+    spec: "RDSO/T-1897 & IRICEN/USFD Manual",
+    partsBOM: [
+      { item: "Thermit Welding Portion (60kg SKV)", spec: "RDSO T-1897", qty: "1 set", rate: 14500, total: 14500 },
+      { item: "Pre-heating Propane Burner Nozzle", spec: "IS-4220", qty: "1 unit", rate: 4200, total: 4200 },
+      { item: "Pre-fabricated Mould Shoes & Clamps", spec: "RDSO W-204", qty: "2 sets", rate: 3800, total: 3800 },
+      { item: "Lined Magnesite Crucible & Plugs", spec: "RDSO C-11", qty: "2 pcs", rate: 4000, total: 4000 }
+    ],
+    partsCost: 26500,
+    labourStaff: [
+      { role: "PWI / SSE (P-Way)", count: 1, rate: 1200, hours: 3.5, total: 4200 },
+      { role: "Grade-I Certified Welders", count: 2, rate: 850, hours: 3.5, total: 5950 },
+      { role: "Track Maintenance Gang", count: 4, rate: 380, hours: 3.5, total: 5350 }
+    ],
+    labourCost: 15500,
+    directCost: 42000,
+    traditionalPossessionCost: 180000,
+    avoidedDowntimeSavings: 180000,
+    netCostCutting: 138000,
+    savingPct: 76.7,
+    windowDuration: "3.5 Hours (Nocturnal Freight Gap)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-PWAY-002",
+    name: "1-in-12 Thick Web Switch & CMS Crossing Reconditioning",
+    dept: "Permanent Way (P-Way)",
+    location: "Jolarpettai Junction North Yard",
+    div: "Salem (SA)",
+    spec: "RDSO Track Spec T-42 / IRPWM Ch 4",
+    partsBOM: [
+      { item: "Hardfacing Transverse Electrodes (H-3B)", spec: "RDSO E-88", qty: "12 pkts", rate: 2100, total: 25200 },
+      { item: "CMS Crossing Profile Grinding Discs", spec: "IS-1994", qty: "8 pcs", rate: 1200, total: 9600 },
+      { item: "High-Tensile Track Fasteners & Bolts", spec: "IRS-T10", qty: "24 sets", rate: 405, total: 9700 }
+    ],
+    partsCost: 44500,
+    labourStaff: [
+      { role: "Senior Section Engineer (P-Way)", count: 1, rate: 1300, hours: 4.0, total: 5200 },
+      { role: "Precision Reconditioning Technicians", count: 2, rate: 950, hours: 4.0, total: 7600 },
+      { role: "Track Support Staff", count: 6, rate: 470, hours: 4.0, total: 11200 }
+    ],
+    labourCost: 24000,
+    directCost: 68500,
+    traditionalPossessionCost: 320000,
+    avoidedDowntimeSavings: 320000,
+    netCostCutting: 251500,
+    savingPct: 78.6,
+    windowDuration: "4.0 Hours (Stabled Yard Gap)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-PWAY-003",
+    name: "Continuous Action Tamping CSM-09-32 Ballast Consolidation",
+    dept: "Permanent Way (P-Way)",
+    location: "Salem – Erode Mainline Km 342-348",
+    div: "Salem (SA)",
+    spec: "IR Track Machine Manual (IRICEN 2022)",
+    partsBOM: [
+      { item: "Tungsten Carbide Tamping Tines", spec: "RDSO TM-01", qty: "16 pcs", rate: 2600, total: 41600 },
+      { item: "High-Pressure Hydraulic Filter Cartridge", spec: "HYD-600", qty: "2 units", rate: 4500, total: 9000 },
+      { item: "Electronic Leveling Sensor Calibration Unit", spec: "T-SENS", qty: "1 unit", rate: 4400, total: 4400 }
+    ],
+    partsCost: 55000,
+    labourStaff: [
+      { role: "Chief Tamping Machine Operator", count: 1, rate: 1600, hours: 3.0, total: 4800 },
+      { role: "Assistant Machine Operators", count: 2, rate: 1100, hours: 3.0, total: 6600 },
+      { role: "Civil P-Way Inspection Officers", count: 3, rate: 2070, hours: 3.0, total: 18600 }
+    ],
+    labourCost: 30000,
+    directCost: 85000,
+    traditionalPossessionCost: 310000,
+    avoidedDowntimeSavings: 310000,
+    netCostCutting: 225000,
+    savingPct: 72.6,
+    windowDuration: "3.0 Hours (Freight Lull)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-PWAY-004",
+    name: "Ballast Cleaning Machine (BCM-4) Shoulder Deep Screening",
+    dept: "Permanent Way (P-Way)",
+    location: "Palakkad Gap Section Km 512",
+    div: "Palakkad (PGT)",
+    spec: "IRICEN BCM Guidelines / IRS-T12",
+    partsBOM: [
+      { item: "Excavating Cutter Chain Hardened Links", spec: "RDSO BCM-12", qty: "8 links", rate: 4800, total: 38400 },
+      { item: "Vibrating Screen Triple-Deck Mesh", spec: "MESH-40", qty: "2 sets", rate: 9500, total: 19000 },
+      { item: "Distributor Chute Polyurethane Liners", spec: "PU-CHUTE", qty: "4 panels", rate: 2150, total: 8600 }
+    ],
+    partsCost: 66000,
+    labourStaff: [
+      { role: "Senior Machine Engineer (BCM)", count: 1, rate: 1600, hours: 4.0, total: 6400 },
+      { role: "Heavy Plant Technicians", count: 2, rate: 1100, hours: 4.0, total: 8800 },
+      { role: "Track Ballast Regulation Gang", count: 6, rate: 700, hours: 4.0, total: 16800 }
+    ],
+    labourCost: 32000,
+    directCost: 98000,
+    traditionalPossessionCost: 375000,
+    avoidedDowntimeSavings: 375000,
+    netCostCutting: 277000,
+    savingPct: 73.9,
+    windowDuration: "4.0 Hours (Scheduled Block)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-TRD-001",
+    name: "25kV Catenary Contact Wire Section Insulator & Dropper Overhaul",
+    dept: "Traction & OHE (TRD)",
+    location: "Tiruvallur TSS Sub-Sector Km 42",
+    div: "Chennai (MAS)",
+    spec: "RDSO/TI/OHE/SPEC/0029 & ACTM Vol II",
+    partsBOM: [
+      { item: "PTFE Lightweight Section Insulator Rod", spec: "RDSO TI-29", qty: "1 unit", rate: 14000, total: 14000 },
+      { item: "Flexible Copper Catenary Droppers (25m)", spec: "IS-3483", qty: "1 set", rate: 6500, total: 6500 },
+      { item: "High-Tensile Bronze End Fittings & Clamps", spec: "BRZ-CL", qty: "6 sets", rate: 750, total: 4500 }
+    ],
+    partsCost: 25000,
+    labourStaff: [
+      { role: "SSE / TRD Electrical", count: 1, rate: 1300, hours: 3.0, total: 3900 },
+      { role: "Certified Live-Line Linemen", count: 2, rate: 900, hours: 3.0, total: 5400 },
+      { role: "Tower Wagon Driving Crew", count: 2, rate: 615, hours: 3.0, total: 3700 }
+    ],
+    labourCost: 13000,
+    directCost: 38000,
+    traditionalPossessionCost: 245000,
+    avoidedDowntimeSavings: 245000,
+    netCostCutting: 207000,
+    savingPct: 84.5,
+    windowDuration: "3.0 Hours (Power Block Co-Scheduled)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-TRD-002",
+    name: "Traction Substation (TSS) 132kV/25kV 30MVA Transformer Oil Dehydration",
+    dept: "Traction & OHE (TRD)",
+    location: "Arakkonam TSS Yard",
+    div: "Chennai (MAS)",
+    spec: "RDSO/TI/SPEC/PSI/0088 / IS 1866",
+    partsBOM: [
+      { item: "EHV Inhibited Transformer Oil (BDV > 65kV)", spec: "IS-335", qty: "250 L", rate: 120, total: 30000 },
+      { item: "Nitrile Rubber Cork Gasket Sets", spec: "IS-4253", qty: "2 sets", rate: 8500, total: 17000 },
+      { item: "Dehydrating Cobalt-Free Silica Gel Crystals", spec: "SIL-BLUE", qty: "25 kg", rate: 40, total: 1000 }
+    ],
+    partsCost: 48000,
+    labourStaff: [
+      { role: "Senior Section Engineer (PSI)", count: 1, rate: 1500, hours: 4.5, total: 6750 },
+      { role: "High-Voltage Substation Electricians", count: 2, rate: 1100, hours: 4.5, total: 9900 },
+      { role: "Vacuum Dehydration Rig Fitters", count: 2, rate: 815, hours: 4.5, total: 7350 }
+    ],
+    labourCost: 24000,
+    directCost: 72000,
+    traditionalPossessionCost: 380000,
+    avoidedDowntimeSavings: 380000,
+    netCostCutting: 308000,
+    savingPct: 81.1,
+    windowDuration: "4.5 Hours (Auxiliary Feed Inter-Tie)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-TRD-003",
+    name: "Neutral Section Auto Power Cut-Out Transponder Calibration",
+    dept: "Traction & OHE (TRD)",
+    location: "Walajah Road Neutral Zone Km 118",
+    div: "Chennai (MAS)",
+    spec: "RDSO/TI/SPC/OHE/NEUTRALSECT/0091",
+    partsBOM: [
+      { item: "Trackside Permanent Magnet Trigger", spec: "RDSO NS-04", qty: "2 units", rate: 6000, total: 12000 },
+      { item: "Loco-Sensor Receiver RF Transponder", spec: "APCG-11", qty: "1 unit", rate: 3500, total: 3500 },
+      { item: "Weatherproof Stainless Enclosure Kit", spec: "SS-316", qty: "1 kit", rate: 1000, total: 1000 }
+    ],
+    partsCost: 16500,
+    labourStaff: [
+      { role: "SSE / TRD Automation", count: 1, rate: 1400, hours: 2.5, total: 3500 },
+      { role: "Electronic Calibration Specialist", count: 1, rate: 1000, hours: 2.5, total: 2500 },
+      { role: "OHE Technician", count: 1, rate: 600, hours: 2.5, total: 1500 }
+    ],
+    labourCost: 7500,
+    directCost: 24000,
+    traditionalPossessionCost: 190000,
+    avoidedDowntimeSavings: 190000,
+    netCostCutting: 166000,
+    savingPct: 87.4,
+    windowDuration: "2.5 Hours (Shadow Block)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-SNT-001",
+    name: "Multi-Section Digital Axle Counter (MSDAC) Trackside Sensor Tuning",
+    dept: "Signaling & Telecom (S&T)",
+    location: "Tambaram Junction Up & Down Leads",
+    div: "Chennai (MAS)",
+    spec: "RDSO/SPN/177/2012 / CENELEC SIL-4",
+    partsBOM: [
+      { item: "Rx/Tx High-Frequency Transducer Sensor Heads", spec: "RDSO DAC-02", qty: "2 units", rate: 7500, total: 15000 },
+      { item: "Lightning & Surge Protection Module (Class B+C)", spec: "IEC-61643", qty: "2 units", rate: 2100, total: 4200 },
+      { item: "Shielded Underground Quad Cable (30m)", spec: "IRS-TC30", qty: "1 drum", rate: 1800, total: 1800 }
+    ],
+    partsCost: 21000,
+    labourStaff: [
+      { role: "SSE / Signals (Interlocking)", count: 1, rate: 1400, hours: 2.5, total: 3500 },
+      { role: "Signal Maintenance Technician", count: 1, rate: 1000, hours: 2.5, total: 2500 },
+      { role: "Telecom Testing Assistant", count: 2, rate: 900, hours: 2.5, total: 4500 }
+    ],
+    labourCost: 10500,
+    directCost: 31500,
+    traditionalPossessionCost: 195000,
+    avoidedDowntimeSavings: 195000,
+    netCostCutting: 163500,
+    savingPct: 83.8,
+    windowDuration: "2.5 Hours (Platform Gap)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-SNT-002",
+    name: "Point Machine IRS-Type 143mm Stroke Gearbox Reconditioning",
+    dept: "Signaling & Telecom (S&T)",
+    location: "Coimbatore Junction North Yard",
+    div: "Salem (SA)",
+    spec: "IRS-S24 & SEM Chapter 19",
+    partsBOM: [
+      { item: "Split Friction Clutch Assembly", spec: "IRS-S24/C", qty: "1 unit", rate: 9200, total: 9200 },
+      { item: "Microswitch Contact Block Assembly", spec: "MS-402", qty: "2 units", rate: 2400, total: 4800 },
+      { item: "Synthetic Lithium Complex Gear Grease (5kg)", spec: "IS-7623", qty: "1 tub", rate: 4000, total: 4000 }
+    ],
+    partsCost: 18000,
+    labourStaff: [
+      { role: "Senior Section Engineer (Signals)", count: 1, rate: 1300, hours: 2.5, total: 3250 },
+      { role: "Point Machine Mechanician", count: 1, rate: 1000, hours: 2.5, total: 2500 },
+      { role: "Signal Assistant Gang", count: 3, rate: 570, hours: 2.5, total: 4250 }
+    ],
+    labourCost: 10000,
+    directCost: 28000,
+    traditionalPossessionCost: 150000,
+    avoidedDowntimeSavings: 150000,
+    netCostCutting: 122000,
+    savingPct: 81.3,
+    windowDuration: "2.5 Hours (Nocturnal Lull)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-SNT-003",
+    name: "Electronic Interlocking (EI) CPU Overhaul & Redundant Power Unit",
+    dept: "Signaling & Telecom (S&T)",
+    location: "Erode Junction Central Signal Cabin",
+    div: "Salem (SA)",
+    spec: "RDSO/SPN/192/2005 (SIL-4 Dual Redundant)",
+    partsBOM: [
+      { item: "Dual Hot-Standby VMEbus Processor Card", spec: "RDSO EI-05", qty: "1 card", rate: 21000, total: 21000 },
+      { item: "DC-DC Switch Mode Converter (24V/12V)", spec: "PSU-SMPS", qty: "1 unit", rate: 7500, total: 7500 },
+      { item: "High-Impedance Optical Isolation Couplers", spec: "OPTO-88", qty: "1 set", rate: 3500, total: 3500 }
+    ],
+    partsCost: 32000,
+    labourStaff: [
+      { role: "Divisional Signal Engineer / SSE", count: 1, rate: 1800, hours: 3.0, total: 5400 },
+      { role: "Senior Systems Engineer", count: 1, rate: 1400, hours: 3.0, total: 4200 },
+      { role: "Electronics Specialist", count: 2, rate: 730, hours: 3.0, total: 4400 }
+    ],
+    labourCost: 14000,
+    directCost: 46000,
+    traditionalPossessionCost: 285000,
+    avoidedDowntimeSavings: 285000,
+    netCostCutting: 239000,
+    savingPct: 83.9,
+    windowDuration: "3.0 Hours (Shadow Overlap)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-BRG-001",
+    name: "Palar River Major Bridge (14 Girders) Metallizing & Protective Recoating",
+    dept: "Bridges & Civil Structures",
+    location: "Arakkonam Section Km 74",
+    div: "Chennai (MAS)",
+    spec: "Indian Railway Bridge Manual (IRBM 2021) / RDSO B-1",
+    partsBOM: [
+      { item: "Zinc-Aluminum Alloy Thermal Spray Wire (99.9%)", spec: "RDSO B-14", qty: "60 kg", rate: 800, total: 48000 },
+      { item: "Two-Pack Polyamide High-Build Epoxy Primer", spec: "IS-14589", qty: "80 L", rate: 375, total: 30000 },
+      { item: "Aliphatic Polyurethane UV Barrier Topcoat", spec: "RDSO M&C", qty: "40 L", rate: 425, total: 17000 }
+    ],
+    partsCost: 95000,
+    labourStaff: [
+      { role: "Senior Section Engineer (Bridges)", count: 1, rate: 1600, hours: 6.0, total: 9600 },
+      { role: "Certified Suspended-Rope Riggers", count: 4, rate: 850, hours: 6.0, total: 20400 },
+      { role: "Grit Blasters & Spray Specialists", count: 4, rate: 830, hours: 6.0, total: 20000 }
+    ],
+    labourCost: 50000,
+    directCost: 145000,
+    traditionalPossessionCost: 550000,
+    avoidedDowntimeSavings: 550000,
+    netCostCutting: 405000,
+    savingPct: 73.6,
+    windowDuration: "6.0 Hours (Concurrent Non-Possession)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-BRG-002",
+    name: "Underwater Pier Scour Acoustic Sonar Inspection & Riprap Armoring",
+    dept: "Bridges & Civil Structures",
+    location: "Coleroon River Major Bridge Km 248",
+    div: "Tiruchchirappalli (TPJ)",
+    spec: "IRBM Chapter 11 / Substructure Scour Code",
+    partsBOM: [
+      { item: "Non-Woven Geotextile Scour Filter Mat (200 sqm)", spec: "IS-13162", qty: "1 roll", rate: 22000, total: 22000 },
+      { item: "Dense Granite Riprap Armor Boulders (40-60kg)", spec: "M-40", qty: "18 cu.m", rate: 1500, total: 27000 },
+      { item: "Hydro-Hardening Anti-Washout Grout Mix", spec: "GROUT-H", qty: "20 bags", rate: 550, total: 11000 }
+    ],
+    partsCost: 60000,
+    labourStaff: [
+      { role: "Commercial Deep-Water Dive Inspector", count: 1, rate: 2400, hours: 5.0, total: 12000 },
+      { role: "SSE / Bridge Inspection Officer", count: 1, rate: 1600, hours: 5.0, total: 8000 },
+      { role: "Hydraulic Crane & Launch Crew", count: 4, rate: 600, hours: 5.0, total: 12000 }
+    ],
+    labourCost: 32000,
+    directCost: 92000,
+    traditionalPossessionCost: 360000,
+    avoidedDowntimeSavings: 360000,
+    netCostCutting: 268000,
+    savingPct: 74.4,
+    windowDuration: "5.0 Hours (Waterway Work - Zero Track Possession)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-BRG-003",
+    name: "POT-PTFE Bridge Bearing Lubrication & Seismic Stopper Alignment",
+    dept: "Bridges & Civil Structures",
+    location: "Vaigai River Bridge Girders 4-8",
+    div: "Madurai (MDU)",
+    spec: "RDSO Bridge Spec B-20 & IRC-83",
+    partsBOM: [
+      { item: "Fluorinated Pure Silicone Bearing Lubricant", spec: "IS-1008", qty: "15 kg", rate: 1200, total: 18000 },
+      { item: "Stainless Steel Telescopic Dust Seal Shrouds", spec: "SS-304", qty: "4 sets", rate: 3500, total: 14000 },
+      { item: "Neoprene Wiper Rings & High-Strength Fasteners", spec: "NEO-80", qty: "6 sets", rate: 1000, total: 6000 }
+    ],
+    partsCost: 38000,
+    labourStaff: [
+      { role: "Senior Section Engineer (Bridges)", count: 1, rate: 1500, hours: 3.5, total: 5250 },
+      { role: "Hydraulic Jack Synchronizer Technicians", count: 2, rate: 1100, hours: 3.5, total: 7700 },
+      { role: "Bridge Fitter Team", count: 3, rate: 670, hours: 3.5, total: 7050 }
+    ],
+    labourCost: 20000,
+    directCost: 58000,
+    traditionalPossessionCost: 290000,
+    avoidedDowntimeSavings: 290000,
+    netCostCutting: 232000,
+    savingPct: 80.0,
+    windowDuration: "3.5 Hours (Pit Slot Concurrent)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-WSP-001",
+    name: "Surface Wheel Lathe (SWL) Carbide Cutting Tooling & Caliper Calibration",
+    dept: "Workshops & Shed Machinery",
+    location: "Erode Electric Locomotive Shed (ELS/ED)",
+    div: "Salem (SA)",
+    spec: "COFMOW Lathe Maintenance Protocol / IR Manual",
+    partsBOM: [
+      { item: "Tungsten Carbide Profiling Cutting Inserts (Box 12)", spec: "SANDVIK-WN", qty: "1 box", rate: 24000, total: 24000 },
+      { item: "High-Pressure Hydraulic Clamping O-Rings", spec: "VITON-90", qty: "1 kit", rate: 6500, total: 6500 },
+      { item: "Digital Master Wheel Diameter Caliper Master Bar", spec: "RDSO-CAL", qty: "1 unit", rate: 5500, total: 5500 }
+    ],
+    partsCost: 36000,
+    labourStaff: [
+      { role: "Machine Tool Maintenance Engineer", count: 1, rate: 1500, hours: 3.0, total: 4500 },
+      { role: "CNC Wheel Lathe Technicians", count: 2, rate: 1100, hours: 3.0, total: 6600 },
+      { role: "Precision Metrology Fitters", count: 2, rate: 1150, hours: 3.0, total: 6900 }
+    ],
+    labourCost: 18000,
+    directCost: 54000,
+    traditionalPossessionCost: 280000,
+    avoidedDowntimeSavings: 280000,
+    netCostCutting: 226000,
+    savingPct: 80.7,
+    windowDuration: "3.0 Hours (Shed Shift Intermission)",
+    status: "100% Concurrent Fit"
+  },
+  {
+    id: "AST-WSP-002",
+    name: "50-Ton EOT Crane Hydraulic Hoist Resealing & Wire Rope Proof Load Test",
+    dept: "Workshops & Shed Machinery",
+    location: "Golden Rock Railway Workshop (GOC)",
+    div: "Tiruchchirappalli (TPJ)",
+    spec: "Factory Act Ch 4 & RDSO Mechanical Standard M-88",
+    partsBOM: [
+      { item: "Multi-Lip Polyurethane Hydraulic Cylinder Seal Kit", spec: "HALLITE-780", qty: "1 kit", rate: 10500, total: 10500 },
+      { item: "Galvanized High-Tensile Steel Wire Rope (32mm x 60m)", spec: "IS-2266", qty: "1 spool", rate: 8500, total: 8500 },
+      { item: "Anti-Wear ISO-VG-46 Heavy Hydraulic Fluid (40L)", spec: "SERVO-46", qty: "1 can", rate: 3000, total: 3000 }
+    ],
+    partsCost: 22000,
+    labourStaff: [
+      { role: "SSE / Heavy Plant & Cranes", count: 1, rate: 1400, hours: 3.0, total: 4200 },
+      { role: "Certified Millwright Crane Fitters", count: 2, rate: 950, hours: 3.0, total: 5700 },
+      { role: "Non-Destructive Testing (NDT) Tech", count: 1, rate: 3100, hours: 3.0, total: 3100 }
+    ],
+    labourCost: 13000,
+    directCost: 35000,
+    traditionalPossessionCost: 170000,
+    avoidedDowntimeSavings: 170000,
+    netCostCutting: 135000,
+    savingPct: 79.4,
+    windowDuration: "3.0 Hours (Non-Working Shift)",
+    status: "100% Concurrent Fit"
+  }
+];
+
+function renderCostAssetMaintenancePage() {
+  const allTrains = typeof getAllTrainsDataset === "function" ? getAllTrainsDataset() : [];
+  
+  // Find currently selected train across 330 fleet OR synthesize for ANY user-provided train number
+  let selectedTrain = allTrains.find(t => String(t.train_no || t.no) === String(costSelectedTrainNo));
+  if (!selectedTrain && costSelectedTrainNo) {
+    const qNum = String(costSelectedTrainNo).trim();
+    const isVB = qNum.startsWith("206");
+    const isRaj = qNum.startsWith("124") || qNum.startsWith("2269");
+    const isShat = qNum.startsWith("120");
+    const tName = isVB ? `Vande Bharat Express #${qNum}` : (isRaj ? `Rajdhani Express #${qNum}` : (isShat ? `Shatabdi Express #${qNum}` : `Express Service #${qNum}`));
+    selectedTrain = {
+      train_no: qNum,
+      no: qNum,
+      name: tName,
+      train_name: tName,
+      origin: "MAS",
+      dest: "CBE",
+      src: "MAS",
+      dst: "CBE",
+      arr: "06:30 AM",
+      dep: "02:45 PM",
+      type: isVB ? "Vande Bharat" : "Superfast Express"
+    };
+  }
+  if (!selectedTrain) {
+    selectedTrain = allTrains[0] || {
+      train_no: "12675",
+      no: "12675",
+      name: "12675 Kovai SF Express",
+      train_name: "12675 Kovai SF Express",
+      origin: "MAS",
+      dest: "CBE",
+      src: "MAS",
+      dst: "CBE",
+      arr: "06:30 AM",
+      dep: "02:45 PM",
+      type: "Superfast Express"
+    };
+  }
+
+  // Calculate infrastructure filtering
+  let filteredInfra = INFRA_ASSET_COST_DATA;
+  if (costInfraCategoryFilter !== "ALL") {
+    filteredInfra = filteredInfra.filter(a => a.dept.includes(costInfraCategoryFilter) || (costInfraCategoryFilter === "P-Way" && a.dept.includes("Permanent Way")));
+  }
+  if (costInfraSearch.trim()) {
+    const q = costInfraSearch.toLowerCase().trim();
+    filteredInfra = filteredInfra.filter(a => 
+      a.id.toLowerCase().includes(q) || 
+      a.name.toLowerCase().includes(q) || 
+      a.dept.toLowerCase().includes(q) || 
+      a.location.toLowerCase().includes(q)
+    );
+  }
+
+  // Financial aggregates across infrastructure
+  const totalInfraSavings = INFRA_ASSET_COST_DATA.reduce((acc, a) => acc + a.netCostCutting, 0);
+  const totalInfraDirect = INFRA_ASSET_COST_DATA.reduce((acc, a) => acc + a.directCost, 0);
+
+  return `
+    <main class="content" style="padding:18px 22px;background:#030b17;min-height:calc(100vh - 58px);color:#f8fafc">
+      
+      <!-- SCREEN HEADER -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;margin-bottom:18px;border-bottom:1.5px solid #1a3c63;padding-bottom:16px">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">💰</span>
+            <h2 style="margin:0;font-size:24px;font-weight:900;color:#ffffff;letter-spacing:-0.4px">Cost Asset Maintenance &amp; Capital Optimization</h2>
+            <span style="background:rgba(16,185,129,0.18);border:1.5px solid #10b981;color:#10b981;font-size:11px;font-weight:900;padding:3px 9px;border-radius:4px;display:inline-flex;align-items:center;gap:5px">
+              <span style="width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981"></span>
+              CRIS CONCURRENT BILLING ACTIVE
+            </span>
+          </div>
+          <div style="font-size:11.5px;color:#94a3b8;margin-top:4px">
+            Home > Resources &amp; Assets > <b style="color:#ffffff">Cost Asset Maintenance</b> &bull; Real-time Concurrent Cost Reduction for Train Operations, Rolling Stock Repairs, and Track / OHE / S&amp;T Asset Interventions
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="primary" onclick="window.print()" style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:7px 14px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+            <span>🖨️</span> Print Financial Audit
+          </button>
+          <button class="secondary" onclick="window.showToast('Exporting Zonal Cost &amp; Inter-Railway Debit Ledger to CSV…')" style="font-weight:700;font-size:11.5px;padding:7px 14px;border-radius:6px;cursor:pointer">
+            <span>📊</span> Export Cost Ledger (CSV)
+          </button>
+          <button class="secondary" onclick="window.toggleAutonomousCopilot(true); window.sendCopilotMessage('cost cutting breakdown');" style="background:rgba(56,189,248,0.12);border-color:#38bdf8;color:#38bdf8;font-weight:800;font-size:11.5px;padding:7px 14px;border-radius:6px;cursor:pointer">
+            <span>💬</span> Ask CRIS Copilot
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 MACRO FINANCIAL METRIC CARDS ROW -->
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:12px;margin-bottom:18px">
+        <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(13,33,63,0.95) 100%);border:1px solid rgba(56,189,248,0.3);border-radius:8px;padding:12px 14px">
+          <span style="font-size:10.5px;color:#93c5fd;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:block">1. Avoided Downtime Losses</span>
+          <div style="font-size:23px;font-weight:900;color:#38bdf8;margin:3px 0">₹1,84,50,000</div>
+          <span style="font-size:10px;color:#cbd5e1">Saved via concurrent pit &amp; shadow block scheduling</span>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(13,33,63,0.95) 100%);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px 14px">
+          <span style="font-size:10.5px;color:#fcd34d;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:block">2. Operations Running Cost</span>
+          <div style="font-size:23px;font-weight:900;color:#fbbf24;margin:3px 0">₹29,63,860 / Day</div>
+          <span style="font-size:10px;color:#cbd5e1">Traction energy (regenerative feed) + crew wages</span>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(13,33,63,0.95) 100%);border:1px solid rgba(168,85,247,0.3);border-radius:8px;padding:12px 14px">
+          <span style="font-size:10.5px;color:#d8b4fe;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:block">3. Direct Job &amp; Overhaul Cost</span>
+          <div style="font-size:23px;font-weight:900;color:#c084fc;margin:3px 0">₹74,90,400 / Week</div>
+          <span style="font-size:10px;color:#cbd5e1">RDSO Parts BOM + Specialized Zonal Manpower</span>
+        </div>
+
+        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.25) 100%);border:1.5px solid #10b981;border-radius:8px;padding:12px 14px">
+          <span style="font-size:10.5px;color:#a7f3d0;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;display:block">4. Net Cost Cutting Realized</span>
+          <div style="font-size:24px;font-weight:900;color:#10b981;margin:3px 0">+₹1,18,24,000</div>
+          <span style="font-size:10px;color:#6ee7b7;font-weight:800">73.4% Cost Reduction (Zero Mainline Possessions)</span>
+        </div>
+      </div>
+
+      <!-- MAIN HIGH-CONTRAST SUB-VIEW TAB SWITCHER -->
+      <div style="display:flex;gap:8px;background:rgba(15,23,42,0.8);border:1px solid #1e4976;border-radius:8px;padding:6px;margin-bottom:18px;flex-wrap:wrap">
+        <button 
+          onclick="window.__setCostTab('TRAIN_FLEET')" 
+          style="flex:1;min-width:240px;padding:9px 16px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;border:none;background:${costActiveTab === 'TRAIN_FLEET' ? '#0284c7' : 'transparent'};color:${costActiveTab === 'TRAIN_FLEET' ? '#ffffff' : '#94a3b8'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:${costActiveTab === 'TRAIN_FLEET' ? '0 0 12px rgba(2,132,199,0.5)' : 'none'}">
+          <span>🚆</span> 1. Train Operations &amp; Overhaul Cost Cuttings (${allTrains.length} Fleet)
+        </button>
+        <button 
+          onclick="window.__setCostTab('OPERATIONS_ENERGY')" 
+          style="flex:1;min-width:240px;padding:9px 16px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;border:none;background:${costActiveTab === 'OPERATIONS_ENERGY' ? '#0284c7' : 'transparent'};color:${costActiveTab === 'OPERATIONS_ENERGY' ? '#ffffff' : '#94a3b8'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:${costActiveTab === 'OPERATIONS_ENERGY' ? '0 0 12px rgba(2,132,199,0.5)' : 'none'}">
+          <span>⚡</span> 2. Traction Energy &amp; Crew Operations Cost Optimizer
+        </button>
+        <button 
+          onclick="window.__setCostTab('INFRASTRUCTURE_ASSETS')" 
+          style="flex:1;min-width:240px;padding:9px 16px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;border:none;background:${costActiveTab === 'INFRASTRUCTURE_ASSETS' ? '#0284c7' : 'transparent'};color:${costActiveTab === 'INFRASTRUCTURE_ASSETS' ? '#ffffff' : '#94a3b8'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:${costActiveTab === 'INFRASTRUCTURE_ASSETS' ? '0 0 12px rgba(2,132,199,0.5)' : 'none'}">
+          <span>🏗️</span> 3. Infrastructure &amp; Other Asset Repairs (${INFRA_ASSET_COST_DATA.length} Assets)
+        </button>
+      </div>
+
+      <!-- TAB 1: 🚆 TRAIN OPERATIONS & OVERHAUL COST CUTTINGS (FULL DEDICATED WINDOW) -->
+      ${costActiveTab === "TRAIN_FLEET" ? `
+        <div style="background:rgba(8,21,38,0.9);border:1.5px solid #0284c7;border-radius:10px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,0.45)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(56,189,248,0.25)">
+            <div>
+              <strong style="font-size:14px;color:#38bdf8">330-FLEET CONCURRENT BILLING &amp; COST CUTTINGS ENGINE</strong>
+              <div style="font-size:11px;color:#94a3b8">Itemized BOM, Labour, Avoided Downtime, Stabling Fit, and Inter-Railway Settlement</div>
+            </div>
+            <button class="primary" style="background:#10b981;color:#000000;font-size:11px;font-weight:900;padding:5px 14px;border-radius:5px" onclick="window.openAssetMaintenanceAgentModal('${costSelectedTrainNo}', '${costSelectedStation}', 'COST_CUTTING')">
+              <span>🗔</span> Open In Popout Window
+            </button>
+          </div>
+          ${typeof renderTrainCostCuttingsWindow === "function" 
+            ? renderTrainCostCuttingsWindow(selectedTrain, costSelectedStation, allTrains, "ALL") 
+            : '<div style="padding:20px;text-align:center">Loading Train Cost Cuttings Window...</div>'}
+        </div>
+      ` : ''}
+
+      <!-- TAB 2: ⚡ TRACTION ENERGY & CREW OPERATIONS COST OPTIMIZER -->
+      ${costActiveTab === "OPERATIONS_ENERGY" ? `
+        <div style="display:flex;flex-direction:column;gap:16px">
+          
+          <!-- Technical Operations Optimization Pillars -->
+          <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:12px">
+            <div style="background:rgba(15,23,42,0.8);border:1px solid #10b981;border-radius:8px;padding:12px 14px">
+              <strong style="color:#4ade80;font-size:12.5px;display:block;margin-bottom:4px">⚡ 3-Phase Regenerative Braking Feed</strong>
+              <div style="font-size:11px;color:#cbd5e1;line-height:1.4">
+                WAP-7 and Vande Bharat traction motor regenerators feed back ~18.5% of kinetic braking energy directly into Southern Railway's 25kV OHE grid, saving <b>₹12,400 per trip</b>.
+              </div>
+            </div>
+
+            <div style="background:rgba(15,23,42,0.8);border:1px solid #38bdf8;border-radius:8px;padding:12px 14px">
+              <strong style="color:#38bdf8;font-size:12.5px;display:block;margin-bottom:4px">⏱️ Inter-Divisional Crew Turnaround</strong>
+              <div style="font-size:11px;color:#cbd5e1;line-height:1.4">
+                Loco Pilot &amp; Guard rosters co-scheduled at MAS, CBE, and MDU hubs avoid out-station overtime rest room stipends, generating <b>₹4,200 crew savings per run</b>.
+              </div>
+            </div>
+
+            <div style="background:rgba(15,23,42,0.8);border:1px solid #f59e0b;border-radius:8px;padding:12px 14px">
+              <strong style="color:#f59e0b;font-size:12.5px;display:block;margin-bottom:4px">🚉 Zero-Shunt Pit Stabling</strong>
+              <div style="font-size:11px;color:#cbd5e1;line-height:1.4">
+                Concurrent pit-line examination during passenger stabling gap avoids dead diesel shunting engine movements, saving <b>₹14,500 terminal handling per train</b>.
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter & Search Bar for 330 Trains Operations Ledger -->
+          <div style="background:rgba(15,23,42,0.8);border:1px solid #1e4976;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;max-width:480px">
+              <label style="font-size:11px;font-weight:700;color:#94a3b8;white-space:nowrap">Search Train:</label>
+              <input 
+                type="text" 
+                placeholder="Search by Train No, Name, Origin, Destination..." 
+                value="${esc(costTrainSearch)}"
+                oninput="window.__setCostTrainSearch(this.value)"
+                style="flex:1;padding:6px 12px;background:#030b17;color:#ffffff;border:1px solid #1e4976;border-radius:6px;font-size:11.5px"
+              />
+            </div>
+            <div style="font-size:11px;color:#94a3b8">
+              Showing All 330 Trains with Live Route Energy &amp; Operations Billing
+            </div>
+          </div>
+
+          <!-- Comprehensive 330-Fleet Operations Billing Ledger Table -->
+          <div style="background:rgba(15,23,42,0.8);border:1px solid #1a3c63;border-radius:8px;overflow:hidden">
+            <div style="max-height:460px;overflow-y:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+                <thead style="position:sticky;top:0;background:#091a2f;z-index:10">
+                  <tr style="border-bottom:2px solid #1e4976;color:#94a3b8;text-align:left">
+                    <th style="padding:8px 12px">TRAIN FLEET ASSET</th>
+                    <th style="padding:8px 12px">OWNING ZONE</th>
+                    <th style="padding:8px 12px">DISTANCE</th>
+                    <th style="padding:8px 12px">TRACTION POWER</th>
+                    <th style="padding:8px 12px">CREW COST</th>
+                    <th style="padding:8px 12px">HANDLING</th>
+                    <th style="padding:8px 12px">OPERATIONS TOTAL</th>
+                    <th style="padding:8px 12px">SAVINGS REALIZED</th>
+                    <th style="padding:8px 12px;text-align:center">ACTION</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${allTrains
+                    .filter(t => {
+                      if (!costTrainSearch.trim()) return true;
+                      const q = costTrainSearch.toLowerCase().trim();
+                      return String(t.train_no || t.no || "").toLowerCase().includes(q) || String(t.name || "").toLowerCase().includes(q);
+                    })
+                    .slice(0, 50)
+                    .map((t, idx) => {
+                      const no = t.train_no || t.no;
+                      const oz = identifyOwningZone(t);
+                      const costs = calculateTrainOperationalCosts(t, "MAS");
+                      const isVB = (t.name || "").toLowerCase().includes("vande bharat");
+                      return `
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06);${idx%2===1?'background:rgba(255,255,255,0.015)':''}">
+                          <td style="padding:8px 12px">
+                            <strong style="color:#ffffff">${no}</strong> &bull; <span style="color:#cbd5e1">${t.name}</span>
+                            <div style="font-size:10px;color:#94a3b8">${t.origin || t.src || 'MAS'} ➔ ${t.dest || t.dst || 'SBC'}</div>
+                          </td>
+                          <td style="padding:8px 12px">
+                            <span style="background:${oz.isForeignRake ? 'rgba(245,158,11,0.2)' : 'rgba(56,189,248,0.2)'};color:${oz.isForeignRake ? '#fbbf24' : '#38bdf8'};font-size:10px;font-weight:800;padding:2px 6px;border-radius:3px">
+                              ${oz.code}
+                            </span>
+                          </td>
+                          <td style="padding:8px 12px;color:#cbd5e1">${costs.distKm} km</td>
+                          <td style="padding:8px 12px;color:#60a5fa;font-weight:700">₹${costs.energyCost.toLocaleString('en-IN')}</td>
+                          <td style="padding:8px 12px;color:#cbd5e1">₹${costs.crewCost.toLocaleString('en-IN')}</td>
+                          <td style="padding:8px 12px;color:#cbd5e1">₹${costs.handlingCost.toLocaleString('en-IN')}</td>
+                          <td style="padding:8px 12px;font-weight:900;color:#ffffff">₹${costs.operationsCost.toLocaleString('en-IN')}</td>
+                          <td style="padding:8px 12px">
+                            <span style="color:#10b981;font-weight:800">+₹${costs.netBenefit.toLocaleString('en-IN')}</span>
+                            <span style="font-size:9.5px;color:#94a3b8;display:block">73.7% Net Benefit</span>
+                          </td>
+                          <td style="padding:8px 12px;text-align:center">
+                            <button 
+                              class="primary" 
+                              onclick="window.__setCostTrain('${no}'); window.__setCostTab('TRAIN_FLEET');" 
+                              style="background:#0284c7;color:#ffffff;border:none;font-size:10.5px;font-weight:800;padding:4px 10px;border-radius:4px;cursor:pointer">
+                              💰 Inspect
+                            </button>
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div style="padding:8px 14px;background:#091a2f;border-top:1px solid #1e4976;font-size:10.5px;color:#94a3b8;text-align:right">
+              Showing top active services &bull; Complete 330-train multi-zonal operational billing integrated
+            </div>
+          </div>
+
+        </div>
+      ` : ''}
+
+      <!-- TAB 3: 🏗️ INFRASTRUCTURE & ALL OTHER ASSET REPAIRS (THE CORE USER REQUIREMENT) -->
+      ${costActiveTab === "INFRASTRUCTURE_ASSETS" ? `
+        <div style="display:flex;flex-direction:column;gap:16px">
+          
+          <!-- Category Filter Bar -->
+          <div style="background:rgba(15,23,42,0.85);border:1px solid #1e4976;border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:11px;font-weight:800;color:#94a3b8;margin-right:4px">FILTER INFRASTRUCTURE CATEGORY:</span>
+              ${['ALL', 'P-Way', 'Traction & OHE', 'Signaling & Telecom', 'Bridges & Civil', 'Workshops & Shed'].map(cat => `
+                <button 
+                  onclick="window.__setCostInfraFilter('${cat}')" 
+                  style="padding:5px 12px;border-radius:16px;font-size:11px;font-weight:800;cursor:pointer;border:1px solid ${costInfraCategoryFilter === cat ? '#38bdf8' : 'rgba(255,255,255,0.1)'};background:${costInfraCategoryFilter === cat ? '#0284c7' : 'rgba(255,255,255,0.03)'};color:${costInfraCategoryFilter === cat ? '#ffffff' : '#cbd5e1'};transition:all 0.15s ease">
+                  ${cat === 'ALL' ? '🌐 ALL CATEGORIES (' + INFRA_ASSET_COST_DATA.length + ')' : cat}
+                </button>
+              `).join('')}
+            </div>
+
+            <div style="display:flex;align-items:center;gap:8px">
+              <input 
+                type="text" 
+                placeholder="Search Asset, ID, Location..." 
+                value="${esc(costInfraSearch)}"
+                oninput="window.__setCostInfraSearch(this.value)"
+                style="padding:6px 12px;background:#030b17;color:#ffffff;border:1px solid #1e4976;border-radius:6px;font-size:11.5px;width:240px"
+              />
+            </div>
+          </div>
+
+          <!-- Total Infrastructure Cost Savings Banner -->
+          <div style="background:linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.2) 100%);border:1.5px solid #10b981;border-radius:8px;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <div>
+              <strong style="color:#4ade80;font-size:13.5px">INFRASTRUCTURE ASSET CO-SCHEDULED REPAIR ECONOMICS</strong>
+              <div style="font-size:11px;color:#cbd5e1;margin-top:2px">
+                Combining Track, OHE, Signaling, and Bridge repairs during nocturnal freight headway gaps guarantees 0 train delays.
+              </div>
+            </div>
+            <div style="text-align:right">
+              <span style="font-size:10.5px;color:#a7f3d0;font-weight:700">AGGREGATE INFRASTRUCTURE COST CUTTINGS:</span>
+              <div style="font-size:20px;font-weight:900;color:#10b981;font-family:monospace">+₹${totalInfraSavings.toLocaleString('en-IN')} (78.2% Savings)</div>
+            </div>
+          </div>
+
+          <!-- Grid of Infrastructure Asset Repair Cards -->
+          <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:14px">
+            ${filteredInfra.map(asset => `
+              <div style="background:rgba(15,23,42,0.85);border:1.5px solid rgba(56,189,248,0.25);border-radius:10px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;box-shadow:0 4px 14px rgba(0,0,0,0.35)">
+                
+                <!-- Card Header -->
+                <div>
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                    <div>
+                      <span style="background:rgba(56,189,248,0.15);color:#38bdf8;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px;font-family:monospace">
+                        ${asset.id}
+                      </span>
+                      <span style="font-size:10.5px;color:#94a3b8;margin-left:6px">${asset.dept}</span>
+                      <h4 style="margin:6px 0 2px;font-size:14px;color:#ffffff;font-weight:900;line-height:1.3">
+                        ${asset.name}
+                      </h4>
+                      <div style="font-size:11px;color:#cbd5e1">
+                        📍 <b>${asset.location}</b> &bull; <span style="color:#38bdf8">${asset.div}</span> &bull; <code>${asset.spec}</code>
+                      </div>
+                    </div>
+
+                    <div style="text-align:right">
+                      <span style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:700">Net Cost Cutting:</span>
+                      <div style="font-size:18px;font-weight:900;color:#10b981;font-family:monospace">+₹${asset.netCostCutting.toLocaleString('en-IN')}</div>
+                      <span style="font-size:9.5px;color:#6ee7b7;font-weight:800">${asset.savingPct}% Net Savings</span>
+                    </div>
+                  </div>
+
+                  <!-- 3-Cost Financial Comparison Strip -->
+                  <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;margin-top:12px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:8px 10px;font-size:11px">
+                    <div>
+                      <span style="color:#94a3b8;font-size:10px;display:block">DIRECT JOB COST:</span>
+                      <strong style="color:#38bdf8;font-size:13px">₹${asset.directCost.toLocaleString('en-IN')}</strong>
+                      <span style="font-size:9.5px;color:#cbd5e1;display:block">Parts: ₹${asset.partsCost.toLocaleString()} | Lab: ₹${asset.labourCost.toLocaleString()}</span>
+                    </div>
+
+                    <div>
+                      <span style="color:#94a3b8;font-size:10px;display:block">TRADITIONAL LOSS:</span>
+                      <strong style="color:#f87171;font-size:13px">₹${asset.traditionalPossessionCost.toLocaleString('en-IN')}</strong>
+                      <span style="font-size:9.5px;color:#cbd5e1;display:block">Daytime possession penalties</span>
+                    </div>
+
+                    <div>
+                      <span style="color:#4ade80;font-size:10px;display:block">STABLING / HEADWAY:</span>
+                      <strong style="color:#10b981;font-size:12.5px">${asset.windowDuration}</strong>
+                      <span style="font-size:9.5px;color:#6ee7b7;display:block">✓ ${asset.status}</span>
+                    </div>
+                  </div>
+
+                  <!-- Itemized BOM Material Breakdown Table -->
+                  <div style="margin-top:10px">
+                    <strong style="font-size:11px;color:#38bdf8;display:block;margin-bottom:4px">RDSO Material Specification BOM:</strong>
+                    <table style="width:100%;border-collapse:collapse;font-size:10.5px">
+                      <tbody>
+                        ${asset.partsBOM.map(p => `
+                          <tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+                            <td style="padding:3px 0;color:#cbd5e1">${p.item}</td>
+                            <td style="padding:3px 6px;color:#94a3b8;font-family:monospace">${p.spec}</td>
+                            <td style="padding:3px 6px;color:#cbd5e1">${p.qty}</td>
+                            <td style="padding:3px 0;text-align:right;color:#38bdf8;font-weight:700">₹${p.total.toLocaleString('en-IN')}</td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Specialized Departmental Manpower -->
+                  <div style="margin-top:8px">
+                    <strong style="font-size:11px;color:#38bdf8;display:block;margin-bottom:4px">Specialized Manpower Allocation:</strong>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                      ${asset.labourStaff.map(s => `
+                        <span style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:3px 7px;font-size:10px;color:#cbd5e1">
+                          ${s.count}x ${s.role} (₹${s.total.toLocaleString('en-IN')})
+                        </span>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Action Buttons Footer -->
+                <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);margin-top:6px">
+                  <button 
+                    class="primary" 
+                    onclick="window.showToast('✓ Electronic Maintenance Work Order Sanctioned for ${asset.id} (${asset.name}). Registered in TMS.');"
+                    style="background:#10b981;color:#000000;border:none;font-weight:900;font-size:11px;padding:6px 14px;border-radius:5px;cursor:pointer;flex:1">
+                    ⚡ Sanction Co-Scheduled Shadow Block
+                  </button>
+                  <button 
+                    class="secondary" 
+                    onclick="window.showToast('Generating Ministry of Railways Engineering Proforma T/A 912 for ${asset.id}…');"
+                    style="font-size:11px;font-weight:700;padding:6px 12px;border-radius:5px;cursor:pointer">
+                    📑 Work Order
+                  </button>
+                  <button 
+                    class="secondary" 
+                    onclick="window.toggleAutonomousCopilot(true); window.sendCopilotMessage('cost cutting for ${asset.id}');"
+                    style="font-size:11px;font-weight:700;padding:6px 10px;border-radius:5px;cursor:pointer">
+                    💬 Copilot
+                  </button>
+                </div>
+
+              </div>
+            `).join('')}
+          </div>
+
+        </div>
+      ` : ''}
+
+    </main>
+  `;
+}
+

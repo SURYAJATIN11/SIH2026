@@ -47,6 +47,7 @@ class MaintenanceStatus(str, enum.Enum):
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
     DEFERRED = "DEFERRED"
+    RECTIFIED = "RECTIFIED"
 
 
 class ApprovalStatus(str, enum.Enum):

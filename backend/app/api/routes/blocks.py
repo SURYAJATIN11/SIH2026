@@ -25,13 +25,14 @@ def list_windows(
 ):
     """List block windows — available maintenance slots."""
     repo = BlockWindowRepository(db)
-    filters = {}
-    if section_id:
-        filters["track_section_id"] = section_id
-    if availability:
-        filters["availability_status"] = availability
-    items = repo.get_all(skip=skip, limit=limit, **filters)
-    total = repo.count(**filters)
+    items, total = repo.get_windows(
+        section_id=section_id,
+        start_date=start_date,
+        end_date=end_date,
+        availability=availability,
+        skip=skip,
+        limit=limit,
+    )
     return {"items": items, "total": total, "skip": skip, "limit": limit}
 
 

@@ -24,7 +24,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/sih2026
       DEBUG: "true"
-      DATA_DIR: /app/../data
+      DATA_DIR: /data
     depends_on:
       db:
         condition: service_healthy

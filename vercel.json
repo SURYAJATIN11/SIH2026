@@ -1,4 +1,7 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd southern-railway-block-planner-frontend && npm install && npm run build",
+  "outputDirectory": "southern-railway-block-planner-frontend/dist",
   "rewrites": [
     {
       "source": "/api/(.*)",

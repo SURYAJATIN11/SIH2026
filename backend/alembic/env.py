@@ -23,6 +23,8 @@ target_metadata = Base.metadata
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
     url = settings.DATABASE_URL or config.get_main_option("sqlalchemy.url")
+    if url and url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -35,16 +37,17 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    database_url = os.getenv("DATABASE_URL") or settings.DATABASE_URL or config.get_main_option("sqlalchemy.url")
-
-    if not database_url:
-        raise RuntimeError("DATABASE_URL environment variable is not set")
-
-    connectable = engine_from_config(
-        {"sqlalchemy.url": database_url},
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    database_url = os.getenv("DATABASE_URL") or settings.DATABASE_URL
+    if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        connectable = engine_from_config(
+            {"sqlalchemy.url": database_url},
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
+    else:
+        from app.database.session import engine as connectable
 
     with connectable.connect() as connection:
         context.configure(

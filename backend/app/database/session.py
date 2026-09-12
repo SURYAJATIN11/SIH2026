@@ -21,6 +21,9 @@ def _resolve_sqlite_path() -> str:
     return f"sqlite:///{candidates[0]}"
 
 def _create_app_engine(url: str, debug: bool):
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+
     if url.startswith("sqlite"):
         # Ensure absolute path for SQLite
         if "./sih2026.db" in url or url.endswith("sih2026.db"):

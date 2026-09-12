@@ -1,12 +1,19 @@
-const isLocal = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-const DEFAULT_BASE = localStorage.getItem("sr_api_base") || (isLocal ? "http://127.0.0.1:8000" : "https://sih2026-hrnz.onrender.com");
+const isLocalhost = typeof window !== "undefined" && (
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1" ||
+  window.location.hostname === "0.0.0.0"
+);
+
+const DEFAULT_BASE = localStorage.getItem("sr_api_base") || 
+  (isLocalhost ? "http://127.0.0.1:8000" : "https://sih2026-hrnz.onrender.com");
 
 export const api = {
   get baseUrl() {
     return localStorage.getItem("sr_api_base") || DEFAULT_BASE;
   },
   setBaseUrl(url) {
-    const cleaned = url ? url.trim().replace(/\/$/, "") : (isLocal ? "http://127.0.0.1:8000" : "https://sih2026-hrnz.onrender.com");
+    const fallback = isLocalhost ? "http://127.0.0.1:8000" : "https://sih2026-hrnz.onrender.com";
+    const cleaned = url ? url.trim().replace(/\/$/, "") : fallback;
     localStorage.setItem("sr_api_base", cleaned);
   },
   async request(path, options = {}) {

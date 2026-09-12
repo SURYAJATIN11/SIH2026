@@ -37,9 +37,24 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    from app.database.session import engine
-    with engine.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+    database_url = os.getenv("DATABASE_URL") or settings.DATABASE_URL
+    if database_url:
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        connectable = engine_from_config(
+            {"sqlalchemy.url": database_url},
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
+    else:
+        from app.database.session import engine as connectable
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+        )
+
         with context.begin_transaction():
             context.run_migrations()
 

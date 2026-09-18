@@ -829,7 +829,7 @@ export function openProfessionalRepairReportModal(trainNo = "12622", stationCode
             </div>
           </div>
           <div style="text-align:center;width:75px">
-            <img src="/southern-railway-logo.png" style="width:48px;height:48px;object-fit:contain" alt="SR Crest" onerror="this.outerHTML='<div style=\'font-size:28px\'>🚆</div>'" />
+            <img src="/railblock-logo.svg" style="width:48px;height:48px;object-fit:contain" alt="SR Crest" onerror="this.src='/southern-railway-logo.png'" />
             <div style="font-size:9px;font-weight:900;color:#0f172a;margin-top:2px">SR ZONE 07</div>
           </div>
         </div>
@@ -1254,7 +1254,7 @@ export function renderTrainCostCuttingsWindow(selectedTrain, currentStation, all
   ];
 
   return `
-    <div class="train-cost-cuttings-window" style="display:flex;flex-direction:column;gap:16px;color:#f8fafc">
+    <div class="train-cost-cuttings-window" style="display:flex;flex-direction:column;gap:16px">
       
       <!-- Universal Train Search & Filter Control Strip (Works for ANY train across 330 fleet or arbitrary number) -->
       <div style="background:#07162b;border:1.5px solid #1a3c63;border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 4px 16px rgba(0,0,0,0.35)">
@@ -2169,7 +2169,7 @@ export function openAssetMaintenanceAgentModal(initialTrainNo = null, initialSta
     <div class="modal-card modal-card-extra-wide" style="max-width:980px;width:95vw;max-height:92vh;overflow-y:auto;background:#061427;border:1.5px solid #1a3c63">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #1a3c63">
         <div style="display:flex;align-items:center;gap:10px">
-          <img src="/southern-railway-logo.png" style="width:28px;height:28px;object-fit:contain" alt="SR Crest" onerror="this.outerHTML='<span style=\'font-size:24px\'>🚆</span>'" />
+          <img src="/railblock-logo.svg" style="width:28px;height:28px;object-fit:contain" alt="SR Crest" onerror="this.src='/southern-railway-logo.png'" />
           <div>
             <h3 style="margin:0;font-size:18px;color:#ffffff;font-family:'Barlow Condensed', sans-serif;letter-spacing:0.5px">SOUTHERN RAILWAY • AI ASSET MAINTENANCE &amp; COST OPTIMIZER</h3>
             <span style="font-size:10.5px;color:#93c5fd">Pan-Indian Railways Multi-Zonal Fleet Intelligence • 14-Parameter Decision Matrix</span>

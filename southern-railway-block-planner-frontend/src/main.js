@@ -8863,7 +8863,7 @@ function renderAssetMaintenancePage() {
               </div>
 
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <button class="primary" style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 14px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="window.openProfessionalRepairReportModal('${audit.trainNo}', '${currentStation}')">
+                <button class="primary" style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 14px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="window.openProfessionalRepairReportModal('${audit.trainNo}', '${audit.stationCode || 'MAS'}')">
                   <span>📑</span> Official RDSO Report
                 </button>
                 <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:12px;padding:8px 18px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="showToast('✓ Electronic Job Card &amp; BPC Issued for Train #${audit.trainNo} at ${audit.stationCode}. Inter-Railway debit registered.')">

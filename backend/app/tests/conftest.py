@@ -90,7 +90,7 @@ def sample_station(db_session):
         station_name="Test Station",
         division="Chennai",
         location="Chennai",
-        zone="Southern Railway",
+        zone="Indian Railways",
         status=EntityStatus.ACTIVE,
         source_type=SourceType.SYNTHETIC_SEED,
     )
@@ -106,7 +106,7 @@ def sample_station_2(db_session):
         station_name="Test Station 2",
         division="Madurai",
         location="Madurai",
-        zone="Southern Railway",
+        zone="Indian Railways",
         status=EntityStatus.ACTIVE,
         source_type=SourceType.SYNTHETIC_SEED,
     )

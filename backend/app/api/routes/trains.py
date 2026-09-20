@@ -18,7 +18,7 @@ def list_trains(
     train_type: Optional[str] = None,
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=500),
+    limit: int = Query(500, ge=1, le=5000),
     db: Session = Depends(get_db),
 ):
     """List all trains."""
@@ -60,7 +60,7 @@ def get_chennai_timetable(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
 ):
-    """Retrieve full Southern Railway timetable data (330 trains from Excel)."""
+    """Retrieve full Indian Railways timetable data (330 trains from Excel)."""
     json_paths = [
         os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "data", "timetable_rows.json"),
         os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "timetable_rows.json"),

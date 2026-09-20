@@ -8,7 +8,7 @@ router = APIRouter()
 
 LIVE_TRAINS: List[Dict[str, Any]] = []
 
-# Core Southern Railway Station Database for live route generation
+# Core Indian Railways Station Database for live route generation
 STATION_METADATA = {
     "MAS":  {"name": "MGR Chennai Central", "lat": 13.0827, "lng": 80.2707, "km": 0, "pf": "1"},
     "MS":   {"name": "Chennai Egmore", "lat": 13.0826, "lng": 80.2612, "km": 0, "pf": "4"},
@@ -150,7 +150,7 @@ def get_live_trains() -> Dict[str, Any]:
         build_live_train_telemetry("12601")
     ]
     return {
-        "network": "Southern Railway (Zone 07)",
+        "network": "Indian Railways (Zone 07)",
         "system": "RTIS (Real-Time Train Information System via ISRO GSAT)",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "total_active": len(active_items),

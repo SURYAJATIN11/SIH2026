@@ -59,7 +59,7 @@ class DataLoader:
                     station_name=r.get("station_name", code),
                     division=r.get("division", "Chennai"),
                     location=r.get("location", "Tamil Nadu"),
-                    zone=r.get("zone", "Southern Railway"),
+                    zone=r.get("zone", "Indian Railways"),
                     status=EntityStatus.ACTIVE,
                     source_type=SourceType.SYNTHETIC_SEED,
                 )

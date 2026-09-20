@@ -46,6 +46,13 @@ def main():
         loader = DataLoader(db)
         report = loader.load_all(data_dir)
         print("\n" + report.summary())
+        
+        # Also seed national network data
+        try:
+            from scripts.seed_national_network import seed_national_data
+            seed_national_data()
+        except Exception as se:
+            print(f"National seed notice: {se}")
     except Exception as e:
         print(f"ERROR: {e}")
         db.rollback()

@@ -1,4 +1,4 @@
-"""Authentication and official identity routes for Southern Railway staff."""
+"""Authentication and official identity routes for Indian Railways staff."""
 
 from typing import List, Optional
 from pydantic import BaseModel, Field
@@ -15,7 +15,7 @@ OFFICIAL_PROFILES = [
         "department": "OPERATING",
         "department_name": "Operating & Traffic Control",
         "division": "Chennai (MAS)",
-        "zone": "Southern Railway (SR)",
+        "zone": "Indian Railways (IR)",
         "role": "CHIEF_CONTROLLER",
         "clearance_level": "LEVEL_5_SANCTION",
         "avatar_emoji": "👨‍✈️",
@@ -30,7 +30,7 @@ OFFICIAL_PROFILES = [
         "department": "ENGINEERING",
         "department_name": "Civil Engineering & Track Maintenance",
         "division": "Chennai (MAS)",
-        "zone": "Southern Railway (SR)",
+        "zone": "Indian Railways (IR)",
         "role": "SECTION_ENGINEER",
         "clearance_level": "LEVEL_3_FIELD_MAINT",
         "avatar_emoji": "👷‍♂️",
@@ -45,7 +45,7 @@ OFFICIAL_PROFILES = [
         "department": "TRD",
         "department_name": "Traction Distribution (25kV OHE)",
         "division": "Palakkad (PGT)",
-        "zone": "Southern Railway (SR)",
+        "zone": "Indian Railways (IR)",
         "role": "TRACTION_OFFICER",
         "clearance_level": "LEVEL_4_POWER_SANCTION",
         "avatar_emoji": "⚡",
@@ -60,7 +60,7 @@ OFFICIAL_PROFILES = [
         "department": "S_AND_T",
         "department_name": "Signaling & Telecommunication",
         "division": "Madurai (MDU)",
-        "zone": "Southern Railway (SR)",
+        "zone": "Indian Railways (IR)",
         "role": "SIGNAL_OFFICER",
         "clearance_level": "LEVEL_4_INTERLOCK_SANCTION",
         "avatar_emoji": "📡",
@@ -75,7 +75,7 @@ OFFICIAL_PROFILES = [
         "department": "OPERATING",
         "department_name": "Zonal Traffic & Timetable Control",
         "division": "Zonal HQ (MAS GM Office)",
-        "zone": "Southern Railway (SR)",
+        "zone": "Indian Railways (IR)",
         "role": "ZONAL_CONTROLLER",
         "clearance_level": "LEVEL_5_SANCTION",
         "avatar_emoji": "🚂",
@@ -90,7 +90,7 @@ OFFICIAL_PROFILES = [
         "department": "SAFETY",
         "department_name": "Safety & Operational Audit Directorate",
         "division": "Zonal HQ (MAS GM Office)",
-        "zone": "Southern Railway (SR)",
+        "zone": "Indian Railways (IR)",
         "role": "SAFETY_AUDITOR",
         "clearance_level": "LEVEL_5_SAFETY_AUDIT",
         "avatar_emoji": "🔍",
@@ -129,13 +129,13 @@ class OfficialProfile(BaseModel):
 
 @router.get("/officials", response_model=List[dict])
 def get_official_profiles():
-    """List standard Southern Railway official profiles for quick demonstration and role switching."""
+    """List standard Indian Railways official profiles for quick demonstration and role switching."""
     return OFFICIAL_PROFILES
 
 
 @router.post("/login", response_model=OfficialProfile)
 def login_official(request: LoginRequest):
-    """Authenticate a Southern Railway official or staff member."""
+    """Authenticate a Indian Railways official or staff member."""
     # 1. Quick profile login by ID
     if request.official_id:
         profile = next((p for p in OFFICIAL_PROFILES if p["id"] == request.official_id or p["employee_id"] == request.official_id), None)
@@ -178,7 +178,7 @@ def login_official(request: LoginRequest):
         department=dept,
         department_name=dept_names.get(dept, f"{dept} Department"),
         division=div,
-        zone="Southern Railway (SR)",
+        zone="Indian Railways (IR)",
         role="RAILWAY_OFFICIAL",
         clearance_level="LEVEL_4_OPERATIONAL_SANCTION",
         avatar_emoji=avatar_map.get(dept, "🏛️"),
@@ -193,7 +193,7 @@ def get_current_user_profile():
     """Verify session token status."""
     return {
         "status": "authenticated",
-        "zone": "Southern Railway",
+        "zone": "Indian Railways",
         "system": "AI-Powered Automatic Block Planning System",
         "version": "1.0.0"
     }

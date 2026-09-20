@@ -1,10 +1,10 @@
 /**
- * SOUTHERN RAILWAY - AI DYNAMIC JUNCTION PRECEDENCE & PASSENGER DEMAND ENGINE
+ * INDIAN RAILWAYS - AI DYNAMIC JUNCTION PRECEDENCE & PASSENGER DEMAND ENGINE
  * 
  * Analyzes historical ticket bookings (PRS reserved & UTS unreserved) across stations,
  * route engagement metrics, and passenger interchange risks.
  * 
- * Calculatively plans precedence for low-priority trains at Southern Railway convergence junctions
+ * Calculatively plans precedence for low-priority trains at Indian Railways convergence junctions
  * using headway clearance criteria, dynamic priority scoring (DPS), and passenger-hours saved (PHS).
  */
 
@@ -12,10 +12,209 @@ import { MASTER_330_TRAINS } from "./all_330_trains.js";
 import { identifyOwningZone, IR_ZONES } from "./asset_maintenance_agent.js";
 
 // ============================================================================
-// 1. SOUTHERN RAILWAY 10 MAJOR CONVERGENCE JUNCTIONS
+// 1. INDIAN RAILWAYS 10 MAJOR CONVERGENCE JUNCTIONS
 // ============================================================================
 
 export const SR_MAJOR_JUNCTIONS = [
+  // Pan-India National Convergence Hubs
+  {
+    code: "NDLS",
+    name: "New Delhi Junction",
+    division: "DLI / NR",
+    category: "Non-Suburban Grade 1 (NSG-1)",
+    platforms: 16,
+    track_layout: "16-platform national terminal with quadruple automatic block signaling",
+    converges: "Ghaziabad (HWH trunk), Mathura (BPL/MMCT trunk), Rohtak (Punjab/JAT trunk)",
+    lines: ["SEC-NDLS-GZB", "SEC-NDLS-MTJ", "SEC-NDLS-ROK"],
+    daily_trains: 360,
+    avg_daily_pax: 520000,
+    rpk_density: "18.5M Pass-Km/Day",
+    dispatch_complexity: "CRITICAL"
+  },
+  {
+    code: "MMCT",
+    name: "Mumbai Central",
+    division: "MMCT / WR",
+    category: "NSG-1",
+    platforms: 9,
+    track_layout: "9-platform Western Railway terminus with Borivali quad tracks",
+    converges: "Western Railway corridor, Ahmedabad, Vadodara, Ratlam trunk",
+    lines: ["SEC-MMCT-BVI", "SEC-BVI-BRC", "SEC-BRC-RTM"],
+    daily_trains: 210,
+    avg_daily_pax: 380000,
+    rpk_density: "14.2M Pass-Km/Day",
+    dispatch_complexity: "CRITICAL"
+  },
+  {
+    code: "CSMT",
+    name: "CSMT Mumbai",
+    division: "BB / CR",
+    category: "NSG-1",
+    platforms: 18,
+    track_layout: "18-platform historic World Heritage terminus with Kalyan dual quad splits",
+    converges: "Central Railway corridor, Pune, Solapur, Nagpur, Howrah trunk",
+    lines: ["SEC-CSMT-KYN", "SEC-KYN-PUNE", "SEC-KYN-IGP"],
+    daily_trains: 280,
+    avg_daily_pax: 450000,
+    rpk_density: "16.8M Pass-Km/Day",
+    dispatch_complexity: "CRITICAL"
+  },
+  {
+    code: "HWH",
+    name: "Howrah Junction",
+    division: "HWH / ER",
+    category: "NSG-1",
+    platforms: 23,
+    track_layout: "23-platform terminal complex with route-relay interlocking",
+    converges: "Eastern & South Eastern trunk, Kharagpur, Barddhaman, Delhi, MAS trunk",
+    lines: ["SEC-HWH-BWN", "SEC-HWH-KGP", "SEC-HWH-BDC"],
+    daily_trains: 410,
+    avg_daily_pax: 650000,
+    rpk_density: "22.4M Pass-Km/Day",
+    dispatch_complexity: "CRITICAL"
+  },
+  {
+    code: "CNB",
+    name: "Kanpur Central",
+    division: "PRYJ / NCR",
+    category: "NSG-1",
+    platforms: 10,
+    track_layout: "10-platform high-density junction with bypass freight chords",
+    converges: "Delhi-Howrah trunk, Lucknow/Gorakhpur NER, Jhansi/Bhopal WCR",
+    lines: ["SEC-CNB-PRYJ", "SEC-CNB-TDL", "SEC-CNB-LKO", "SEC-CNB-JHS"],
+    daily_trains: 320,
+    avg_daily_pax: 240000,
+    rpk_density: "11.2M Pass-Km/Day",
+    dispatch_complexity: "CRITICAL"
+  },
+  {
+    code: "PRYJ",
+    name: "Prayagraj Junction",
+    division: "PRYJ / NCR",
+    category: "NSG-1",
+    platforms: 10,
+    track_layout: "10-platform junction with electrified Sangam yard bypasses",
+    converges: "Delhi-Howrah mainline, Varanasi, Manikpur/Jabalpur, Ayodhya chord",
+    lines: ["SEC-CNB-PRYJ", "SEC-PRYJ-DDU", "SEC-PRYJ-BSB", "SEC-PRYJ-MKP"],
+    daily_trains: 250,
+    avg_daily_pax: 180000,
+    rpk_density: "9.5M Pass-Km/Day",
+    dispatch_complexity: "VERY HIGH"
+  },
+  {
+    code: "DDU",
+    name: "Pt. Deen Dayal Upadhyaya Jn",
+    division: "DDU / ECR",
+    category: "NSG-1",
+    platforms: 8,
+    track_layout: "Asia's largest railway marshalling yard with electronic interlocking",
+    converges: "Grand Chord (Dhanbad), Main Line (Patna), Varanasi/Lucknow, Gaya",
+    lines: ["SEC-DDU-GAYA", "SEC-DDU-PNBE", "SEC-DDU-BSB", "SEC-PRYJ-DDU"],
+    daily_trains: 310,
+    avg_daily_pax: 190000,
+    rpk_density: "12.8M Pass-Km/Day",
+    dispatch_complexity: "CRITICAL"
+  },
+  {
+    code: "BPL",
+    name: "Bhopal Junction",
+    division: "BPL / WCR",
+    category: "NSG-1",
+    platforms: 6,
+    track_layout: "6-platform junction with Habibganj / RKMP quad chords",
+    converges: "Delhi-Chennai Grand Trunk, Ujjain/Indore chord, Itarsi/Nagpur",
+    lines: ["SEC-BPL-BINA", "SEC-BPL-ET", "SEC-BPL-UJN"],
+    daily_trains: 190,
+    avg_daily_pax: 135000,
+    rpk_density: "7.8M Pass-Km/Day",
+    dispatch_complexity: "HIGH"
+  },
+  {
+    code: "NGP",
+    name: "Nagpur Junction",
+    division: "NGP / CR",
+    category: "NSG-1",
+    platforms: 8,
+    track_layout: "8-platform central diamond crossing of India with Ajni yard",
+    converges: "North-South Grand Trunk (Delhi-MAS) & East-West Trunk (Mumbai-HWH)",
+    lines: ["SEC-NGP-ET", "SEC-NGP-BPQ", "SEC-NGP-BD", "SEC-NGP-G"],
+    daily_trains: 260,
+    avg_daily_pax: 210000,
+    rpk_density: "11.6M Pass-Km/Day",
+    dispatch_complexity: "CRITICAL"
+  },
+  {
+    code: "BZA",
+    name: "Vijayawada Junction",
+    division: "BZA / SCR",
+    category: "NSG-1",
+    platforms: 10,
+    track_layout: "10-platform high-volume junction with Krishna canal bypass",
+    converges: "Chennai-Kolkata East Coast trunk, Hyderabad/Secunderabad, Visakhapatnam",
+    lines: ["SEC-BZA-MAS", "SEC-BZA-KZJ", "SEC-BZA-VSKP", "SEC-BZA-GNT"],
+    daily_trains: 290,
+    avg_daily_pax: 260000,
+    rpk_density: "13.4M Pass-Km/Day",
+    dispatch_complexity: "CRITICAL"
+  },
+  {
+    code: "SC",
+    name: "Secunderabad Junction",
+    division: "SC / SCR",
+    category: "NSG-1",
+    platforms: 10,
+    track_layout: "10-platform dual terminal complex with Kazipet quad transitions",
+    converges: "Kazipet/BZA, Wadi/Mumbai, Nizamabad, Guntakal/SBC",
+    lines: ["SEC-SC-KZJ", "SEC-SC-WADI", "SEC-SC-NZB"],
+    daily_trains: 220,
+    avg_daily_pax: 200000,
+    rpk_density: "10.1M Pass-Km/Day",
+    dispatch_complexity: "HIGH"
+  },
+  {
+    code: "SBC",
+    name: "KSR Bengaluru City",
+    division: "SBC / SWR",
+    category: "NSG-1",
+    platforms: 10,
+    track_layout: "10-platform terminus with Baiyyappanahalli / Yesvantpur bypass",
+    converges: "Jolarpettai/MAS, Mysuru, Hubballi/Dharwad, Dharmavaram/SC",
+    lines: ["SEC-SBC-JTJ", "SEC-SBC-MYS", "SEC-SBC-TK"],
+    daily_trains: 210,
+    avg_daily_pax: 240000,
+    rpk_density: "11.8M Pass-Km/Day",
+    dispatch_complexity: "HIGH"
+  },
+  {
+    code: "ADI",
+    name: "Ahmedabad Junction",
+    division: "ADI / WR",
+    category: "NSG-1",
+    platforms: 12,
+    track_layout: "12-platform Western gateway with Sabarmati chord integration",
+    converges: "Mumbai-Delhi Western trunk, Bhavnagar/Rajkot, Udaipur, Gandhinagar",
+    lines: ["SEC-ADI-BRC", "SEC-ADI-PNU", "SEC-ADI-VG"],
+    daily_trains: 230,
+    avg_daily_pax: 220000,
+    rpk_density: "10.9M Pass-Km/Day",
+    dispatch_complexity: "HIGH"
+  },
+  {
+    code: "GHY",
+    name: "Guwahati Junction",
+    division: "LMG / NFR",
+    category: "NSG-1",
+    platforms: 7,
+    track_layout: "7-platform gateway junction for the entire Northeast Frontier",
+    converges: "Northeast Frontier gateway, New Jalpaiguri/Kolkata, Lumding/Dibrugarh",
+    lines: ["SEC-GHY-NBQ", "SEC-GHY-LMG"],
+    daily_trains: 110,
+    avg_daily_pax: 95000,
+    rpk_density: "5.4M Pass-Km/Day",
+    dispatch_complexity: "HIGH"
+  },
+
+  // Southern Railway Junctions
   {
     code: "JTJ",
     name: "Jolarpettai Junction",
@@ -272,7 +471,7 @@ export function generateStationBookingHistory(train, junctionCode) {
     type: trainType,
     static_priority_tier: staticPriorityTier,
     static_score: staticScore,
-    owning_zone: (identifyOwningZone(train).code || "SR") + " (" + (identifyOwningZone(train).name || "Southern Railway") + ")",
+    owning_zone: (identifyOwningZone(train).code || "SR") + " (" + (identifyOwningZone(train).name || "Indian Railways") + ")",
     rake_capacity: rakeCapacity,
     coach_count: coachCount,
     occupancy_pct: occupancyPct,
@@ -508,7 +707,7 @@ export function calculateJunctionPrecedencePlan(junctionCode) {
 }
 
 /**
- * Realistic Convergence pairs for each Southern Railway Junction
+ * Realistic Convergence pairs for each Indian Railways Junction
  */
 function getJunctionConflictPairs(junctionCode) {
   const t = (no) => MASTER_330_TRAINS.find(x => x.train_no === no) || {
@@ -1095,7 +1294,7 @@ export function openDispatchOrderModal(junctionCode = "JTJ") {
     <div class="modal-card modal-card-wide" style="max-width:940px;width:95vw;max-height:90vh;overflow-y:auto;background:#0c1a2e;border:1.5px solid #0284c7;border-radius:10px;color:#f8fafc;padding:0">
       <div style="background:#0284c7;color:#ffffff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center">
         <div>
-          <h3 style="margin:0;font-size:16px;font-weight:800">SOUTHERN RAILWAY • OPERATING CONTROL (DOM / COA)</h3>
+          <h3 style="margin:0;font-size:16px;font-weight:800">INDIAN RAILWAYS • OPERATING CONTROL (DOM / COA)</h3>
           <span style="font-size:11px;color:#e0f2fe">MANDATORY SECTION CONTROLLER DISPATCH PRECEDENCE ORDER • FORM COA-DISPATCH-901</span>
         </div>
         <div style="display:flex;gap:8px">
@@ -1150,7 +1349,7 @@ export function openDispatchOrderModal(junctionCode = "JTJ") {
         </table>
 
         <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#94a3b8">
-          <div>Authorized By: <b style="color:#ffffff">Chief Controller (DOM / Safety), Southern Railway</b></div>
+          <div>Authorized By: <b style="color:#ffffff">Chief Controller (DOM / Safety), Indian Railways</b></div>
           <div style="color:#10b981;font-weight:800">● Section Signals Validated &amp; Route Relay Interlocking Synchronized</div>
         </div>
       </div>
@@ -1167,7 +1366,7 @@ if (typeof window !== "undefined") {
 }
 
 export function renderDynamicDispatchPage() {
-  // Aggregate macro metrics across all 10 Southern Railway Junctions
+  // Aggregate macro metrics across all 10 Indian Railways Junctions
   let grandTotalPax = 0;
   let grandTotalPrs = 0;
   let grandTotalUts = 0;
@@ -1225,7 +1424,7 @@ export function renderDynamicDispatchPage() {
               PRS &amp; UTS TICKET ANALYTICS ACTIVE
             </span>
             <span style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;font-size:11px;font-weight:800;padding:3px 8px;border-radius:4px">
-              10 SOUTHERN RAILWAY JUNCTIONS
+              10 INDIAN RAILWAYS JUNCTIONS
             </span>
           </div>
           <div class="screen-breadcrumb" style="font-size:11.5px;color:#94a3b8;margin-top:5px">

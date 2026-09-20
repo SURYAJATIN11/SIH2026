@@ -1,4 +1,4 @@
-# Southern Railway AI Block Planner — Frontend
+# Indian Railways AI Block Planner — Frontend
 
 A frontend prototype for **AI-Powered Automatic Block Planning to Maximize Asset Availability for Train Operations**.
 

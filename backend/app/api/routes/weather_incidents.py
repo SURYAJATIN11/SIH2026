@@ -1,4 +1,4 @@
-"""Weather and Incident simulation endpoints for Southern Railway divisions."""
+"""Weather and Incident simulation endpoints for Indian Railways divisions."""
 
 from datetime import datetime, timezone
 from typing import List, Dict, Any
@@ -24,9 +24,9 @@ DIVISIONS = [
 
 @router.get("/weather")
 def get_weather() -> Dict[str, Any]:
-    """Get real-time / simulated weather conditions for Southern Railway network."""
+    """Get real-time / simulated weather conditions for Indian Railways network."""
     return {
-        "network": "Southern Railway",
+        "network": "Indian Railways",
         "last_updated": datetime.now(timezone.utc).isoformat(),
         "total_divisions": len(DIVISIONS),
         "items": DIVISIONS,
@@ -76,7 +76,7 @@ def ingest_train_delays(data: List[Dict[str, Any]]) -> Dict[str, Any]:
 def get_weather_train_delays() -> Dict[str, Any]:
     """Get active trains with real-time delays, weather impact, and predicted further delays."""
     return {
-        "network": "Southern Railway (Zone 07)",
+        "network": "Indian Railways (Zone 07)",
         "system": "Weather-Aware Dynamic Delay Propagation & AI Dispatch Advisory",
         "last_updated": datetime.now(timezone.utc).isoformat(),
         "total": len(TRAIN_DELAY_FORECASTS),

@@ -178,7 +178,7 @@ class AutonomousAIController:
         depts = departments or ["CIVIL", "TRD", "S_AND_T"]
         block_code = f"BLK-CRIS-DEF-{uuid.uuid4().hex[:4].upper()}"
         
-        # Coordinates for section centers in Southern Railway
+        # Coordinates for section centers in Indian Railways
         section_coords = {
             "SEC-MAS-CBE-01": {"lat": 12.7667, "lng": 78.8582, "name": "Katpadi Jn – Jolarpettai Jn (UP Main)", "div": "MAS/SA"},
             "SEC-PGT-TVC-01": {"lat": 10.2546, "lng": 76.2571, "name": "Shoranur Jn – Thrissur – Ernakulam", "div": "PGT/TVC"},
@@ -264,7 +264,7 @@ class AutonomousAIController:
             return {
                 "reply": (
                     "### 🏗️ CRIS Railway Infrastructure Asset Cost Cuttings & Optimization\n\n"
-                    "Chief Controller, I evaluated the concurrent co-scheduling economics for non-rolling stock infrastructure assets across Southern Railway:\n\n"
+                    "Chief Controller, I evaluated the concurrent co-scheduling economics for non-rolling stock infrastructure assets across Indian Railways:\n\n"
                     "• **Track / P-Way (Rail Welding & Turnout Reconditioning):** ₹1,38,000 to ₹2,51,500 net savings per site via scheduled shadow blocks.\n"
                     "• **Traction & OHE (25kV Catenary & TSS Overhauls):** ₹2,07,000 to ₹3,08,000 net savings per substation intervention.\n"
                     "• **Signaling & Telecom (MSDAC & Point Machines):** ₹1,22,000 to ₹1,63,500 net savings by eliminating cascading yard detentions.\n"
@@ -275,7 +275,7 @@ class AutonomousAIController:
                 "intent": "INFRASTRUCTURE_COST_CUTTINGS",
                 "action_card": {
                     "title": "Open Infrastructure & Other Asset Repairs Window",
-                    "description": "15 Southern Railway assets across P-Way, TRD, S&T, and Bridges with itemized BOM and avoided possession savings.",
+                    "description": "15 Indian Railways assets across P-Way, TRD, S&T, and Bridges with itemized BOM and avoided possession savings.",
                     "action_type": "OPEN_COST_CUTTINGS",
                     "target_screen": "Cost Asset Maintenance",
                     "payload": { "target_screen": "Cost Asset Maintenance", "tab": "INFRASTRUCTURE_ASSETS" },
@@ -382,7 +382,7 @@ class AutonomousAIController:
             return {
                 "reply": (
                     f"Chief Controller, I have executed the CRIS multi-department combinatorial solver across all "
-                    f"Southern Railway corridors. 23 conflict-free blocks have been sanctioned across Civil, TRD, "
+                    f"Indian Railways corridors. 23 conflict-free blocks have been sanctioned across Civil, TRD, "
                     f"and S&T, saving 14.5 hours of manual phone coordination with 0.0 train delay."
                 ),
                 "intent": "OPTIMIZE_BLOCKS",
@@ -463,7 +463,7 @@ class AutonomousAIController:
         elif any(w in msg for w in ["map", "gis", "track", "corridor", "view map", "show map"]):
             return {
                 "reply": (
-                    f"Navigating to the Southern Railway GIS Network Operations Console. Displaying active track "
+                    f"Navigating to the Indian Railways GIS Network Operations Console. Displaying active track "
                     f"circuits, 25kV OHE electrified corridors, and live RTIS train positions."
                 ),
                 "intent": "NAVIGATE",

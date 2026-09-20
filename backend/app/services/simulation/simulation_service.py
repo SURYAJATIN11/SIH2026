@@ -37,7 +37,7 @@ class SimulationService:
         self.emergency_service = EmergencyService(db)
 
     def _get_or_create_demo_corridors(self) -> List[TrackSection]:
-        """Ensure 3 primary Southern Railway destination corridors exist in DB."""
+        """Ensure 3 primary Indian Railways destination corridors exist in DB."""
         destinations = [
             {
                 "corridor_code": "CORR-MAS-CBE",
@@ -84,7 +84,7 @@ class SimulationService:
                     station_name=d["from_name"],
                     division="MAS",
                     location="Tamil Nadu",
-                    zone="Southern Railway",
+                    zone="Indian Railways",
                     status=EntityStatus.ACTIVE,
                     source_type=SourceType.SYNTHETIC_SEED,
                 )
@@ -98,7 +98,7 @@ class SimulationService:
                     station_name=d["to_name"],
                     division="MAS",
                     location="Tamil Nadu",
-                    zone="Southern Railway",
+                    zone="Indian Railways",
                     status=EntityStatus.ACTIVE,
                     source_type=SourceType.SYNTHETIC_SEED,
                 )
@@ -110,7 +110,7 @@ class SimulationService:
                 cor = Corridor(
                     corridor_code=d["corridor_code"],
                     corridor_name=d["corridor_name"],
-                    division="Southern Railway",
+                    division="Indian Railways",
                     status=EntityStatus.ACTIVE,
                     source_type=SourceType.SYNTHETIC_SEED,
                 )

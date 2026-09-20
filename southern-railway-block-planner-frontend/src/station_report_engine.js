@@ -1,5 +1,5 @@
 // ==========================================================================
-// SOUTHERN RAILWAY (ZONE 07) — PROFESSIONAL TECHNICAL AUDIT & ANALYSIS DOSSIER
+// INDIAN RAILWAYS (ZONE 07) — PROFESSIONAL TECHNICAL AUDIT & ANALYSIS DOSSIER
 // Institutional Specification: Government of India • Ministry of Railways
 // Design: Formal Monochrome & Archival Deep-Ink Corporate Presentation
 // ==========================================================================
@@ -9,7 +9,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Chengalpattu Junction",
     code: "CGL",
     division: "Chennai Division (MAS)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 3 (NSG-3) Major Junction",
     platforms: 8,
     tracks: "Broad Gauge Electrified Double Line with Arakkonam & Villupuram Chords",
@@ -31,7 +31,7 @@ export const KNOWN_STATION_DATABASE = {
         aiRemedy: "Green Wave automatic through-lock granted on Down Fast line. Suburban stock held on Platform 8 loop."
       },
       {
-        title: "20:15 – 22:50 IST Southern Trunk Night Wave",
+        title: "20:15 – 22:50 IST Mainline Trunk Night Wave",
         detail: "Heavy outbound departure wave to Madurai, Kanyakumari, Tirunelveli, and Rameswaram (12635, 12633, 16851, 12631, 12637).",
         aiRemedy: "Absolute Down Main precedence. Automatic route reset enforces 3-minute electronic spacing between successive departures."
       }
@@ -59,7 +59,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Alappuzha",
     code: "ALLP",
     division: "Thiruvananthapuram Division (TVC)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 4 (NSG-4) Coastal Terminal",
     platforms: 3,
     tracks: "Broad Gauge Electrified Double Line Coastal Trunk Route",
@@ -103,7 +103,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Thiruvananthapuram Central",
     code: "TVC",
     division: "Thiruvananthapuram Division (TVC)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 1 (NSG-1) State Capital Terminal",
     platforms: 5,
     tracks: "Broad Gauge Electrified Terminal Network with Kochuveli Satellite Facility",
@@ -112,7 +112,7 @@ export const KNOWN_STATION_DATABASE = {
     electrification: "25 kV AC 50Hz OHE (Kochuveli Feeder)",
     trafficDensity: "92 Scheduled Movements / 24 Hours",
     dailyPassengers: "120,000 Passengers / Day",
-    routeClass: "Broad Gauge Southern Trunk Terminal",
+    routeClass: "Broad Gauge Mainline Trunk Terminal",
     bottlenecks: [
       {
         title: "Morning Superfast & Vande Bharat Dispatch Cluster (05:00 - 06:15 IST)",
@@ -138,7 +138,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Chennai Egmore",
     code: "MS",
     division: "Chennai Division (MAS)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 1 (NSG-1) Heritage Terminal",
     platforms: 11,
     tracks: "Broad Gauge Quadruple Electrified Corridor (Suburban & Mainline)",
@@ -150,7 +150,7 @@ export const KNOWN_STATION_DATABASE = {
     routeClass: "Broad Gauge South Tamil Nadu Trunk Origin",
     bottlenecks: [
       {
-        title: "20:00 – 22:30 IST Southern Trunk Night Mail Dispatches",
+        title: "20:00 – 22:30 IST Mainline Trunk Night Mail Dispatches",
         detail: "Pandian, Nellai, Pearl City, Pothigai, Rockfort, and Mannai depart within 150 minutes.",
         aiRemedy: "Automated route sequencing staggers mainline dispatches with 8-minute headway spacing."
       }
@@ -171,7 +171,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Ernakulam Junction",
     code: "ERS",
     division: "Thiruvananthapuram Division (TVC)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 2 (NSG-2) Coastal Hub",
     platforms: 6,
     tracks: "Broad Gauge (1676 mm) Double Line Electrified with Harbour Terminus & Marshalling Yard",
@@ -224,7 +224,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Coimbatore Junction",
     code: "CBE",
     division: "Salem Division (SA)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 2 (NSG-2) Major Junction",
     platforms: 6,
     tracks: "Broad Gauge (1676 mm) Double Line Electrified with Podanur & Irugur Chords",
@@ -272,7 +272,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "MGR Chennai Central",
     code: "MAS",
     division: "Chennai Division (MAS)",
-    zone: "Southern Railway (Zone 07 Headquarters)",
+    zone: "Indian Railways (Zone 07 Headquarters)",
     category: "Non-Suburban Grade 1 (NSG-1) World-Class Terminal",
     platforms: 17,
     tracks: "Broad Gauge Quadruple Track Corridor with Basin Bridge Chord Interlocking",
@@ -327,7 +327,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Erode Junction",
     code: "ED",
     division: "Salem Division (SA)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 2 (NSG-2)",
     platforms: 5,
     tracks: "Electrified Broad Gauge Trunk Double Line with Cauvery River Chords",
@@ -363,7 +363,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Madurai Junction",
     code: "MDU",
     division: "Madurai Division (MDU)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 2 (NSG-2)",
     platforms: 8,
     tracks: "Broad Gauge Double Line with Rameswaram & Bodinayakkanur Branches",
@@ -397,7 +397,7 @@ export const KNOWN_STATION_DATABASE = {
     name: "Palakkad Junction",
     code: "PGT",
     division: "Palakkad Division (PGT)",
-    zone: "Southern Railway (Zone 07)",
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 3 (NSG-3)",
     platforms: 5,
     tracks: "Broad Gauge Double Line (Walayar Ghat Mountain Section)",
@@ -438,8 +438,8 @@ export function generateProfessionalExecutiveAuditReport() {
       
       <!-- Archival Header Rule -->
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111827;padding-bottom:4px;margin-bottom:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.8px">
-        <span>SOUTHERN RAILWAY • HEADQUARTERS OPERATIONS &amp; ENGINEERING</span>
-        <span>AUDIT DOCKET: SR/HQ/OP-ENG/2026/DOC-0842</span>
+        <span>INDIAN RAILWAYS • HEADQUARTERS OPERATIONS &amp; ENGINEERING</span>
+        <span>AUDIT DOCKET: IR/HQ/OP-ENG/2026/DOC-0842</span>
         <span>STRICTLY CONFIDENTIAL</span>
       </div>
 
@@ -463,7 +463,7 @@ export function generateProfessionalExecutiveAuditReport() {
         <div>
           <div style="font-size:13px;font-weight:800;letter-spacing:1px;color:#111827">भारत सरकार / GOVERNMENT OF INDIA</div>
           <div style="font-size:11.5px;font-weight:700;letter-spacing:0.8px;color:#374151">रेल मंत्रालय / MINISTRY OF RAILWAYS</div>
-          <div style="font-size:19px;font-weight:900;letter-spacing:0.6px;color:#0f172a;margin:3px 0">दक्षिण रेलवे / SOUTHERN RAILWAY</div>
+          <div style="font-size:19px;font-weight:900;letter-spacing:0.6px;color:#0f172a;margin:3px 0">भारतीय रेल / INDIAN RAILWAYS</div>
           <div style="font-size:12px;font-weight:700;color:#1e293b">प्रधान मुख्य परिचालन प्रबंधक एवं मुख्य इंजीनियर कार्यालय</div>
           <div style="font-size:11px;font-weight:600;color:#475569">Office of the Principal Chief Operations Manager &amp; Principal Chief Engineer</div>
           <div style="font-size:9.5px;color:#6b7280;margin-top:2px">Zonal Headquarters Office, NGO Annexe, Park Town, Chennai – 600003</div>
@@ -494,7 +494,7 @@ export function generateProfessionalExecutiveAuditReport() {
           </tr>
           <tr style="border-bottom:1px solid #d1d5db">
             <td style="padding:5px 8px;font-weight:700">AUDIT DOCKET NUMBER:</td>
-            <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-weight:700">SR/HQ/OP-ENG/2026/DOC-0842</td>
+            <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-weight:700">IR/HQ/OP-ENG/2026/DOC-0842</td>
             <td style="padding:5px 8px;font-weight:700">AUDIT PERIOD:</td>
             <td style="padding:5px 8px;font-weight:600">01 Aug 2026 – 31 Aug 2026</td>
           </tr>
@@ -513,7 +513,7 @@ export function generateProfessionalExecutiveAuditReport() {
           1.0 Executive Performance Telemetry &amp; Macro Indicators
         </div>
         <div style="font-size:11px;margin:8px 0;line-height:1.45">
-          During the evaluation period of August 2026, Southern Railway deployed coordinated multi-departmental integrated blocks resulting in substantial line occupancy efficiency and punctuality optimization:
+          During the evaluation period of August 2026, Indian Railways deployed coordinated multi-departmental integrated blocks resulting in substantial line occupancy efficiency and punctuality optimization:
         </div>
 
         <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:-apple-system,sans-serif;border:1px solid #111827;text-align:center">
@@ -796,7 +796,7 @@ export function generateProfessionalExecutiveAuditReport() {
             <path id="formalStampTop" d="M 20,65 A 45,45 0 0,1 110,65" fill="none"/>
             <path id="formalStampBottom" d="M 110,65 A 45,45 0 0,1 20,65" fill="none"/>
             <text font-size="8" font-weight="900" fill="#1e3a8a" letter-spacing="1">
-              <textPath href="#formalStampTop" startOffset="50%" text-anchor="middle">SOUTHERN RAILWAY • ZONE 07</textPath>
+              <textPath href="#formalStampTop" startOffset="50%" text-anchor="middle">INDIAN RAILWAYS • ZONE 07</textPath>
             </text>
             <text font-size="7.5" font-weight="900" fill="#1e3a8a" letter-spacing="0.8">
               <textPath href="#formalStampBottom" startOffset="50%" text-anchor="middle">HEADQUARTERS CHENNAI</textPath>
@@ -812,7 +812,7 @@ export function generateProfessionalExecutiveAuditReport() {
         <div style="font-size:9px;color:#4b5563;line-height:1.45">
           <b>CRIS Electronic Validation Key:</b><br/>
           <span style="font-family:'JetBrains Mono',monospace;color:#1e3a8a;font-weight:700">SHA256:4b91e70c8a21f855d09b63a948e</span><br/>
-          <b>Document Reference:</b> SR-Z07-TMS-AUDIT-2026-AUG<br/>
+          <b>Document Reference:</b> IR-TMS-AUDIT-2026-AUG<br/>
           <b>Data Authenticity:</b> Center for Railway Information Systems (CRIS)<br/>
           <span style="color:#15803d;font-weight:800">● DIGITAL SIGNATURE ATTESTED &amp; VERIFIED</span>
         </div>
@@ -822,12 +822,12 @@ export function generateProfessionalExecutiveAuditReport() {
           <div style="margin-bottom:10px">
             <div style="font-family:'Brush Script MT',cursive;font-size:18px;color:#1e293b;line-height:1">A. K. Sundaram</div>
             <div style="font-size:10px;font-weight:900;color:#111827">Chief Operating Manager (COM)</div>
-            <div style="font-size:8.5px;color:#4b5563">Southern Railway, Chennai HQ</div>
+            <div style="font-size:8.5px;color:#4b5563">Indian Railways, Chennai HQ</div>
           </div>
           <div>
             <div style="font-family:'Brush Script MT',cursive;font-size:18px;color:#1e293b;line-height:1">Dr. R. Ramanathan, IRSE</div>
             <div style="font-size:10px;font-weight:900;color:#111827">Principal Chief Engineer (PCE)</div>
-            <div style="font-size:8.5px;color:#4b5563">Southern Railway, Chennai HQ</div>
+            <div style="font-size:8.5px;color:#4b5563">Indian Railways, Chennai HQ</div>
           </div>
         </div>
 
@@ -835,7 +835,7 @@ export function generateProfessionalExecutiveAuditReport() {
 
       <!-- Institutional Running Footer -->
       <div style="margin-top:14px;border-top:1px solid #d1d5db;padding-top:4px;display:flex;justify-content:space-between;font-family:-apple-system,sans-serif;font-size:8.5px;color:#6b7280">
-        <span>SOUTHERN RAILWAY INTEGRATED BLOCK PLANNING PORTAL (SR-IBPP v2.4)</span>
+        <span>INDIAN RAILWAYS INTEGRATED BLOCK PLANNING PORTAL (IR-IBPP v2.4)</span>
         <span>FORMAL AUDIT DOCUMENTATION • RDSO COMPLIANT</span>
         <span>Page 1 of 1</span>
       </div>
@@ -848,8 +848,8 @@ export function buildAiStationReportData(stnCode, stnName, div, scope, dateRange
   const base = KNOWN_STATION_DATABASE[stnCode] || {
     name: stnName,
     code: stnCode,
-    division: `${div} Division (SR)`,
-    zone: "Southern Railway (Zone 07)",
+    division: `${div} Division (IR)`,
+    zone: "Indian Railways (Zone 07)",
     category: "Non-Suburban Grade 2 (NSG-2)",
     platforms: 6,
     tracks: "Broad Gauge (1676 mm) Double Line Electrified with Interlocking Chords",
@@ -904,7 +904,7 @@ export function buildAiStationReportData(stnCode, stnName, div, scope, dateRange
     : ((stnCode === "CBE" || stnCode === "ED" || stnCode === "SA") ? "Salem Division (SA)" : (stnCode === "ERS" ? "Thiruvananthapuram Division (TVC)" : `${div} Division`));
 
   return {
-    reportId: `SR/OP-ENG/2026/DOC-0948/Z07-${stnCode}`,
+    reportId: `IR/OP-ENG/2026/DOC-0948/${stnCode}`,
     fileRef: `HQ/G-24/TRK-BLK/2026-27/${stnCode}`,
     generatedDate: "06 Sept 2026, 16:30 IST",
     stnCode: stnCode,
@@ -937,7 +937,7 @@ export function generateReportHtml(rep) {
       
       <!-- Archival Header Rule -->
       <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #111827;padding-bottom:4px;margin-bottom:16px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.8px">
-        <span>SOUTHERN RAILWAY • ZONE 07 • TECHNICAL DOSSIER</span>
+        <span>INDIAN RAILWAYS • ZONE 07 • TECHNICAL DOSSIER</span>
         <span>DOCKET: ${rep.reportId}</span>
         <span>OFFICIAL RECORD</span>
       </div>
@@ -962,7 +962,7 @@ export function generateReportHtml(rep) {
         <div>
           <div style="font-size:13px;font-weight:800;letter-spacing:1px;color:#111827">भारत सरकार / GOVERNMENT OF INDIA</div>
           <div style="font-size:11.5px;font-weight:700;letter-spacing:0.8px;color:#374151">रेल मंत्रालय / MINISTRY OF RAILWAYS</div>
-          <div style="font-size:19px;font-weight:900;letter-spacing:0.6px;color:#0f172a;margin:3px 0">दक्षिण रेलवे / SOUTHERN RAILWAY</div>
+          <div style="font-size:19px;font-weight:900;letter-spacing:0.6px;color:#0f172a;margin:3px 0">भारतीय रेल / INDIAN RAILWAYS</div>
           <div style="font-size:12px;font-weight:700;color:#1e293b">प्रधान मुख्य परिचालन प्रबंधक एवं मुख्य इंजीनियर कार्यालय</div>
           <div style="font-size:11px;font-weight:600;color:#475569">Office of the Principal Chief Operations Manager &amp; Principal Chief Engineer</div>
           <div style="font-size:9.5px;color:#6b7280;margin-top:2px">Zonal Headquarters Office, NGO Annexe, Park Town, Chennai – 600003</div>
@@ -1151,7 +1151,7 @@ export function generateReportHtml(rep) {
             <path id="stnStampTop" d="M 20,65 A 45,45 0 0,1 110,65" fill="none"/>
             <path id="stnStampBottom" d="M 110,65 A 45,45 0 0,1 20,65" fill="none"/>
             <text font-size="8" font-weight="900" fill="#1e3a8a" letter-spacing="1">
-              <textPath href="#stnStampTop" startOffset="50%" text-anchor="middle">SOUTHERN RAILWAY • ZONE 07</textPath>
+              <textPath href="#stnStampTop" startOffset="50%" text-anchor="middle">INDIAN RAILWAYS • ZONE 07</textPath>
             </text>
             <text font-size="7.5" font-weight="900" fill="#1e3a8a" letter-spacing="0.8">
               <textPath href="#stnStampBottom" startOffset="50%" text-anchor="middle">HEADQUARTERS CHENNAI</textPath>
@@ -1177,12 +1177,12 @@ export function generateReportHtml(rep) {
           <div style="margin-bottom:10px">
             <div style="font-family:'Brush Script MT',cursive;font-size:18px;color:#1e293b;line-height:1">A. K. Sundaram</div>
             <div style="font-size:10px;font-weight:900;color:#111827">Chief Operating Manager (COM)</div>
-            <div style="font-size:8.5px;color:#4b5563">Southern Railway, Chennai HQ</div>
+            <div style="font-size:8.5px;color:#4b5563">Indian Railways, Chennai HQ</div>
           </div>
           <div>
             <div style="font-family:'Brush Script MT',cursive;font-size:18px;color:#1e293b;line-height:1">Dr. R. Ramanathan, IRSE</div>
             <div style="font-size:10px;font-weight:900;color:#111827">Principal Chief Engineer (PCE)</div>
-            <div style="font-size:8.5px;color:#4b5563">Southern Railway, Chennai HQ</div>
+            <div style="font-size:8.5px;color:#4b5563">Indian Railways, Chennai HQ</div>
           </div>
         </div>
 
@@ -1190,7 +1190,7 @@ export function generateReportHtml(rep) {
 
       <!-- Institutional Running Footer -->
       <div style="margin-top:14px;border-top:1px solid #d1d5db;padding-top:4px;display:flex;justify-content:space-between;font-family:-apple-system,sans-serif;font-size:8.5px;color:#6b7280">
-        <span>SOUTHERN RAILWAY INTEGRATED BLOCK PLANNING PORTAL (SR-IBPP v2.4)</span>
+        <span>INDIAN RAILWAYS INTEGRATED BLOCK PLANNING PORTAL (IR-IBPP v2.4)</span>
         <span>STRICTLY FOR OFFICIAL USE ONLY</span>
         <span>Page 1 of 1</span>
       </div>
@@ -1205,11 +1205,11 @@ export function renderStationReportModal(rep) {
 
   const titleText = rep?.scope === "ZONAL_EXECUTIVE" 
     ? "Official Zonal Operational & Safety Audit Report (Zone 07)"
-    : `Official Railway Technical Dossier: ${rep?.stnName || 'Station'} [${rep?.stnCode || 'SR'}]`;
+    : `Official Railway Technical Dossier: ${rep?.stnName || 'Station'} [${rep?.stnCode || 'IR'}]`;
 
   const subText = rep?.scope === "ZONAL_EXECUTIVE"
-    ? "Government of India • Ministry of Railways Zonal Headquarters • Docket: SR/HQ/OP-ENG/2026/DOC-0842"
-    : `Official Ministry of Railways Technical Dossier • Docket: ${rep?.reportId || 'SR-0948'}`;
+    ? "Government of India • Ministry of Railways Zonal Headquarters • Docket: IR/HQ/OP-ENG/2026/DOC-0842"
+    : `Official Ministry of Railways Technical Dossier • Docket: ${rep?.reportId || 'IR-0948'}`;
 
   if (typeof window.showModal === 'function') {
     window.showModal(
@@ -1219,7 +1219,7 @@ export function renderStationReportModal(rep) {
         <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg-input);padding:10px 14px;border-radius:6px;border:1px solid var(--border-light);margin-bottom:14px">
           <div>
             <div style="font-size:11px;color:var(--text-muted)">REPORT IDENTIFIER &amp; AUDIT DOCKET</div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:900;color:#60a5fa">${rep?.reportId || 'SR/HQ/OP-ENG/2026/DOC-0842'}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:900;color:#60a5fa">${rep?.reportId || 'IR/HQ/OP-ENG/2026/DOC-0842'}</div>
           </div>
           <div style="display:flex;gap:8px">
             <button style="background:#1e3a5f;color:#ffffff;border:1px solid #3b82f6;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 2px 6px rgba(0,0,0,0.3)" onclick="window.printStationPdfReport('${rep?.stnCode || 'ZONAL'}')">
@@ -1243,6 +1243,11 @@ export function openStationReportDraftModal(prefillStation = "") {
   const isHi = (typeof currentLang !== 'undefined' && currentLang === 'hi') || (typeof localStorage !== 'undefined' && localStorage.getItem("sr_lang") === 'hi');
   const defaultStn = prefillStation || (typeof window.selectedPlanningStation !== 'undefined' ? window.selectedPlanningStation : "ZONAL");
 
+  const allStns = (window.liveStations && window.liveStations.length > 0)
+    ? window.liveStations
+    : (window.OFFICIAL_STATIONS_37 || []);
+  const sortedStns = [...allStns].sort((a, b) => (a.name || a.station_name || "").localeCompare(b.name || b.station_name || ""));
+
   if (typeof window.showModal === 'function') {
     window.showModal(
       isHi ? "📑 आधिकारिक रेलवे तकनीकी रिपोर्ट स्टूडियो (PDF)" : "📑 Official Railway Technical & Analytical Audit Studio",
@@ -1253,10 +1258,10 @@ export function openStationReportDraftModal(prefillStation = "") {
             <span style="font-size:18px">🏛️</span>
             <div>
               <div style="font-size:13px;font-weight:900;color:var(--text-heading)">
-                GOVERNMENT OF INDIA • MINISTRY OF RAILWAYS (ZONE 07)
+                GOVERNMENT OF INDIA • MINISTRY OF RAILWAYS (INDIAN RAILWAYS)
               </div>
               <div style="font-size:11px;color:var(--text-muted)">
-                Official Zonal Operations &amp; Engineering Technical Audit Generator
+                Official Operations &amp; Engineering Technical Audit Generator (Pan-India Network)
               </div>
             </div>
           </div>
@@ -1269,26 +1274,15 @@ export function openStationReportDraftModal(prefillStation = "") {
           <div>
             <label style="font-size:11px;font-weight:800;color:var(--text-muted);display:block;margin-bottom:4px">SELECT REPORT SCOPE *</label>
             <select id="repSelectStation" style="width:100%;padding:8px 10px;border-radius:6px;background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);font-size:12.5px;font-weight:700" onchange="window.syncDraftStationInputs(this.value)">
-              <option value="ZONAL" ${defaultStn==='ZONAL'?'selected':''}>📊 Comprehensive Zonal Audit Report (Zone 07 All Divisions)</option>
-              <option value="ERS" ${defaultStn==='ERS'?'selected':''}>Ernakulam Junction (ERS) [TVC Division - 141 Trains]</option>
-              <option value="MAS" ${defaultStn==='MAS'?'selected':''}>MGR Chennai Central (MAS) [Chennai Division HQ - 88 Trains]</option>
-              <option value="CBE" ${defaultStn==='CBE'?'selected':''}>Coimbatore Junction (CBE) [Salem Division - 38 Trains]</option>
-              <option value="CGL" ${defaultStn==='CGL'?'selected':''}>Chengalpattu Junction (CGL) [Chennai Division - 8 Platforms]</option>
-              <option value="ALLP" ${defaultStn==='ALLP'?'selected':''}>Alappuzha (ALLP) [TVC Division - Coastal Trunk - 3 Platforms]</option>
-              <option value="TVC" ${defaultStn==='TVC'?'selected':''}>Thiruvananthapuram Central (TVC) [TVC Division - 5 Platforms]</option>
-              <option value="MS" ${defaultStn==='MS'?'selected':''}>Chennai Egmore (MS) [Chennai Division - 11 Platforms]</option>
-              <option value="TPJ" ${defaultStn==='TPJ'?'selected':''}>Tiruchirappalli Junction (TPJ) [TPJ Division - 8 Platforms]</option>
-              <option value="MDU" ${defaultStn==='MDU'?'selected':''}>Madurai Junction (MDU) [Madurai Division - 8 Platforms]</option>
-              <option value="SA" ${defaultStn==='SA'?'selected':''}>Salem Junction (SA) [Salem Division - 6 Platforms]</option>
-              <option value="ED" ${defaultStn==='ED'?'selected':''}>Erode Junction (ED) [Salem Division - 5 Platforms]</option>
-              <option value="PGT" ${defaultStn==='PGT'?'selected':''}>Palakkad Junction (PGT) [Palakkad Division - 5 Platforms]</option>
-              <option value="AJJ" ${defaultStn==='AJJ'?'selected':''}>Arakkonam Junction (AJJ) [Chennai Division - 5 Platforms]</option>
-              <option value="KPD" ${defaultStn==='KPD'?'selected':''}>Katpadi Junction (KPD) [Chennai Division - 5 Platforms]</option>
-              <option value="VM" ${defaultStn==='VM'?'selected':''}>Villupuram Junction (VM) [TPJ Division - 6 Platforms]</option>
-              <option value="TCR" ${defaultStn==='TCR'?'selected':''}>Thrissur (TCR) [TVC Division - 4 Platforms]</option>
-              <option value="CAN" ${defaultStn==='CAN'?'selected':''}>Kannur (CAN) [Palakkad Division - 4 Platforms]</option>
-              <option value="QLN" ${defaultStn==='QLN'?'selected':''}>Kollam Junction (QLN) [TVC Division - 6 Platforms]</option>
-              <option value="RMM" ${defaultStn==='RMM'?'selected':''}>Rameswaram (RMM) [Madurai Division - Pamban Link]</option>
+              <option value="ZONAL" ${defaultStn==='ZONAL'?'selected':''}>📊 Comprehensive Zonal Audit Report (All Divisions)</option>
+              <optgroup label="Pan-India Stations (${sortedStns.length})">
+                ${sortedStns.map(s => {
+                  const code = s.code || s.station_code;
+                  const name = s.name || s.station_name;
+                  const div = s.division || s.div || 'IR';
+                  return `<option value="${code}" ${defaultStn===code?'selected':''}>${name} (${code}) [${div} Div]</option>`;
+                }).join('')}
+              </optgroup>
               <option value="CUSTOM">✏️ Custom Draft Station / Section...</option>
             </select>
           </div>
@@ -1296,13 +1290,28 @@ export function openStationReportDraftModal(prefillStation = "") {
           <div>
             <label style="font-size:11px;font-weight:800;color:var(--text-muted);display:block;margin-bottom:4px">RAILWAY DIVISION JURISDICTION *</label>
             <select id="repDivision" style="width:100%;padding:8px 10px;border-radius:6px;background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);font-size:12.5px;font-weight:700">
-              <option value="All Divisions (Zone 07)" selected>Zone 07 (All 6 Divisions)</option>
-              <option value="Chennai">Chennai Division (MAS)</option>
-              <option value="Salem">Salem Division (SA)</option>
-              <option value="Palakkad">Palakkad Division (PGT)</option>
-              <option value="Thiruvananthapuram">Thiruvananthapuram Division (TVC)</option>
-              <option value="Madurai">Madurai Division (MDU)</option>
-              <option value="Tiruchirappalli">Tiruchirappalli Division (TPJ)</option>
+              <option value="All Divisions (Pan-India)" selected>Pan-India (All Zonal Divisions)</option>
+              <optgroup label="National Trunk Divisions">
+                <option value="Delhi">Delhi Division (DLI / NR)</option>
+                <option value="Mumbai">Mumbai Division (BB / CR-WR)</option>
+                <option value="Howrah">Howrah Division (HWH / ER)</option>
+                <option value="Secunderabad">Secunderabad Division (SC / SCR)</option>
+                <option value="Bengaluru">Bengaluru Division (SBC / SWR)</option>
+                <option value="Vijayawada">Vijayawada Division (BZA / SCR)</option>
+                <option value="Nagpur">Nagpur Division (NGP / CR)</option>
+                <option value="Bhopal">Bhopal Division (BPL / WCR)</option>
+                <option value="Ahmedabad">Ahmedabad Division (ADI / WR)</option>
+                <option value="Prayagraj">Prayagraj Division (PRYJ / NCR)</option>
+                <option value="Guwahati">Guwahati Division (GHY / NFR)</option>
+              </optgroup>
+              <optgroup label="Southern Railway Divisions">
+                <option value="Chennai">Chennai Division (MAS)</option>
+                <option value="Salem">Salem Division (SA)</option>
+                <option value="Palakkad">Palakkad Division (PGT)</option>
+                <option value="Thiruvananthapuram">Thiruvananthapuram Division (TVC)</option>
+                <option value="Madurai">Madurai Division (MDU)</option>
+                <option value="Tiruchirappalli">Tiruchirappalli Division (TPJ)</option>
+              </optgroup>
             </select>
           </div>
         </div>
@@ -1365,16 +1374,45 @@ export function syncDraftStationInputs(val) {
   } else {
     if (customBox) customBox.style.display = "none";
     if (val === "ZONAL") {
-      if (divSelect) divSelect.value = "All Divisions (Zone 07)";
+      if (divSelect) divSelect.value = "All Divisions (Pan-India)";
       if (scopeSelect) scopeSelect.value = "ZONAL_EXECUTIVE";
     } else {
       if (scopeSelect) scopeSelect.value = "HEADWAY";
       if (divSelect) {
-        if (val === "MAS") divSelect.value = "Chennai";
-        else if (val === "CBE" || val === "ED") divSelect.value = "Salem";
-        else if (val === "ERS") divSelect.value = "Thiruvananthapuram";
-        else if (val === "MDU") divSelect.value = "Madurai";
-        else if (val === "PGT") divSelect.value = "Palakkad";
+        const allStns = (window.liveStations && window.liveStations.length > 0)
+          ? window.liveStations
+          : (window.OFFICIAL_STATIONS_37 || []);
+        const found = allStns.find(s => (s.code || s.station_code) === val);
+        if (found) {
+          const divName = (found.division || found.div || "").toUpperCase();
+          let matched = false;
+          for (let opt of divSelect.options) {
+            if (divName && (opt.text.toUpperCase().includes(divName) || opt.value.toUpperCase().includes(divName))) {
+              divSelect.value = opt.value;
+              matched = true;
+              break;
+            }
+          }
+          if (!matched) {
+            if (val === "MAS" || val === "AJJ" || val === "KPD" || val === "CGL") divSelect.value = "Chennai";
+            else if (val === "CBE" || val === "ED" || val === "SA") divSelect.value = "Salem";
+            else if (val === "ERS" || val === "TVC" || val === "TCR" || val === "QLN" || val === "ALLP") divSelect.value = "Thiruvananthapuram";
+            else if (val === "MDU" || val === "DG" || val === "RMM") divSelect.value = "Madurai";
+            else if (val === "PGT" || val === "CAN" || val === "SRR" || val === "CLT") divSelect.value = "Palakkad";
+            else if (val === "TPJ" || val === "VM" || val === "TJ") divSelect.value = "Tiruchirappalli";
+            else if (val === "NDLS" || val === "DLI" || val === "NZM" || val === "ANVT") divSelect.value = "Delhi";
+            else if (val === "MMCT" || val === "CSMT" || val === "BDTS" || val === "LTT") divSelect.value = "Mumbai";
+            else if (val === "HWH" || val === "SDAH" || val === "KOAA") divSelect.value = "Howrah";
+            else if (val === "SC" || val === "HYB") divSelect.value = "Secunderabad";
+            else if (val === "SBC" || val === "YPR" || val === "SMVB") divSelect.value = "Bengaluru";
+            else if (val === "BZA") divSelect.value = "Vijayawada";
+            else if (val === "NGP") divSelect.value = "Nagpur";
+            else if (val === "BPL" || val === "RKMP") divSelect.value = "Bhopal";
+            else if (val === "ADI") divSelect.value = "Ahmedabad";
+            else if (val === "PRYJ" || val === "CNB") divSelect.value = "Prayagraj";
+            else if (val === "GHY") divSelect.value = "Guwahati";
+          }
+        }
       }
     }
   }
@@ -1382,7 +1420,7 @@ export function syncDraftStationInputs(val) {
 
 export function executeGenerateStationReport() {
   const sel = document.querySelector("#repSelectStation")?.value || "ZONAL";
-  const div = document.querySelector("#repDivision")?.value || "All Divisions (Zone 07)";
+  const div = document.querySelector("#repDivision")?.value || "Pan-India (All Zonal Divisions)";
   const scope = document.querySelector("#repScope")?.value || (sel === "ZONAL" ? "ZONAL_EXECUTIVE" : "COMPREHENSIVE");
   const dateRange = document.querySelector("#repDateRange")?.value || "August – September 2026";
   const includeSignatures = document.querySelector("#repIncludeSignatures")?.checked !== false;
@@ -1392,12 +1430,12 @@ export function executeGenerateStationReport() {
       window.showToast("Synthesizing Official Zonal Operational & Safety Audit Report…");
     }
     const reportData = {
-      reportId: "SR/HQ/OP-ENG/2026/DOC-0842",
+      reportId: "IR/HQ/OP-ENG/2026/DOC-0842",
       scope: "ZONAL_EXECUTIVE",
       fileRef: "HQ/G-24/TRK-BLK/2026-AUG",
       generatedDate: "06 Sept 2026, 16:30 IST",
       stnCode: "ZONAL",
-      stnName: "Southern Railway Zone 07",
+      stnName: "Indian Railways Zone 07",
       division: "All 6 Divisions (MAS, SA, PGT, TVC, MDU, TPJ)",
       dateRange: dateRange,
       includeSignatures: includeSignatures
@@ -1448,7 +1486,7 @@ export function printStationPdfReport(stnCode) {
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Southern_Railway_Official_Audit_Report_${stnCode || 'ZONAL'}</title>
+        <title>Indian_Railways_Official_Audit_Report_${stnCode || 'ZONAL'}</title>
         <meta charset="utf-8" />
         <style>
           @page {
@@ -1474,7 +1512,7 @@ export function printStationPdfReport(stnCode) {
       <body>
         <div class="no-print" style="background:#1e293b;color:#ffffff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-family:-apple-system,sans-serif;margin-bottom:12px">
           <div>
-            <b style="font-size:13px;letter-spacing:0.5px">SOUTHERN RAILWAY (ZONE 07) — OFFICIAL TECHNICAL DOSSIER</b>
+            <b style="font-size:13px;letter-spacing:0.5px">INDIAN RAILWAYS (ZONE 07) — OFFICIAL TECHNICAL DOSSIER</b>
             <div style="font-size:11px;opacity:0.8">Document rendered for formal archival print and PDF export. Select "Save as PDF" in destination.</div>
           </div>
           <button onclick="window.print()" style="background:#2563eb;color:#ffffff;font-weight:800;border:none;padding:7px 18px;border-radius:4px;cursor:pointer;font-size:12.5px;display:flex;align-items:center;gap:6px">

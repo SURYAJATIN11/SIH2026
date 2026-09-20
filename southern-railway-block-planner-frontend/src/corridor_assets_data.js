@@ -1,9 +1,9 @@
 /**
- * SOUTHERN RAILWAY - MASTER GIS CORRIDOR ASSET REGISTRY
+ * INDIAN RAILWAYS - MASTER GIS CORRIDOR ASSET REGISTRY
  * 
  * Contains detailed engineering, sensor telemetry (USFD, TRD, S&T),
  * historical maintenance, and operational risk specifications for every asset
- * across all 8 Southern Railway Corridors.
+ * across all 8 Indian Railways Corridors.
  */
 
 export const CORRIDOR_ASSETS_REGISTRY = [
@@ -255,7 +255,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
       vibration_rms: "Traction motor bearing acoustic analysis: Normal"
     },
     history: [
-      { year: "1978", text: "Established as first AC electric loco shed in Southern Railway" },
+      { year: "1978", text: "Established as first AC electric loco shed in Indian Railways" },
       { year: "2007", text: "Upgraded for 3-Phase WAP-7 locomotives" },
       { year: "2023", text: "Commissioned automated regenerative braking test rig" }
     ],
@@ -511,7 +511,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
       vibration_rms: "Flyover deflection: 1.2 mm under loaded freight"
     },
     history: [
-      { year: "1958", text: "Established during Southern Railway zonal restructuring" },
+      { year: "1958", text: "Established during Indian Railways zonal restructuring" },
       { year: "2018", text: "Grade-separated Bangalore flyover commissioned to eliminate surface conflicts" }
     ],
     blocks: [
@@ -597,7 +597,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
     health_score: 98,
     condition: "Pristine • Highest Punctuality Rating in Zone 07",
     speed_limit: "Yard: 15 km/h",
-    desc: "Renowned locomotive workshop powering Southern Railway's southern express and heavy mineral trains with WAP-7, WAG-9, and WAP-4 engines.",
+    desc: "Renowned locomotive workshop powering Indian Railways express and heavy mineral trains with WAP-7, WAG-9, and WAP-4 engines.",
     specs: {
       rdso_standard: "RDSO Schedule TI/TO/POH Overhaul Specification",
       load_class: "6,000 HP 3-Phase Electric Locomotives",
@@ -752,7 +752,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
     health_score: 95,
     condition: "Good • High Turnaround Efficiency",
     speed_limit: "Yard: 15 km/h",
-    desc: "Historic depot that pioneered South India's electric suburban train system, now maintaining EMU sets and Southern express passenger fleets.",
+    desc: "Historic depot that pioneered South India's electric suburban train system, now maintaining EMU sets and Express passenger fleets.",
     specs: {
       rdso_standard: "CAMTECH EMU Maintenance Handbook",
       load_class: "12-Car EMU & 22-Coach LHB Rakes",
@@ -905,7 +905,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
     health_score: 94,
     condition: "Good • Normal Speed (110 km/h)",
     speed_limit: "110 km/h",
-    desc: "Key southern link spanning the historic Vaigai River approaching Madurai Junction with continuous seismic elastomeric bearing pads.",
+    desc: "Key railway link spanning the historic Vaigai River approaching Madurai Junction with continuous seismic elastomeric bearing pads.",
     specs: {
       rdso_standard: "IRS Concrete Bridge Code (25t Loading)",
       load_class: "25t Axle Load Heavy Broad Gauge",
@@ -921,7 +921,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
       vibration_rms: "Bridge vibration: 0.12g at 110 km/h"
     },
     history: [
-      { year: "1972", text: "Constructed during southern trunk broad-gauge alignment" },
+      { year: "1972", text: "Constructed during mainline trunk broad-gauge alignment" },
       { year: "2018", text: "Electrification 25kV OHE portals anchored" }
     ],
     blocks: [
@@ -1320,7 +1320,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
     health_score: 93,
     condition: "Good • High Turnaround Capability",
     speed_limit: "Yard: 15 km/h",
-    desc: "Northern gateway coaching facility connecting Southern Railway with Konkan Railway (KRCL) and South Western Railway (SWR).",
+    desc: "Northern gateway coaching facility connecting Indian Railways with Konkan Railway (KRCL) and South Western Railway (SWR).",
     specs: {
       rdso_standard: "CAMTECH LHB & ICF Maintenance Code",
       load_class: "Broad Gauge 24-Coach Rakes",
@@ -1526,7 +1526,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
     health_score: 95,
     condition: "Good • Normal Speed (110 km/h)",
     speed_limit: "110 km/h",
-    desc: "Major southern bridge crossing the perennial Thamirabarani River connecting Tirunelveli with Nagercoil and Kanyakumari.",
+    desc: "Major railway bridge crossing the perennial Thamirabarani River connecting Tirunelveli with Nagercoil and Kanyakumari.",
     specs: {
       rdso_standard: "IRS Concrete Bridge Code (25t Loading)",
       load_class: "25t Heavy Axle Load",
@@ -1664,7 +1664,7 @@ export const CORRIDOR_ASSETS_REGISTRY = [
 // ============================================================================
 
 export function generateAssetAIDossier(asset) {
-  if (!asset) return "Asset not found in CRIS Southern Railway Registry.";
+  if (!asset) return "Asset not found in CRIS Indian Railways Registry.";
 
   const historyLines = (asset.history || []).map(h => "* **" + h.year + ":** " + h.text).join("\n");
   const usfd = asset.sensor_telemetry?.usfd_status || "Pass - No Defects Detected";

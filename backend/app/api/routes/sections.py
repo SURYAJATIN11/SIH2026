@@ -28,7 +28,7 @@ def list_sections(
     corridor_id: Optional[UUID] = None,
     traffic_level: Optional[str] = None,
     skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=500),
+    limit: int = Query(500, ge=1, le=5000),
     db: Session = Depends(get_db),
 ):
     """List track sections with optional filtering."""

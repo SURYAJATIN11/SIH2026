@@ -21,7 +21,7 @@ def list_stations(
     division: Optional[str] = None,
     status: Optional[str] = None,
     skip: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(500, ge=1, le=5000),
     db: Session = Depends(get_db),
 ):
     """List all stations with optional filtering."""
@@ -49,7 +49,7 @@ def create_station(data: StationCreate, db: Session = Depends(get_db)):
         station_name=data.station_name,
         division=data.division,
         location=data.location,
-        zone=data.zone or "Southern Railway",
+        zone=data.zone or "Indian Railways",
         status=EntityStatus.ACTIVE,
         source_type=SourceType.USER_ENTERED,
     )

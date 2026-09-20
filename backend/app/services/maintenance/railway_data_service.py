@@ -231,7 +231,7 @@ class RailwayDataService:
                 "system_name": "Control Office Application (COA)",
                 "scheduled_trains": len(self.coa_trains),
                 "high_priority_trains": sum(1 for t in self.coa_trains if t.get("priority_tier", 2) == 1),
-                "network_coverage": "Southern Railway (MAS, SA, PGT, TVC, TPJ, MDU)",
+                "network_coverage": "Indian Railways (MAS, SA, PGT, TVC, TPJ, MDU)",
                 "status": "ONLINE"
             },
             "unified_integration": {

@@ -11,7 +11,7 @@ class StationCreate(BaseModel):
     station_name: str
     division: str
     location: Optional[str] = None
-    zone: Optional[str] = "Southern Railway"
+    zone: Optional[str] = "Indian Railways"
 
 
 class StationUpdate(BaseModel):

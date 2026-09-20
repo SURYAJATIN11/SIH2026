@@ -1,5 +1,5 @@
 /**
- * AI ROUTE ANALYSIS & VISUAL DECISION SUPPORT ENGINE (CRIS / SOUTHERN RAILWAY)
+ * AI ROUTE ANALYSIS & VISUAL DECISION SUPPORT ENGINE (CRIS / INDIAN RAILWAYS)
  * 
  * Implements chatbot-triggered maintenance block detection, dynamic multi-path network analysis,
  * multi-factor operational and passenger-impact route evaluation, Leaflet map layer rendering,
@@ -7,7 +7,7 @@
  */
 
 // ============================================================================
-// 1. SOUTHERN RAILWAY TOPOLOGICAL NETWORK GRAPH
+// 1. INDIAN RAILWAYS TOPOLOGICAL NETWORK GRAPH
 // ============================================================================
 
 export const SR_GRAPH_STATIONS = {
@@ -54,7 +54,7 @@ export const SR_GRAPH_STATIONS = {
   KKDI:{ code: "KKDI",name: "Karaikkudi Junction", lat: 10.0700, lng: 78.7800, div: "TPJ", type: "Chord Station", platforms: 3 },
   VPT: { code: "VPT", name: "Virudhunagar Junction", lat: 9.5872, lng: 77.9577, div: "MDU", type: "Junction", platforms: 4 },
   TEN: { code: "TEN", name: "Tirunelveli Junction", lat: 8.7139, lng: 77.7567, div: "MDU", type: "Terminal Hub", platforms: 5 },
-  CAPE:{ code: "CAPE",name: "Kanyakumari", lat: 8.0883, lng: 77.5385, div: "TVC", type: "Southernmost Terminal", platforms: 4 },
+  CAPE:{ code: "CAPE",name: "Kanyakumari", lat: 8.0883, lng: 77.5385, div: "TVC", type: "Kanyakumari Terminal", platforms: 4 },
   RMM: { code: "RMM", name: "Rameswaram", lat: 9.2876, lng: 79.3129, div: "MDU", type: "Island Marine Terminal", platforms: 4 }
 };
 

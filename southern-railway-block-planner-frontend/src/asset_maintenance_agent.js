@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * RAILBLOCK AI — AI RAILWAY ASSET MAINTENANCE & COST AGENT
- * Operational Region: Southern Railway (SR)
+ * Operational Region: Indian Railways (SR)
  * Asset Scope: Pan-Indian Railways Multi-Zonal Train & Rolling Stock Fleet (330+ Trains)
  * ============================================================================
  */
@@ -49,7 +49,7 @@ export const IR_ZONES = {
   },
   SR: {
     code: "SR",
-    name: "Southern Railway",
+    name: "Indian Railways",
     hq: "Chennai GM Office, Park Town",
     divisions: ["Chennai (MAS)", "Salem (SA)", "Tiruchirappalli (TPJ)", "Madurai (MDU)", "Palakkad (PGT)", "Thiruvananthapuram (TVC)"],
     primaryDepots: ["Basin Bridge (BBQ)", "Tambaram (TBM)", "Coimbatore (CBE)", "Madurai (MDU)", "Kochuveli (KCVL)", "Ernakulam (ERS)"],
@@ -112,7 +112,7 @@ export const IR_ZONES = {
   }
 };
 
-// Southern Railway Stations Maintenance Infrastructure Capabilities
+// Indian Railways Stations Maintenance Infrastructure Capabilities
 export const SR_STATION_MAINTENANCE_FACILITIES = {
   MAS: {
     name: "MGR Chennai Central",
@@ -222,7 +222,7 @@ export function getAllTrainsDataset() {
 /**
  * Identify Owning Zone of any train based on Indian Railways numbering, terminal stations, and known rake links.
  * 
- * CRITICAL RULE: DO NOT assume that an asset belongs to Southern Railway merely because it is operating within Southern Railway!
+ * CRITICAL RULE: DO NOT assume that an asset belongs to Indian Railways merely because it is operating within Indian Railways!
  */
 export function identifyOwningZone(train) {
   if (!train) return IR_ZONES.SR;
@@ -322,10 +322,10 @@ export function identifyOwningZone(train) {
     return { ...IR_ZONES.ECR, primaryDepot: "Danapur / Patna Depot", isForeignRake: true };
   }
 
-  // Default: Southern Railway (SR) indigenous asset
+  // Default: Indian Railways (SR) indigenous asset
   return {
     ...IR_ZONES.SR,
-    primaryDepot: origin.includes("MAS") ? "Basin Bridge (BBQ)" : (origin.includes("CBE") ? "Coimbatore Coaching Depot" : (origin.includes("MDU") ? "Madurai Depot" : "Southern Railway Zonal Yard")),
+    primaryDepot: origin.includes("MAS") ? "Basin Bridge (BBQ)" : (origin.includes("CBE") ? "Coimbatore Coaching Depot" : (origin.includes("MDU") ? "Madurai Depot" : "Indian Railways Zonal Yard")),
     isForeignRake: false
   };
 }
@@ -520,7 +520,7 @@ export function run14PointAssetAudit(train, stationCode = "MAS") {
       title: "2. Current Location",
       station: `${facility.name} (${stationCode})`,
       berth: `Platform Road & Stabling Pit-Line (${facility.facility})`,
-      corridor: `Southern Railway Core Network (MAS-JTJ-CBE-PGT)`
+      corridor: `Indian Railways Core Network (MAS-JTJ-CBE-PGT)`
     },
 
     // 3. Does it require maintenance/repair?
@@ -822,15 +822,15 @@ export function openProfessionalRepairReportModal(trainNo = "12622", stationCode
           </div>
           <div style="text-align:center;flex:1;padding:0 12px">
             <div style="font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:#475569">GOVERNMENT OF INDIA • MINISTRY OF RAILWAYS</div>
-            <div style="font-size:18px;font-weight:900;color:#0f172a;letter-spacing:0.5px;margin:2px 0;text-transform:uppercase">SOUTHERN RAILWAY (दक्षीण रेलवे)</div>
+            <div style="font-size:18px;font-weight:900;color:#0f172a;letter-spacing:0.5px;margin:2px 0;text-transform:uppercase">INDIAN RAILWAYS (भारतीय रेल)</div>
             <div style="font-size:12px;font-weight:800;color:#0369a1;text-transform:uppercase">MECHANICAL &amp; ELECTRICAL ENGINEERING DEPARTMENT (CARRIAGE &amp; WAGON BRANCH)</div>
             <div style="font-size:13px;font-weight:900;color:#0f172a;margin-top:4px;display:inline-block;border:1.5px solid #0f172a;padding:2px 14px;border-radius:4px;background:#f8fafc">
               FORM C&amp;W-BPC-402: ROLLING STOCK OVERHAUL, REPAIR &amp; BRAKE POWER CERTIFICATE
             </div>
           </div>
           <div style="text-align:center;width:75px">
-            <img src="/railblock-logo.svg" style="width:48px;height:48px;object-fit:contain" alt="SR Crest" onerror="this.src='/southern-railway-logo.png'" />
-            <div style="font-size:9px;font-weight:900;color:#0f172a;margin-top:2px">SR ZONE 07</div>
+            <img src="/railblock-logo.svg" style="width:48px;height:48px;object-fit:contain" alt="SR Crest" onerror="this.src='/indian-railways-logo.png'" />
+            <div style="font-size:9px;font-weight:900;color:#0f172a;margin-top:2px">IR ZONE 07</div>
           </div>
         </div>
 
@@ -1017,7 +1017,7 @@ export function openProfessionalRepairReportModal(trainNo = "12622", stationCode
 
           <!-- Official Stamp Seal in Center -->
           <div style="text-align:center;border:2.5px solid #dc2626;border-radius:8px;padding:6px 14px;background:#fff5f5;transform:rotate(-1deg)">
-            <div style="font-size:10px;font-weight:900;color:#dc2626;letter-spacing:1px">SOUTHERN RAILWAY • MECHANICAL DEPT</div>
+            <div style="font-size:10px;font-weight:900;color:#dc2626;letter-spacing:1px">INDIAN RAILWAYS • MECHANICAL DEPT</div>
             <div style="font-size:14px;font-weight:900;color:#b91c1c;margin:2px 0">★ BPC CERTIFIED FIT FOR SERVICE ★</div>
             <div style="font-size:9.5px;font-weight:800;color:#dc2626">VALIDITY: 4,500 KM / 96 HRS • AIR BRAKE QA: PASS</div>
           </div>
@@ -1026,7 +1026,7 @@ export function openProfessionalRepairReportModal(trainNo = "12622", stationCode
             <div style="font-family:'Brush Script MT', cursive, sans-serif;font-size:22px;color:#0369a1;margin-bottom:2px">Dr. K. Jayachandran</div>
             <div style="border-top:1px solid #0f172a;padding-top:4px;font-size:10.5px;font-weight:800;color:#0f172a">
               DIVISIONAL MECHANICAL ENGINEER (COACHING)<br/>
-              <span style="font-weight:500;color:#64748b">Chennai Division, Southern Railway</span>
+              <span style="font-weight:500;color:#64748b">Chennai Division, Indian Railways</span>
             </div>
           </div>
 
@@ -1696,7 +1696,7 @@ export function openAssetMaintenanceAgentModal(initialTrainNo = null, initialSta
               <span style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px">MULTI-ZONE ACTIVE</span>
             </div>
             <div style="margin-top:3px;font-size:11px;color:#94a3b8">
-              Operating Region: <b style="color:#ffffff">Southern Railway (SR)</b> • Multi-Zonal Fleet: <b style="color:#38bdf8">${allTrains.length} Trains Tracked</b>
+              Operating Region: <b style="color:#ffffff">Indian Railways (SR)</b> • Multi-Zonal Fleet: <b style="color:#38bdf8">${allTrains.length} Trains Tracked</b>
             </div>
           </div>
 
@@ -2169,9 +2169,9 @@ export function openAssetMaintenanceAgentModal(initialTrainNo = null, initialSta
     <div class="modal-card modal-card-extra-wide" style="max-width:980px;width:95vw;max-height:92vh;overflow-y:auto;background:#061427;border:1.5px solid #1a3c63">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #1a3c63">
         <div style="display:flex;align-items:center;gap:10px">
-          <img src="/railblock-logo.svg" style="width:28px;height:28px;object-fit:contain" alt="SR Crest" onerror="this.src='/southern-railway-logo.png'" />
+          <img src="/railblock-logo.svg" style="width:28px;height:28px;object-fit:contain" alt="SR Crest" onerror="this.src='/indian-railways-logo.png'" />
           <div>
-            <h3 style="margin:0;font-size:18px;color:#ffffff;font-family:'Barlow Condensed', sans-serif;letter-spacing:0.5px">SOUTHERN RAILWAY • AI ASSET MAINTENANCE &amp; COST OPTIMIZER</h3>
+            <h3 style="margin:0;font-size:18px;color:#ffffff;font-family:'Barlow Condensed', sans-serif;letter-spacing:0.5px">INDIAN RAILWAYS • AI ASSET MAINTENANCE &amp; COST OPTIMIZER</h3>
             <span style="font-size:10.5px;color:#93c5fd">Pan-Indian Railways Multi-Zonal Fleet Intelligence • 14-Parameter Decision Matrix</span>
           </div>
         </div>

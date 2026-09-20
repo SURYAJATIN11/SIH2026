@@ -1,4 +1,4 @@
-"""CLI Simulation Runner for Southern Railway Block Planning & Emergency Replanning.
+"""CLI Simulation Runner for Indian Railways Block Planning & Emergency Replanning.
 
 Demonstrates:
 1. Multi-Destination Asset Availability Maximization (MAS-CBE, PGT-TVC, MDU-RMM).
@@ -30,7 +30,7 @@ def run_multi_destination_simulation():
     db = SessionLocal()
     try:
         service = SimulationService(db)
-        print('[+] Initializing multi-destination simulation across Southern Railway corridors...')
+        print('[+] Initializing multi-destination simulation across Indian Railways corridors...')
         print('    - Corridor 1: Chennai Central (MAS) - Coimbatore Jn (CBE)')
         print('    - Corridor 2: Palakkad Jn (PGT) - Thiruvananthapuram (TVC)')
         print('    - Corridor 3: Madurai Jn (MDU) - Rameswaram (RMM)')
@@ -132,7 +132,7 @@ def run_emergency_replanning_simulation():
 if __name__ == '__main__':
     hdr = '=' * 80
     print(hdr)
-    print('   INDIAN RAILWAYS - SOUTHERN RAILWAY BLOCK PLANNER SIMULATION ENGINE')
+    print('   INDIAN RAILWAYS - INDIAN RAILWAYS BLOCK PLANNER SIMULATION ENGINE')
     print('   AI-Driven Coordinated Block Planning & Asset Availability Maximization')
     print(hdr)
     

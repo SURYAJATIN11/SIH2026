@@ -1065,22 +1065,13 @@ window.extendActiveBlock = (mins = 30) => {
 // 2. STATE MANAGEMENT & SESSION
 // ==========================================================================
 
-let currentTheme = localStorage.getItem("sr_portal_theme") || "dark";
-document.documentElement.setAttribute("data-theme", currentTheme);
-document.body.className = currentTheme === "light" ? "theme-light" : "theme-dark";
+const currentTheme = "dark";
+localStorage.setItem("sr_portal_theme", "dark");
+document.documentElement.setAttribute("data-theme", "dark");
+document.body.className = "theme-dark";
 
 window.toggleTheme = () => {
-  currentTheme = currentTheme === "light" ? "dark" : "light";
-  localStorage.setItem("sr_portal_theme", currentTheme);
-  document.documentElement.setAttribute("data-theme", currentTheme);
-  document.body.className = currentTheme === "light" ? "theme-light" : "theme-dark";
-  if (typeof selectedMapLayer !== "undefined") {
-    selectedMapLayer = currentTheme === "light" ? "osm" : "dark";
-  }
-  if (typeof showToast === "function") {
-    showToast(`Theme switched to ${currentTheme === 'light' ? 'Light Executive' : 'Dark Navy'} Mode`);
-  }
-  render();
+  // RAILBLOCK AI is permanently optimized for Tactical Dark Mode
 };
 
 // Cover Page as First Page: GUARANTEED to ALWAYS be the first page to open whenever the link is opened
@@ -1105,6 +1096,13 @@ window.navigateTo = (pageName) => {
     window.handleLogout();
     return;
   }
+  if (pageName === "Schedule" || pageName === "Timetable") pageName = "Block Planning";
+  if (pageName === "Conflict Resolution" || pageName === "Conflicts") pageName = "Block Optimization";
+  if (pageName === "Corridors" || pageName === "Sections") pageName = "Corridors & Sections";
+  if (pageName === "Stations") pageName = "Stations Master";
+  if (pageName === "Assets") pageName = "Asset Maintenance";
+  if (pageName === "Economics" || pageName === "Cost Maintenance") pageName = "Cost Asset Maintenance";
+  if (pageName === "Dispatch") pageName = "Dynamic Dispatch AI";
   current = pageName;
   render();
 };
@@ -1803,17 +1801,10 @@ function renderGovTopStrip(isLoginPage = false) {
         <span class="gov-portal-brand">${isHi ? 'रेल-ब्लॉक एआई (भारतीय रेल)' : 'RAILBLOCK AI (INDIAN RAILWAYS)'}</span>
       </div>
       <div class="gov-top-right">
-        ${!isLoginPage ? `
-        <button class="gov-theme-toggle-btn" id="govTopThemeToggle" onclick="window.toggleTheme()" title="${isHi ? 'थीम बदलें' : 'Toggle Theme (Dark / Light)'}">
-          ${currentTheme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        ` : ''}
         <div class="gov-lang-group" title="${isHi ? 'भाषा चयन' : 'Language / भाषा'}">
           <button class="gov-lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="setLanguage('en')">EN</button>
           <button class="gov-lang-btn ${currentLang === 'hi' ? 'active' : ''}" onclick="setLanguage('hi')">हि</button>
         </div>
-        <button class="gov-access-btn" title="${isHi ? 'फ़ॉन्ट घटाएं' : 'Decrease font size'}" onclick="document.body.style.fontSize='12px'">A-</button>
-        <button class="gov-access-btn" title="${isHi ? 'फ़ॉन्ट बढ़ाएं' : 'Increase font size'}" onclick="document.body.style.fontSize='14px'">A+</button>
         <span class="gov-security-badge">${isHi ? '🔒 प्रतिबंधित' : '🔒 RESTRICTED'}</span>
       </div>
     </div>
@@ -1911,22 +1902,49 @@ function renderTopbar() {
         </button>
 
         <!-- ⋯ More dropdown -->
-        <div class="btn-topbar-more">
-          <button class="btn-topbar-action" title="${isHi ? 'अधिक विकल्प' : 'More actions'}">
+        <div class="btn-topbar-more" id="topbarMoreContainer">
+          <button class="btn-topbar-action" id="btnTopbarMore" onclick="window.toggleTopbarMoreMenu(event)" title="${isHi ? 'अधिक विकल्प' : 'More actions'}">
             <span>${isHi ? '⋯ अधिक' : '⋯ More'}</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left:3px;vertical-align:middle"><path d="M6 9l6 6 6-6"/></svg>
           </button>
-          <div class="btn-topbar-more-menu">
-            <button class="more-menu-item" onclick="window.openCommandPalette()" title="${isHi ? 'त्वरित खोज (⌘K)' : 'Quick Jump (⌘K)'}">
+          <div class="btn-topbar-more-menu" id="topbarMoreMenu">
+            <button class="more-menu-item" onclick="window.closeTopbarMoreMenu(); window.openCommandPalette()" title="${isHi ? 'त्वरित खोज (⌘K)' : 'Quick Jump (⌘K)'}">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               ${isHi ? 'त्वरित खोज' : 'Quick Jump'} <kbd style="font-size:9px;opacity:0.6;margin-left:auto">⌘K</kbd>
             </button>
             <div class="more-menu-divider"></div>
-            <button class="more-menu-item" onclick="window.openFleetStationManagerModal()">${isHi ? '🚆 बेड़ा एवं स्टेशन प्रबंधक' : '🚆 Fleet &amp; Stations'}</button>
-            <button class="more-menu-item" onclick="window.openZonalAuditReportModal()">${isHi ? '📊 जोनल ऑडिट रिपोर्ट' : '📊 Audit Reports'}</button>
+            <button class="more-menu-item" onclick="window.closeTopbarMoreMenu(); window.openFleetStationManagerModal()">
+              <span>🚆</span> ${isHi ? 'बेड़ा एवं स्टेशन प्रबंधक' : 'Fleet &amp; Stations Manager'}
+            </button>
+            <button class="more-menu-item" onclick="window.closeTopbarMoreMenu(); window.openZonalAuditReportModal()">
+              <span>📊</span> ${isHi ? 'जोनल ऑडिट रिपोर्ट' : 'Zonal Audit Reports'}
+            </button>
+            <button class="more-menu-item" onclick="window.closeTopbarMoreMenu(); if(typeof window.showSanctionMemo === 'function') window.showSanctionMemo(); else if (typeof showSanctionMemo === 'function') showSanctionMemo();">
+              <span>📄</span> ${isHi ? 'स्वीकृति ज्ञापन (T/A 912)' : 'Proforma T/A 912 Memo'}
+            </button>
             <div class="more-menu-divider"></div>
-            <button class="more-menu-item ${current === 'Asset Maintenance' ? 'active' : ''}" onclick="window.navigateTo('Asset Maintenance')">${isHi ? '🤖 परिसंपत्ति अनुरक्षण' : '🤖 Asset Maintenance'}</button>
-            <button class="more-menu-item ${current === 'Cost Asset Maintenance' ? 'active' : ''}" onclick="window.navigateTo('Cost Asset Maintenance')">${isHi ? '💰 लागत अनुरक्षण' : '💰 Cost Maintenance'}</button>
-            <button class="more-menu-item ${current === 'Dynamic Dispatch AI' ? 'active' : ''}" onclick="window.navigateTo('Dynamic Dispatch AI')">${isHi ? '🧠 प्रेषण (डिस्पैच) एआई' : '🧠 Dispatch AI'}</button>
+            <button class="more-menu-item ${current === 'Asset Maintenance' ? 'active' : ''}" onclick="window.closeTopbarMoreMenu(); window.navigateTo('Asset Maintenance')">
+              <span>🤖</span> ${isHi ? 'परिसंपत्ति अनुरक्षण' : 'Asset Maintenance'}
+            </button>
+            <button class="more-menu-item ${current === 'Cost Asset Maintenance' ? 'active' : ''}" onclick="window.closeTopbarMoreMenu(); window.navigateTo('Cost Asset Maintenance')">
+              <span>💰</span> ${isHi ? 'लागत अनुरक्षण' : 'Cost Asset Maintenance'}
+            </button>
+            <button class="more-menu-item ${current === 'Dynamic Dispatch AI' ? 'active' : ''}" onclick="window.closeTopbarMoreMenu(); window.navigateTo('Dynamic Dispatch AI')">
+              <span>🧠</span> ${isHi ? 'प्रेषण (डिस्पैच) एआई' : 'Dynamic Dispatch AI'}
+            </button>
+            <button class="more-menu-item ${current === 'Corridors & Sections' ? 'active' : ''}" onclick="window.closeTopbarMoreMenu(); window.navigateTo('Corridors & Sections')">
+              <span>🛤️</span> ${isHi ? 'कॉरिडोर और खंड' : 'Corridors &amp; Sections'}
+            </button>
+            <button class="more-menu-item ${current === 'Corridor Map' ? 'active' : ''}" onclick="window.closeTopbarMoreMenu(); window.navigateTo('Corridor Map')">
+              <span>🗺️</span> ${isHi ? 'कॉरिडोर मानचित्र' : 'Corridor Map Intelligence'}
+            </button>
+            <button class="more-menu-item ${current === 'Station Planning' ? 'active' : ''}" onclick="window.closeTopbarMoreMenu(); window.navigateTo('Station Planning')">
+              <span>🚦</span> ${isHi ? 'स्टेशन हेडवे योजना' : 'Station Planning &amp; Headway'}
+            </button>
+            <div class="more-menu-divider"></div>
+            <button class="more-menu-item" onclick="window.closeTopbarMoreMenu(); window.toggleTheme()">
+              <span>🌓</span> ${isHi ? 'थीम बदलें (Dark / Light)' : 'Toggle Theme (Dark / Light)'}
+            </button>
           </div>
         </div>
       </div>
@@ -1937,10 +1955,6 @@ function renderTopbar() {
           <div class="status-dot-pulse"></div>
           <span>${connected ? (isHi ? 'सर्वर ऑनलाइन' : 'SERVER ONLINE') : (isHi ? 'सर्वर ऑफलाइन' : 'SERVER OFFLINE')}</span>
         </div>
-        <button class="btn-top-theme" id="btnToggleTheme" title="${currentTheme === 'light' ? (isHi ? 'डार्क मोड पर जाएं' : 'Switch to Dark Mode') : (isHi ? 'लाइट मोड पर जाएं' : 'Switch to Light Mode')}">
-          ${currentTheme === 'light' ? SVG_ICONS.moon : SVG_ICONS.sun}
-          <span>${currentTheme === 'light' ? (isHi ? 'डार्क' : 'Dark') : (isHi ? 'लाइट' : 'Light')}</span>
-        </button>
         <div class="clock-formal">
           <b id="liveTime">--:--:--</b>
           <small id="liveDate">${isHi ? '01 सितं 2026' : '01 Sept 2026'}</small>
@@ -1953,6 +1967,38 @@ function renderTopbar() {
   `;
 }
 window.renderTopbar = renderTopbar;
+
+window.toggleTopbarMoreMenu = function(e) {
+  if (e) {
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
+  }
+  const menu = document.querySelector("#topbarMoreMenu");
+  if (!menu) return;
+  const isOpen = menu.classList.toggle("open");
+  menu.style.display = isOpen ? "flex" : "none";
+};
+
+window.closeTopbarMoreMenu = function() {
+  const menu = document.querySelector("#topbarMoreMenu");
+  if (menu) {
+    menu.classList.remove("open");
+    menu.style.display = "none";
+  }
+};
+
+if (typeof window !== "undefined" && !window.__moreMenuClickBound) {
+  window.__moreMenuClickBound = true;
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("#topbarMoreContainer")) {
+      const m = document.querySelector("#topbarMoreMenu");
+      if (m) {
+        m.classList.remove("open");
+        m.style.display = "none";
+      }
+    }
+  });
+}
 
 async function fetchBackendData() {
   try {
@@ -2214,9 +2260,255 @@ function renderHomePage() {
   `;
 }
 
+function renderDashboardAuthorizedBanner() {
+  let b = window.dashboardAuthorizedBanner;
+  if (!b) {
+    try {
+      const stored = sessionStorage.getItem("dashboardAuthorizedBanner") || localStorage.getItem("dashboardAuthorizedBanner");
+      if (stored) {
+        b = JSON.parse(stored);
+        window.dashboardAuthorizedBanner = b;
+      }
+    } catch(e) {}
+  }
+  if (!b) return "";
+
+  return `
+    <div class="dashboard-auth-banner" id="dashboardAuthBannerCard" style="margin-bottom:16px;background:linear-gradient(135deg, rgba(6,35,38,0.96) 0%, rgba(6,20,39,0.98) 100%);border:2px solid #22c55e;border-radius:10px;padding:16px 20px;box-shadow:0 8px 30px rgba(34,197,94,0.22);position:relative;animation:fadeInDown 0.4s ease">
+      <!-- Top bar -->
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid rgba(34,197,94,0.3);padding-bottom:10px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:24px;filter:drop-shadow(0 0 8px rgba(34,197,94,0.6))">⚡</span>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <strong style="color:#ffffff;font-size:15px;letter-spacing:0.5px">CRIS EXECUTIVE SANCTION DISPATCH CONFIRMATION</strong>
+              <span style="background:rgba(34,197,94,0.2);border:1px solid #22c55e;color:#4ade80;font-size:11px;font-weight:900;padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:5px">
+                <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block"></span> ${b.status || 'SANCTION ISSUED & ACTIVE'}
+              </span>
+            </div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:2px">
+              Certificate: <code style="color:#67e8f9;font-weight:800;font-family:'JetBrains Mono',monospace">${b.bpcNo}</code> &bull; Sanctioned at <b>${b.timestamp} IST (${b.date})</b> by <b>${b.authorizer}</b>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="window.openBPCDossierModal(window.dashboardAuthorizedBanner)" style="background:#0284c7;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:11.5px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:5px">
+            <span>📑</span> View Official BPC Dossier
+          </button>
+          <button onclick="window.dismissDashboardAuthBanner()" title="Dismiss Sanction Banner" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#94a3b8;border-radius:6px;padding:6px 10px;font-size:11.5px;cursor:pointer">
+            ✕ Dismiss
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 Highlights Grid -->
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;margin-bottom:12px">
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(34,197,94,0.2);border-radius:6px;padding:10px">
+          <span style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:800;display:block">Authorized Train &amp; Yard</span>
+          <b style="color:#ffffff;font-size:13px;display:block;margin-top:2px">Train #${b.trainNo} (${(b.trainName || '').split(' ')[0]})</b>
+          <span style="font-size:10.5px;color:#cbd5e1">${b.stationName} &bull; ${b.pitLine}</span>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(34,197,94,0.2);border-radius:6px;padding:10px">
+          <span style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:800;display:block">Net Realized Savings</span>
+          <b style="color:#4ade80;font-size:16px;display:block;margin-top:2px">+₹${Number(b.netBenefit).toLocaleString('en-IN')}</b>
+          <span style="font-size:10.5px;color:#86efac">${b.savingsPct || '73.8%'} Direct Avoided Loss</span>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(34,197,94,0.2);border-radius:6px;padding:10px">
+          <span style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:800;display:block">Line Possession Avoidance</span>
+          <b style="color:#38bdf8;font-size:13px;display:block;margin-top:2px">0 Mins Daytime Block</b>
+          <span style="font-size:10.5px;color:#93c5fd">Executed in Scheduled Yard Dwell</span>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(34,197,94,0.2);border-radius:6px;padding:10px">
+          <span style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:800;display:block">Inter-Railway Settlement</span>
+          <b style="color:#fbbf24;font-size:12px;font-family:'JetBrains Mono',monospace;display:block;margin-top:2px">${b.debitAccountHead || 'IR-SR-REV-08-200'}</b>
+          <span style="font-size:10.5px;color:#fde68a">Internal Zonal Billing Registered</span>
+        </div>
+      </div>
+
+      <!-- Avoided Losses Detail Strip -->
+      <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.25);border-radius:6px;padding:8px 12px;font-size:11px;color:#cbd5e1;flex-wrap:wrap;gap:8px">
+        <div>
+          <span style="color:#4ade80;font-weight:800">Financial Ledger Breakdown:</span>
+          Avoided Dead Haul (₹65,000) + Prevented Punctuality Penalty (₹77,000) + Saved Mainline Possession (₹85,000) = <b style="color:#ffffff">₹2,27,000 Gross</b> &bull; Direct Job: <b style="color:#f87171">-₹59,580</b>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="if(window.leafletMapInstance){ window.leafletMapInstance.flyTo([13.0827, 80.2707], 14); showToast('📍 Centered on BBQ Pit-Line Yard'); }" style="background:rgba(56,189,248,0.15);border:1px solid #38bdf8;color:#38bdf8;font-size:10.5px;font-weight:800;padding:4px 8px;border-radius:4px;cursor:pointer">
+            🗺️ Locate Pit-Line on Map
+          </button>
+          <button onclick="window.navigateTo('Cost Asset Maintenance')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#e2e8f0;font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:4px;cursor:pointer">
+            📊 Asset Optimizer
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+window.renderDashboardAuthorizedBanner = renderDashboardAuthorizedBanner;
+
+window.dismissDashboardAuthBanner = function() {
+  window.dashboardAuthorizedBanner = null;
+  try {
+    sessionStorage.removeItem("dashboardAuthorizedBanner");
+    localStorage.removeItem("dashboardAuthorizedBanner");
+  } catch (e) {}
+  const b = document.getElementById("dashboardAuthBannerCard");
+  if (b) {
+    b.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+    b.style.opacity = "0";
+    b.style.transform = "translateY(-10px)";
+    setTimeout(() => b.remove(), 300);
+  }
+};
+
+window.openBPCDossierModal = function(data) {
+  const b = data || window.dashboardAuthorizedBanner || {
+    trainNo: "12675",
+    trainName: "Kovai Superfast Express",
+    stationCode: "MAS",
+    stationName: "Chennai Central (BBQ Coaching Yard)",
+    pitLine: "Coaching Pit-Line Bay #4",
+    netBenefit: 167420,
+    savingsPct: "73.8%",
+    debitAccountHead: "IR-SR-REV-08-200",
+    bpcNo: "BPC/IR-SR/MAS/2026/09/7741",
+    timestamp: "11:45:00",
+    date: "22 Sept 2026",
+    authorizer: "Chief Passenger Transportation Manager (CPTM) / Sr. DOM",
+    status: "OFFICIAL SANCTION ACTIVE & SYNCHRONIZED"
+  };
+
+  const existing = document.querySelector(".modal-overlay");
+  if (existing) existing.remove();
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-card modal-card-extra-wide" style="max-width:850px;width:95vw;max-height:92vh;overflow-y:auto;background:#ffffff;color:#0f172a;border:2px solid #0f766e;border-radius:10px;padding:24px;box-shadow:0 15px 50px rgba(0,0,0,0.5);font-family:'Segoe UI',system-ui,sans-serif">
+      <!-- Printable IR Header -->
+      <div style="border-bottom:2px solid #047857;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="/railblock-logo.svg" style="width:42px;height:42px;object-fit:contain" alt="IR Emblem" onerror="this.src='/indian-railways-logo.png'" />
+          <div>
+            <div style="font-size:16px;font-weight:900;color:#065f46;letter-spacing:1px;text-transform:uppercase">INDIAN RAILWAYS • SOUTHERN RAILWAY</div>
+            <div style="font-size:12px;font-weight:700;color:#334155">MECHANICAL &amp; ROLLING STOCK DEPARTMENT • COACHING OPERATIONS</div>
+            <div style="font-size:11px;color:#64748b">Electronic Brake Power Certificate (E-BPC) &amp; Yard Servicing Job Card</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="background:#ecfdf5;border:1.5px solid #059669;padding:4px 10px;border-radius:6px;font-weight:900;color:#047857;font-size:12px;font-family:'JetBrains Mono',monospace">
+            ${b.bpcNo}
+          </div>
+          <div style="font-size:10.5px;color:#64748b;margin-top:3px">Issued: ${b.date} • ${b.timestamp} IST</div>
+        </div>
+      </div>
+
+      <!-- Train Identity & Sanction Scope -->
+      <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;font-size:12px">
+        <div>
+          <span style="color:#64748b;font-size:10.5px;text-transform:uppercase;font-weight:700;display:block">Train Designation</span>
+          <b style="color:#0f172a;font-size:14px">Train #${b.trainNo}</b>
+          <div style="color:#334155">${b.trainName}</div>
+        </div>
+        <div>
+          <span style="color:#64748b;font-size:10.5px;text-transform:uppercase;font-weight:700;display:block">Pit-Line Facility</span>
+          <b style="color:#0f172a;font-size:13px">${b.stationName}</b>
+          <div style="color:#334155">${b.pitLine}</div>
+        </div>
+        <div>
+          <span style="color:#64748b;font-size:10.5px;text-transform:uppercase;font-weight:700;display:block">BPC Validity Window</span>
+          <b style="color:#047857;font-size:13px">4,500 KM / 96 Hours</b>
+          <div style="color:#059669">Valid for Round-Trip Revenue Service</div>
+        </div>
+      </div>
+
+      <!-- Technical Inspection Parameters -->
+      <table style="width:100%;font-size:11.5px;border-collapse:collapse;margin-bottom:16px;border:1px solid #e2e8f0">
+        <thead>
+          <tr style="background:#f1f5f9;border-bottom:1px solid #cbd5e1">
+            <th style="padding:8px 10px;text-align:left;color:#475569">SYSTEM PARAMETER</th>
+            <th style="padding:8px 10px;text-align:left;color:#475569">SPECIFICATION REQUIRED</th>
+            <th style="padding:8px 10px;text-align:left;color:#475569">RECORDED VALUE</th>
+            <th style="padding:8px 10px;text-align:center;color:#475569">STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #f1f5f9">
+            <td style="padding:7px 10px;font-weight:600">Brake Pipe Pressure (BP)</td>
+            <td style="padding:7px 10px">5.0 ± 0.1 kg/cm²</td>
+            <td style="padding:7px 10px;font-family:'JetBrains Mono',monospace">5.02 kg/cm²</td>
+            <td style="padding:7px 10px;text-align:center"><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:4px;font-weight:800;font-size:10px">PASSED</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1f5f9">
+            <td style="padding:7px 10px;font-weight:600">Feed Pipe Pressure (FP)</td>
+            <td style="padding:7px 10px">6.0 ± 0.1 kg/cm²</td>
+            <td style="padding:7px 10px;font-family:'JetBrains Mono',monospace">6.01 kg/cm²</td>
+            <td style="padding:7px 10px;text-align:center"><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:4px;font-weight:800;font-size:10px">PASSED</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1f5f9">
+            <td style="padding:7px 10px;font-weight:600">Brake Power Effective Percentage</td>
+            <td style="padding:7px 10px">≥ 95% at Originating Station</td>
+            <td style="padding:7px 10px;font-family:'JetBrains Mono',monospace;color:#15803d;font-weight:800">100.0% (22/22 Coaches Operative)</td>
+            <td style="padding:7px 10px;text-align:center"><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:4px;font-weight:800;font-size:10px">CERTIFIED</span></td>
+          </tr>
+          <tr style="border-bottom:1px solid #f1f5f9">
+            <td style="padding:7px 10px;font-weight:600">Air Brake Leakage Rate</td>
+            <td style="padding:7px 10px">≤ 0.2 kg/cm² per min</td>
+            <td style="padding:7px 10px;font-family:'JetBrains Mono',monospace">0.08 kg/cm² / min</td>
+            <td style="padding:7px 10px;text-align:center"><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:4px;font-weight:800;font-size:10px">PASSED</span></td>
+          </tr>
+          <tr>
+            <td style="padding:7px 10px;font-weight:600">Wheel Profile &amp; USFD Clearance</td>
+            <td style="padding:7px 10px">Flange Wear &lt; 3mm, No Flat Tyre</td>
+            <td style="padding:7px 10px;font-family:'JetBrains Mono',monospace">Within RDSO Specification (Zero Defects)</td>
+            <td style="padding:7px 10px;text-align:center"><span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:4px;font-weight:800;font-size:10px">CLEARED</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Inter-Railway Accounting Summary -->
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:11.5px;color:#1e3a8a;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <b style="display:block;font-size:12px;color:#1d4ed8">Inter-Railway Settlement &amp; Billing Debit:</b>
+          Debit Head: <code>${b.debitAccountHead || 'IR-SR-REV-08-200'}</code> &bull; Direct Repair: -₹59,580 &bull; Net Realized Gain: <b style="color:#047857">+₹${Number(b.netBenefit).toLocaleString('en-IN')}</b>
+        </div>
+        <div style="background:#ffffff;border:1px solid #93c5fd;padding:6px 12px;border-radius:6px;text-align:right">
+          <span style="font-size:10px;color:#64748b;display:block">CRIS ICMS Sync Status</span>
+          <b style="color:#15803d;font-size:11.5px">✓ Verified &amp; Synced</b>
+        </div>
+      </div>
+
+      <!-- Signatures Footer & Actions -->
+      <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e2e8f0;padding-top:14px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:11px;color:#64748b">
+          <div>Authorized By: <b>${b.authorizer}</b></div>
+          <div>Senior Section Engineer (C&amp;W) &bull; Basin Bridge BBQ Coaching Depot</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="window.print()" style="background:#0f172a;color:#ffffff;border:none;border-radius:6px;padding:8px 14px;font-size:11.5px;font-weight:700;cursor:pointer">
+            🖨️ Print Certificate
+          </button>
+          <button onclick="overlay.remove()" style="background:#e2e8f0;color:#334155;border:none;border-radius:6px;padding:8px 14px;font-size:11.5px;font-weight:700;cursor:pointer">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+};
+
 function renderDashboardPage() {
   return `
     <main class="content">
+      <!-- Executive Maintenance Sanction Confirmation Banner -->
+      <div id="dashboardAuthBannerMount">
+        ${renderDashboardAuthorizedBanner()}
+      </div>
+
       <!-- Track Possession Active Live HUD Banner (Matching Operations Specification) -->
       <div id="liveCountdownMount">
         ${renderLiveCountdownBanner()}
@@ -2297,28 +2589,32 @@ function renderDashboardPage() {
               <div class="map-leaflet-stage">
                 <div id="snapMapStage"></div>
 
-                <!-- Floating Layer Controls at Bottom of Map -->
-                <div class="map-floating-bottom-bar">
-                  <button class="map-floating-btn ${selectedMapLayer === 'google-hybrid' ? 'active' : ''}" data-layer="google-hybrid" title="Photorealistic Google Satellite with Roads">
+                <!-- Floating Layer Controls (Relocated to Top Alongside Leaflet Controls) -->
+                <div class="map-floating-bottom-bar" role="toolbar" aria-label="Map Cartography Layers and Maintenance Status">
+                  <button class="map-floating-btn ${selectedMapLayer === 'google-hybrid' ? 'active' : ''}" data-layer="google-hybrid" onclick="window.switchMapCartographyLayer('google-hybrid')" title="Photorealistic Google Satellite with Roads">
                     <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
                     <span>Google Satellite</span>
                   </button>
-                  <button class="map-floating-btn ${selectedMapLayer === 'google-roadmap' ? 'active' : ''}" data-layer="google-roadmap" title="Official Google Roadmap">
+                  <button class="map-floating-btn ${selectedMapLayer === 'google-roadmap' ? 'active' : ''}" data-layer="google-roadmap" onclick="window.switchMapCartographyLayer('google-roadmap')" title="Official Google Roadmap">
                     <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg>
                     <span>Google Maps</span>
                   </button>
-                  <button class="map-floating-btn ${selectedMapLayer === 'dark' ? 'active' : ''}" data-layer="dark" title="Esri Tactical Dark Canvas (Keyless, 0 Watermark)">
+                  <button class="map-floating-btn ${selectedMapLayer === 'dark' ? 'active' : ''}" data-layer="dark" onclick="window.switchMapCartographyLayer('dark')" title="Esri Tactical Dark Canvas (Keyless, 0 Watermark)">
                     <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><polygon points="12 2 2 7 22 7 12 2"></polygon></svg>
                     <span>Tactical Dark</span>
                   </button>
-                  <button class="map-floating-btn ${selectedMapLayer === 'satellite' ? 'active' : ''}" data-layer="satellite" title="Esri High-Res World Imagery">
+                  <button class="map-floating-btn ${selectedMapLayer === 'satellite' ? 'active' : ''}" data-layer="satellite" onclick="window.switchMapCartographyLayer('satellite')" title="Esri High-Res World Imagery">
                     <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
                     <span>Esri Imagery</span>
                   </button>
-                  <button class="map-floating-btn" id="btnOpenTrackView">
+                  <button class="map-floating-btn" id="btnOpenTrackView" onclick="window.__openTrackView ? window.__openTrackView('SEC-MAS-CBE', true) : (window.openTrackStreetView ? window.openTrackStreetView('SEC-MAS-CBE', true) : null)" title="Forward Cab View Simulator">
                     <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none"><rect x="4" y="3" width="16" height="16" rx="2"></rect><circle cx="8" cy="15" r="1"></circle><circle cx="16" cy="15" r="1"></circle></svg>
                     <span>Forward Cab View</span>
                   </button>
+                  <div class="map-floating-btn maint-zoom-pill" id="maintZoomHint" onclick="window.zoomToActiveMaintenance()" title="Maintenance blocks appear at zoom ≥ 7. Click to zoom directly into active maintenance corridor.">
+                    <span class="maint-zoom-status warning"></span>
+                    <span id="maintZoomHintText">Zoom in (≥7) for Maintenance</span>
+                  </div>
                 </div>
               </div>
 
@@ -5713,18 +6009,6 @@ function bindLoginEvents() {
       executeLogin("hrms");
     };
   }
-
-  const themeBtn = document.querySelector("#btnToggleTheme");
-  if (themeBtn) {
-    themeBtn.onclick = () => {
-      currentTheme = currentTheme === "light" ? "dark" : "light";
-      localStorage.setItem("sr_portal_theme", currentTheme);
-      document.documentElement.setAttribute("data-theme", currentTheme);
-      document.body.className = currentTheme === "light" ? "theme-light" : "theme-dark";
-      showToast(`Theme switched to ${currentTheme === 'light' ? 'Light Executive' : 'Dark Navy'} Mode`);
-      render();
-    };
-  }
 }
 
 function openOfficialProfileModal() {
@@ -5888,6 +6172,7 @@ function showSanctionMemo() {
     }
   }, 100);
 }
+window.showSanctionMemo = showSanctionMemo;
 
 function openTrackStreetView(sectionCode = "SEC-MAS-CBE", isMaint = true, blockParam = null) {
   const existing = document.querySelector(".track-view-modal");
@@ -6493,6 +6778,7 @@ function initHighResMap() {
   if (leafletMapInstance) {
     try { leafletMapInstance.remove(); } catch(e) {}
     leafletMapInstance = null;
+    window.leafletMapInstance = null;
   }
 
   clearInterval(window.__trainMapTimer);
@@ -6513,6 +6799,7 @@ function initHighResMap() {
     zoomControl: true,
   });
   leafletMapInstance = map;
+  window.leafletMapInstance = map;
 
   try {
     map.fitBounds(ALL_INDIA_BOUNDS, { padding: [15, 15] });
@@ -6520,7 +6807,7 @@ function initHighResMap() {
 
   // Base Map Layer Groups
   let currentBaseLayer;
-  if (selectedMapLayer === "google-hybrid" || selectedMapLayer === "satellite") {
+  if (selectedMapLayer === "google-hybrid") {
     currentBaseLayer = L.tileLayer("https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
       attribution: 'Map data &copy; Google Maps',
       subdomains: ["0", "1", "2", "3"],
@@ -6532,7 +6819,7 @@ function initHighResMap() {
       subdomains: ["0", "1", "2", "3"],
       maxZoom: 20
     });
-  } else if (selectedMapLayer === "esri-satellite") {
+  } else if (selectedMapLayer === "satellite" || selectedMapLayer === "esri-satellite") {
     currentBaseLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       attribution: 'Tiles &copy; Esri World Imagery',
       maxZoom: 18
@@ -6546,6 +6833,7 @@ function initHighResMap() {
   currentBaseLayer.addTo(map);
 
   overviewDefaultLayerGroup = L.layerGroup().addTo(map);
+  window.__overviewMaintLayerGroup = L.layerGroup();
 
   // Plot Authentic Indian Railways Network Corridors
   REAL_ROUTES.forEach(r => {
@@ -6603,6 +6891,7 @@ function initHighResMap() {
     MAINT_ZONES = [...OFFICIAL_SANCTIONED_MAINT_ZONES];
   }
 
+  // Add maintenance circles and markers to dedicated window.__overviewMaintLayerGroup (shown only on zoom >= 7)
   MAINT_ZONES.forEach(m => {
     L.circle([m.lat, m.lng], {
       color: m.isNew ? "#ef4444" : "#e74c3c",
@@ -6610,7 +6899,7 @@ function initHighResMap() {
       fillOpacity: m.isNew ? 0.5 : 0.25,
       radius: m.isNew ? 14000 : 10000,
       weight: m.isNew ? 3 : 2
-    }).addTo(overviewDefaultLayerGroup);
+    }).addTo(window.__overviewMaintLayerGroup);
 
     // Marker includes small icon representing the work
     const maintHtml = `
@@ -6646,10 +6935,58 @@ function initHighResMap() {
         </button>
       </div>
     `);
-    maintMarker.addTo(overviewDefaultLayerGroup);
+    maintMarker.addTo(window.__overviewMaintLayerGroup);
     window.__maintMarkers[m.code] = maintMarker;
     if (m.id) window.__maintMarkers[m.id] = maintMarker;
   });
+
+  // Zoom-Adaptive Maintenance Layer: Clutter is hidden at national overview (< 7).
+  // Maintenance blocks & permits appear automatically when zoomed in (>= 7).
+  const updateMaintVisibility = () => {
+    try {
+      const currentZoom = map.getZoom();
+      const hintText = document.getElementById("maintZoomHintText");
+      const hintPill = document.getElementById("maintZoomHint");
+      const statusDot = hintPill?.querySelector(".maint-zoom-status");
+      
+      if (currentZoom >= 7) {
+        if (!map.hasLayer(window.__overviewMaintLayerGroup)) {
+          map.addLayer(window.__overviewMaintLayerGroup);
+        }
+        if (hintPill) {
+          hintPill.classList.remove("zoomed-out");
+          hintPill.classList.add("active");
+          hintPill.title = `Zoom ${currentZoom} (≥7): Maintenance zones & track blocks are displayed`;
+        }
+        if (statusDot) {
+          statusDot.className = "maint-zoom-status active";
+        }
+        if (hintText) {
+          hintText.textContent = `Blocks Active (Zoom: ${currentZoom})`;
+        }
+      } else {
+        if (map.hasLayer(window.__overviewMaintLayerGroup)) {
+          map.removeLayer(window.__overviewMaintLayerGroup);
+        }
+        if (hintPill) {
+          hintPill.classList.remove("active");
+          hintPill.classList.add("zoomed-out");
+          hintPill.title = `Zoom ${currentZoom} (<7): Maintenance blocks hidden to prevent clutter. Click to zoom directly into Southern Railway corridor.`;
+        }
+        if (statusDot) {
+          statusDot.className = "maint-zoom-status warning";
+        }
+        if (hintText) {
+          hintText.textContent = `Zoom in (≥7) for Maintenance`;
+        }
+      }
+    } catch (e) {
+      console.warn("Maint visibility update error:", e);
+    }
+  };
+
+  map.on("zoomend", updateMaintVisibility);
+  updateMaintVisibility();
 
   initMovingTrains(map);
   if (typeof aiRouteAnalysisState !== "undefined" && aiRouteAnalysisState.active) {
@@ -6663,15 +7000,39 @@ function initHighResMap() {
     try {
       map.invalidateSize();
       map.fitBounds(ALL_INDIA_BOUNDS, { padding: [15, 15] });
+      updateMaintVisibility();
     } catch(e) {}
   }, 100);
   setTimeout(() => {
     try {
       map.invalidateSize();
       map.fitBounds(ALL_INDIA_BOUNDS, { padding: [15, 15] });
+      updateMaintVisibility();
     } catch(e) {}
   }, 350);
 }
+
+window.switchMapCartographyLayer = function(layerName) {
+  selectedMapLayer = layerName;
+  initHighResMap();
+  const labelMap = {
+    "google-hybrid": "Google Satellite",
+    "google-roadmap": "Google Maps",
+    "dark": "Tactical Dark",
+    "satellite": "Esri Imagery"
+  };
+  showToast(`Switched map layer: ${labelMap[layerName] || layerName}`);
+  document.querySelectorAll(".map-floating-btn[data-layer]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.layer === layerName);
+  });
+};
+
+window.zoomToActiveMaintenance = function() {
+  if (leafletMapInstance) {
+    leafletMapInstance.flyTo([12.7667, 78.8582], 9, { duration: 1.2 });
+    showToast("Zooming into Southern Railway Active Maintenance Corridor (MAS-SBC-CBE)...");
+  }
+};
 
 window.syncMapWithBackendAPI = async function(showToastFeedback = false) {
   try {
@@ -7547,6 +7908,9 @@ function highlightTrainRouteOnMap(query) {
   if (overviewDefaultLayerGroup && leafletMapInstance.hasLayer(overviewDefaultLayerGroup)) {
     leafletMapInstance.removeLayer(overviewDefaultLayerGroup);
   }
+  if (window.__overviewMaintLayerGroup && leafletMapInstance.hasLayer(window.__overviewMaintLayerGroup)) {
+    leafletMapInstance.removeLayer(window.__overviewMaintLayerGroup);
+  }
   clearInterval(window.__trainMapTimer);
   clearInterval(singleTrainMovingTimer);
 
@@ -7705,6 +8069,11 @@ function clearTrainRouteHighlight() {
   if (overviewDefaultLayerGroup && leafletMapInstance && !leafletMapInstance.hasLayer(overviewDefaultLayerGroup)) {
     leafletMapInstance.addLayer(overviewDefaultLayerGroup);
     initMovingTrains(leafletMapInstance);
+  }
+  if (window.__overviewMaintLayerGroup && leafletMapInstance) {
+    if (leafletMapInstance.getZoom() >= 7 && !leafletMapInstance.hasLayer(window.__overviewMaintLayerGroup)) {
+      leafletMapInstance.addLayer(window.__overviewMaintLayerGroup);
+    }
   }
 
   const input = document.querySelector("#trainRouteSearchInput");
@@ -9432,7 +9801,7 @@ function renderAssetMaintenancePage() {
                             <button class="primary" style="background:#2563eb;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:4px" onclick="event.stopPropagation(); window.openAssetMaintenanceAgentModal('${no}', '${t.stnCode}')" title="Open Deep 14-Point Audit Modal">
                               🤖 14-Pt Audit
                             </button>
-                            <button class="secondary" style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:4px" onclick="event.stopPropagation(); showToast('✓ Electronic Job Card &amp; BPC authorized for Train #${no} at ${t.stnCode}.')">
+                            <button class="secondary" style="font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:4px;background:#16a34a;color:#ffffff;border:none" onclick="event.stopPropagation(); window.executeAuthorizeTrainMaintenance('${no}', '${t.stnCode}', ${t.netBenefit || 167420}, '73.8%')" title="Authorize BPC and redirect to Executive Dashboard">
                               ✓ BPC
                             </button>
                           </div>
@@ -9607,7 +9976,7 @@ function renderAssetMaintenancePage() {
                 <button class="primary" style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 14px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="window.openProfessionalRepairReportModal('${audit.trainNo}', '${audit.stationCode || 'MAS'}')">
                   <span>📑</span> Official RDSO Report
                 </button>
-                <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:12px;padding:8px 18px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="showToast('✓ Electronic Job Card &amp; BPC Issued for Train #${audit.trainNo} at ${audit.stationCode}. Inter-Railway debit registered.')">
+                <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:12px;padding:8px 18px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="window.executeAuthorizeTrainMaintenance('${audit.trainNo}', '${audit.stationCode || 'MAS'}', ${audit.param13_potentialSaving?.netBenefit || 167420}, '73.8%')">
                   <span>✓</span> Authorize Pit-Line Servicing &amp; Issue BPC
                 </button>
               </div>
@@ -10262,9 +10631,19 @@ const MAJOR_JUNCTIONS = [
 
 window.setSmartPanelMode = (mode) => {
   smartPanelMode = mode;
+  window.__smartAssetPanelClosed = false;
   const panel = document.querySelector("#smartAssetPanel");
   if (panel && selectedSmartAsset) {
+    panel.classList.remove("closed");
+    panel.style.removeProperty("display");
+    panel.style.removeProperty("visibility");
+    panel.style.removeProperty("opacity");
+    panel.style.removeProperty("pointer-events");
+    panel.style.display = "flex";
     panel.innerHTML = window.renderSmartAssetPanelHtml(selectedSmartAsset);
+    if (typeof window.attachDraggableSmartAssetPanel === "function") {
+      window.attachDraggableSmartAssetPanel();
+    }
   }
 };
 
@@ -10486,10 +10865,10 @@ window.renderSmartAssetPanelHtml = (ast) => {
           </button>
         </div>
         <div class="smart-header-controls">
-          <button class="smart-asset-ctrl-btn" onclick="window.toggleMinimizeSmartAssetPanel()" title="Minimize / Expand">
+          <button class="smart-asset-ctrl-btn" onclick="window.toggleMinimizeSmartAssetPanel(event)" title="Minimize / Expand">
             ${isSmartAssetPanelMinimized ? '□' : '—'}
           </button>
-          <button class="smart-asset-ctrl-btn close-btn" onclick="window.closeSmartAssetPanel()" title="Close Asset Info">✖</button>
+          <button class="smart-asset-ctrl-btn close-btn" onclick="window.closeSmartAssetPanel(event)" title="Close Asset Info">✖</button>
         </div>
       </div>
 
@@ -10643,10 +11022,10 @@ window.renderSmartAssetPanelHtml = (ast) => {
         </div>
       </div>
       <div class="smart-header-controls">
-        <button class="smart-asset-ctrl-btn" onclick="window.toggleMinimizeSmartAssetPanel()" title="Minimize / Expand">
+        <button class="smart-asset-ctrl-btn" onclick="window.toggleMinimizeSmartAssetPanel(event)" title="Minimize / Expand">
           ${isSmartAssetPanelMinimized ? '□' : '—'}
         </button>
-        <button class="smart-asset-ctrl-btn close-btn" onclick="window.closeSmartAssetPanel()" title="Close Asset Info">✖</button>
+        <button class="smart-asset-ctrl-btn close-btn" onclick="window.closeSmartAssetPanel(event)" title="Close Asset Info">✖</button>
       </div>
     </div>
 
@@ -10842,7 +11221,7 @@ function renderCorridorMapPage() {
             <span style="background:#ef4444;color:#fff;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:800">12 ALERTS</span>
           </div>
           <button 
-            onclick="window.toggleMinimizeSmartAssetPanel ? window.toggleMinimizeSmartAssetPanel() : (document.getElementById('smartAssetPanel')?.classList.toggle('minimized'))" 
+            onclick="window.toggleSmartAssetPanelOpen ? window.toggleSmartAssetPanelOpen() : (document.getElementById('smartAssetPanel')?.classList.toggle('minimized'))" 
             style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11px;padding:4px 10px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
             <span>📋</span> Assets (${corridorAssets.length})
           </button>
@@ -10852,29 +11231,36 @@ function renderCorridorMapPage() {
       <!-- MAIN BODY: LEFT LAYERS + CENTER MAP + RIGHT ASSET INFORMATION -->
       <div class="smart-map-body">
 
-        <!-- FLOATING TOP CORRIDOR QUICK-JUMP RIBBON -->
-        <div class="smart-map-floating-corridors">
-          <button class="smart-corridor-pill ${selectedSmartCorridor === 'ALL' ? 'active' : ''}" data-corridor="ALL" onclick="window.filterSmartCorridor('ALL')">
-            ALL ZONE 07
-          </button>
-          <button class="smart-corridor-pill ${selectedSmartCorridor === 'MAS-SBC' ? 'active' : ''}" data-corridor="MAS-SBC" onclick="window.filterSmartCorridor('MAS-SBC')">
-            MAS – SBC (130 km/h)
-          </button>
-          <button class="smart-corridor-pill ${selectedSmartCorridor === 'MAS-CBE' ? 'active' : ''}" data-corridor="MAS-CBE" onclick="window.filterSmartCorridor('MAS-CBE')">
-            MAS – CBE TRUNK
-          </button>
-          <button class="smart-corridor-pill ${selectedSmartCorridor === 'PGT-TVC' ? 'active' : ''}" data-corridor="PGT-TVC" onclick="window.filterSmartCorridor('PGT-TVC')">
-            ERS – TVC COASTAL
-          </button>
-          <button class="smart-corridor-pill ${selectedSmartCorridor === 'MDU-RMM' ? 'active' : ''}" data-corridor="MDU-RMM" onclick="window.filterSmartCorridor('MDU-RMM')">
-            MDU – RMM (PAMBAN)
-          </button>
-          <button class="smart-corridor-pill ${selectedSmartCorridor === 'PGT-MAQ' ? 'active' : ''}" data-corridor="PGT-MAQ" onclick="window.filterSmartCorridor('PGT-MAQ')">
-            PGT – MAQ MAINLINE
-          </button>
-          <button class="smart-corridor-pill" style="background:#1e3a5f;border-color:#3b82f6" onclick="window.toggleMapFullscreen()" title="Toggle Edge-to-Edge Fullscreen">
-            FULLSCREEN
-          </button>
+        <!-- FLOATING TOP CORRIDOR QUICK-JUMP RIBBON & ZOOM HUD (Stacked to prevent overlap) -->
+        <div class="smart-map-floating-header-stack">
+          <div class="smart-map-floating-corridors">
+            <button class="smart-corridor-pill ${selectedSmartCorridor === 'ALL' ? 'active' : ''}" data-corridor="ALL" onclick="window.filterSmartCorridor('ALL')">
+              ALL ZONE 07
+            </button>
+            <button class="smart-corridor-pill ${selectedSmartCorridor === 'MAS-SBC' ? 'active' : ''}" data-corridor="MAS-SBC" onclick="window.filterSmartCorridor('MAS-SBC')">
+              MAS – SBC (130 km/h)
+            </button>
+            <button class="smart-corridor-pill ${selectedSmartCorridor === 'MAS-CBE' ? 'active' : ''}" data-corridor="MAS-CBE" onclick="window.filterSmartCorridor('MAS-CBE')">
+              MAS – CBE TRUNK
+            </button>
+            <button class="smart-corridor-pill ${selectedSmartCorridor === 'PGT-TVC' ? 'active' : ''}" data-corridor="PGT-TVC" onclick="window.filterSmartCorridor('PGT-TVC')">
+              ERS – TVC COASTAL
+            </button>
+            <button class="smart-corridor-pill ${selectedSmartCorridor === 'MDU-RMM' ? 'active' : ''}" data-corridor="MDU-RMM" onclick="window.filterSmartCorridor('MDU-RMM')">
+              MDU – RMM (PAMBAN)
+            </button>
+            <button class="smart-corridor-pill ${selectedSmartCorridor === 'PGT-MAQ' ? 'active' : ''}" data-corridor="PGT-MAQ" onclick="window.filterSmartCorridor('PGT-MAQ')">
+              PGT – MAQ MAINLINE
+            </button>
+            <button class="smart-corridor-pill fullscreen-toggle-btn" id="smartMapFullscreenBtn" style="background:#1e3a5f;border-color:#3b82f6" onclick="window.toggleMapFullscreen()" title="Toggle Edge-to-Edge Fullscreen">
+              ⛶ FULLSCREEN
+            </button>
+          </div>
+          <!-- Live Zoom Adaptive HUD Badge -->
+          <div id="corridorZoomHud" class="corridor-zoom-hud" onclick="window.focusCorridorSector()" title="Click to toggle between National Overview and Sector Detail View">
+            <span class="hud-dot"></span>
+            <span id="corridorZoomHudText">🗺️ <b>NATIONAL CORRIDOR OVERVIEW</b> • Zoom in to sector level to view live trains &amp; worksites</span>
+          </div>
         </div>
 
         <!-- TILE STYLE SWITCHER (Bottom Left) -->
@@ -10889,7 +11275,7 @@ function renderCorridorMapPage() {
         <div class="smart-layers-panel ${isSmartLayersCollapsed ? 'collapsed' : ''}" id="smartLayersPanel">
           <div class="smart-layers-header">
             <strong>GIS LAYERS</strong>
-            <button class="smart-layers-toggle-btn" onclick="window.toggleSmartLayers()" title="Toggle Layers Panel">
+            <button class="smart-layers-toggle-btn" onclick="window.toggleSmartLayers(event)" title="Toggle Layers Panel">
               ${isSmartLayersCollapsed ? '▶' : '◀'}
             </button>
           </div>
@@ -10982,7 +11368,7 @@ function renderCorridorMapPage() {
         </div>
 
         <!-- RIGHT ASSET INFORMATION & HISTORY PANEL -->
-        <div class="smart-asset-panel ${isSmartAssetPanelMinimized ? 'minimized' : ''}" id="smartAssetPanel">
+        <div class="smart-asset-panel ${isSmartAssetPanelMinimized ? 'minimized' : ''} ${window.__smartAssetPanelClosed ? 'closed' : ''}" id="smartAssetPanel" style="${window.__smartAssetPanelClosed ? 'display:none !important;' : ''}">
           ${window.renderSmartAssetPanelHtml(ast)}
         </div>
 
@@ -11009,20 +11395,211 @@ function renderCorridorMapPage() {
   `;
 }
 
-// Window interactive helper functions
+// Window interactive helper functions & Free-Roaming Drag Engines
 
-window.toggleMinimizeSmartAssetPanel = () => {
+window.makeDraggable = function(el, handleSelectorOrEl, options = {}) {
+  if (!el) return;
+  if (el.__isDraggableBound) return;
+  el.__isDraggableBound = true;
+
+  let isDragging = false;
+  let startX = 0, startY = 0;
+  let startLeft = 0, startTop = 0;
+  let hasMoved = false;
+
+  const onPointerDown = (e) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    
+    // Check if target matches handle
+    let isHandle = false;
+    if (typeof handleSelectorOrEl === 'string') {
+      isHandle = !!e.target.closest(handleSelectorOrEl);
+    } else if (handleSelectorOrEl instanceof Element) {
+      isHandle = handleSelectorOrEl.contains(e.target);
+    }
+    if (!isHandle) return;
+
+    // Ignore interactive controls inside the handle
+    if (e.target.closest('button, input, select, textarea, a, .smart-mode-tab-btn, .smart-asset-ctrl-btn, .smart-layers-toggle-btn, .smart-search-clear-btn')) {
+      return;
+    }
+
+    isDragging = true;
+    hasMoved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    const parent = el.offsetParent || document.body;
+    const parentRect = parent.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+
+    startLeft = elRect.left - parentRect.left;
+    startTop = elRect.top - parentRect.top;
+
+    // Reset right / bottom and switch to left / top
+    el.style.right = 'auto';
+    el.style.bottom = 'auto';
+    el.style.left = `${startLeft}px`;
+    el.style.top = `${startTop}px`;
+    if (options.zIndex) {
+      el.style.zIndex = options.zIndex;
+    }
+
+    if (e.target.setPointerCapture) {
+      try { e.target.setPointerCapture(e.pointerId); } catch(err) {}
+    }
+
+    const onPointerMove = (ev) => {
+      if (!isDragging) return;
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+
+      if (Math.hypot(dx, dy) > 4) {
+        hasMoved = true;
+      }
+
+      let newLeft = startLeft + dx;
+      let newTop = startTop + dy;
+
+      const maxLeft = (parent === document.body ? window.innerWidth : parent.clientWidth) - (el.offsetWidth || 100);
+      const maxTop = (parent === document.body ? window.innerHeight : parent.clientHeight) - (el.offsetHeight || 40);
+
+      newLeft = Math.max(4, Math.min(newLeft, Math.max(4, maxLeft)));
+      newTop = Math.max(4, Math.min(newTop, Math.max(4, maxTop)));
+
+      el.style.left = `${newLeft}px`;
+      el.style.top = `${newTop}px`;
+
+      if (options.onMove) options.onMove(newLeft, newTop, ev);
+      ev.preventDefault();
+    };
+
+    const onPointerUp = (ev) => {
+      if (!isDragging) return;
+      isDragging = false;
+
+      if (e.target.releasePointerCapture) {
+        try { e.target.releasePointerCapture(ev.pointerId); } catch(err) {}
+      }
+
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onPointerUp);
+      document.removeEventListener('pointercancel', onPointerUp);
+
+      if (hasMoved) {
+        el.__justDragged = true;
+        setTimeout(() => { el.__justDragged = false; }, 200);
+      }
+
+      if (options.onEnd) options.onEnd(hasMoved, ev);
+    };
+
+    document.addEventListener('pointermove', onPointerMove, { passive: false });
+    document.addEventListener('pointerup', onPointerUp, { passive: false });
+    document.addEventListener('pointercancel', onPointerUp, { passive: false });
+
+    if (options.onStart) options.onStart(e);
+  };
+
+  el.addEventListener('pointerdown', onPointerDown);
+};
+
+window.attachDraggableSmartAssetPanel = function() {
+  const p = document.querySelector("#smartAssetPanel");
+  if (p) {
+    if (window.__lastSmartAssetPos) {
+      p.style.right = 'auto';
+      p.style.bottom = 'auto';
+      p.style.left = `${window.__lastSmartAssetPos.left}px`;
+      p.style.top = `${window.__lastSmartAssetPos.top}px`;
+    }
+    window.makeDraggable(p, '.smart-asset-header', {
+      zIndex: '1005',
+      onEnd: (moved) => {
+        if (moved) {
+          const parent = p.offsetParent || document.body;
+          const parentRect = parent.getBoundingClientRect();
+          const r = p.getBoundingClientRect();
+          window.__lastSmartAssetPos = { left: r.left - parentRect.left, top: r.top - parentRect.top };
+        }
+      }
+    });
+  }
+};
+
+window.attachDraggableSmartLayersPanel = function() {
+  const p = document.querySelector("#smartLayersPanel");
+  if (p) {
+    if (window.__lastSmartLayersPos) {
+      p.style.right = 'auto';
+      p.style.bottom = 'auto';
+      p.style.left = `${window.__lastSmartLayersPos.left}px`;
+      p.style.top = `${window.__lastSmartLayersPos.top}px`;
+    }
+    window.makeDraggable(p, '.smart-layers-header', {
+      zIndex: '1004',
+      onEnd: (moved) => {
+        if (moved) {
+          const parent = p.offsetParent || document.body;
+          const parentRect = parent.getBoundingClientRect();
+          const r = p.getBoundingClientRect();
+          window.__lastSmartLayersPos = { left: r.left - parentRect.left, top: r.top - parentRect.top };
+        }
+      }
+    });
+  }
+};
+
+window.toggleMinimizeSmartAssetPanel = (e) => {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
   isSmartAssetPanelMinimized = !isSmartAssetPanelMinimized;
   const p = document.querySelector("#smartAssetPanel");
-  if (p) p.classList.toggle("minimized", isSmartAssetPanelMinimized);
+  if (p) {
+    p.classList.toggle("minimized", isSmartAssetPanelMinimized);
+    const btn = p.querySelector(".smart-asset-ctrl-btn:not(.close-btn)");
+    if (btn) btn.textContent = isSmartAssetPanelMinimized ? '□' : '—';
+    window.attachDraggableSmartAssetPanel();
+  }
+};
+
+window.toggleSmartAssetPanelOpen = function(forceOpen) {
+  const p = document.querySelector("#smartAssetPanel");
+  if (!p) return;
+  const isClosed = window.__smartAssetPanelClosed || p.classList.contains("closed") || p.style.display === "none";
+  const shouldOpen = typeof forceOpen === "boolean" ? forceOpen : isClosed;
+  if (shouldOpen) {
+    window.__smartAssetPanelClosed = false;
+    p.classList.remove("closed");
+    p.style.removeProperty("display");
+    p.style.removeProperty("visibility");
+    p.style.removeProperty("opacity");
+    p.style.removeProperty("pointer-events");
+    p.style.display = "flex";
+    if (isSmartAssetPanelMinimized) {
+      isSmartAssetPanelMinimized = false;
+      p.classList.remove("minimized");
+      const btn = p.querySelector(".smart-asset-ctrl-btn:not(.close-btn)");
+      if (btn) btn.textContent = '—';
+    }
+    window.attachDraggableSmartAssetPanel();
+  } else {
+    window.closeSmartAssetPanel();
+  }
 };
 
 window.toggleMapFullscreen = () => {
   const container = document.querySelector("#smartMapMainContainer");
   if (container) {
-    container.classList.toggle("fullscreen-map-mode");
+    const isFull = container.classList.toggle("fullscreen-map-mode");
+    const btn = document.querySelector("#smartMapFullscreenBtn");
+    if (btn) {
+      btn.innerHTML = isFull ? "✕ EXIT FULLSCREEN" : "⛶ FULLSCREEN";
+      btn.style.background = isFull ? "#dc2626" : "#1e3a5f";
+      btn.style.borderColor = isFull ? "#f87171" : "#3b82f6";
+    }
     if (leafletMapInstance) {
-      setTimeout(() => { leafletMapInstance.invalidateSize(); }, 300);
+      setTimeout(() => { leafletMapInstance.invalidateSize(); }, 200);
+      setTimeout(() => { leafletMapInstance.invalidateSize(); }, 500);
     }
   }
 };
@@ -11066,7 +11643,8 @@ window.switchTileLayer = (layerType) => {
   });
 };
 
-window.toggleSmartLayers = () => {
+window.toggleSmartLayers = (e) => {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
   isSmartLayersCollapsed = !isSmartLayersCollapsed;
   const p = document.querySelector("#smartLayersPanel");
   if (p) {
@@ -11075,12 +11653,22 @@ window.toggleSmartLayers = () => {
     if (content) content.style.display = isSmartLayersCollapsed ? "none" : "block";
     const btn = p.querySelector(".smart-layers-toggle-btn");
     if (btn) btn.textContent = isSmartLayersCollapsed ? "▶" : "◀";
+    window.attachDraggableSmartLayersPanel();
   }
 };
 
-window.closeSmartAssetPanel = () => {
+window.closeSmartAssetPanel = (e) => {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+  if (e && typeof e.preventDefault === 'function') e.preventDefault();
+  window.__smartAssetPanelClosed = true;
   const p = document.querySelector("#smartAssetPanel");
-  if (p) p.style.display = "none";
+  if (p) {
+    p.classList.add("closed");
+    p.style.setProperty("display", "none", "important");
+    p.style.setProperty("visibility", "hidden", "important");
+    p.style.setProperty("opacity", "0", "important");
+    p.style.setProperty("pointer-events", "none", "important");
+  }
 };
 
 window.setSmartTab = (tabName) => {
@@ -11088,6 +11676,7 @@ window.setSmartTab = (tabName) => {
   const panel = document.querySelector("#smartAssetPanel");
   if (panel && selectedSmartAsset) {
     panel.innerHTML = window.renderSmartAssetPanelHtml(selectedSmartAsset);
+    window.attachDraggableSmartAssetPanel();
   }
 };
 
@@ -11096,10 +11685,17 @@ window.selectSmartAsset = (assetId) => {
   if (!ast) return;
   selectedSmartAsset = ast;
   
+  window.__smartAssetPanelClosed = false;
   const panel = document.querySelector("#smartAssetPanel");
   if (panel) {
+    panel.classList.remove("closed");
+    panel.style.removeProperty("display");
+    panel.style.removeProperty("visibility");
+    panel.style.removeProperty("opacity");
+    panel.style.removeProperty("pointer-events");
     panel.style.display = "flex";
     panel.innerHTML = window.renderSmartAssetPanelHtml(ast);
+    window.attachDraggableSmartAssetPanel();
   }
 
   if (leafletMapInstance && ast.coords) {
@@ -11231,6 +11827,37 @@ window.resetSmartLayers = () => {
   showToast("All GIS cartography layers reset to active.");
 };
 
+const NATIONAL_APEX_JUNCTIONS = new Set([
+  "NDLS", "MMCT", "CSMT", "HWH", "SBC", "SC", "BZA", "NGP", "ADI", "BPL", 
+  "JP", "CNB", "PRYJ", "DDU", "PNBE", "GHY", "JAT", "BBS", "VSKP", "LKO", "MAS"
+]);
+
+window.updateCorridorZoomHud = () => {
+  const hud = document.querySelector("#corridorZoomHud");
+  const textEl = document.querySelector("#corridorZoomHudText");
+  if (!hud || !textEl || !leafletMapInstance) return;
+  const z = typeof leafletMapInstance.getZoom === "function" ? Math.round(leafletMapInstance.getZoom()) : 5;
+  if (z >= 7) {
+    hud.className = "corridor-zoom-hud active";
+    textEl.innerHTML = `⚡ <b>SECTOR DETAIL VIEW (Zoom ${z})</b> • Live Trains, Worksite Blocks &amp; Asset Twins Active`;
+  } else {
+    hud.className = "corridor-zoom-hud";
+    textEl.innerHTML = `🗺️ <b>NATIONAL CORRIDOR OVERVIEW (Zoom ${z})</b> • Zoom in to sector level to view live trains &amp; worksites`;
+  }
+};
+
+window.focusCorridorSector = () => {
+  if (!leafletMapInstance) return;
+  const z = typeof leafletMapInstance.getZoom === "function" ? leafletMapInstance.getZoom() : 5;
+  if (z < 7) {
+    leafletMapInstance.flyTo([11.2, 78.5], 8, { duration: 1.0 });
+    showToast("Zoomed to Southern Railway Sector View (Live Trains & Blocks Active)");
+  } else {
+    leafletMapInstance.flyTo([22.5, 79.0], 5, { duration: 1.0 });
+    showToast("Zoomed to National Corridor Overview");
+  }
+};
+
 window.rebuildCorridorMapLayers = () => {
   if (!leafletMapInstance || !smartLayerGroups.tracks) return;
 
@@ -11247,7 +11874,11 @@ window.rebuildCorridorMapLayers = () => {
   const curBlockStatus = selectedSmartBlockStatus;
   const query = smartMapSearchQuery;
 
-  // 1. RENDER CORRIDOR TRACK POLYLINES
+  // Check current zoom level to prevent overlapping clutter and clusters when zoomed out
+  const currentZoom = typeof leafletMapInstance.getZoom === "function" ? leafletMapInstance.getZoom() : 5;
+  const isZoomedIn = (currentZoom >= 7) || Boolean(query);
+
+  // 1. RENDER CORRIDOR TRACK POLYLINES (Always visible at all zoom levels)
   SR_CORRIDORS.forEach(c => {
     const isSelected = curCorridor === "ALL" || c.id === curCorridor;
     const isDivMatch = curDiv === "ALL" || c.div === curDiv;
@@ -11290,6 +11921,9 @@ window.rebuildCorridorMapLayers = () => {
     if (curDiv !== "ALL" && stn.div !== curDiv) return;
     if (query && !stn.name.toLowerCase().includes(query) && !stn.code.toLowerCase().includes(query)) return;
 
+    // When zoomed out (macro overview), only display apex national junction hubs to eliminate local clustering
+    if (!isZoomedIn && !NATIONAL_APEX_JUNCTIONS.has(stn.code)) return;
+
     const jIcon = L.divIcon({
       html: `
         <div class="pro-gis-junction-pin">
@@ -11314,92 +11948,94 @@ window.rebuildCorridorMapLayers = () => {
     `);
   });
 
-  // 3. RENDER ASSETS WITH CRISP SVG SYMBOLS
-  SR_MAP_ASSETS.forEach(ast => {
-    // Division filter
-    if (curDiv !== "ALL" && ast.div !== curDiv) return;
+  // 3. RENDER ASSETS WITH CRISP SVG SYMBOLS (Only visible when zoomed in to prevent map clutter)
+  if (isZoomedIn) {
+    SR_MAP_ASSETS.forEach(ast => {
+      // Division filter
+      if (curDiv !== "ALL" && ast.div !== curDiv) return;
 
-    // Asset Category filter
-    if (curAssetType !== "ALL" && ast.category !== curAssetType) return;
+      // Asset Category filter
+      if (curAssetType !== "ALL" && ast.category !== curAssetType) return;
 
-    // Block status filter
-    if (curBlockStatus !== "ALL") {
-      if (ast.category === "Active Blocks" && curBlockStatus !== "Active Blocks") return;
-      if (ast.category === "Planned Blocks" && curBlockStatus !== "Planned Blocks") return;
-      if (ast.category === "Maintenance Zones" && curBlockStatus !== "Maintenance Zones") return;
-    }
+      // Block status filter
+      if (curBlockStatus !== "ALL") {
+        if (ast.category === "Active Blocks" && curBlockStatus !== "Active Blocks") return;
+        if (ast.category === "Planned Blocks" && curBlockStatus !== "Planned Blocks") return;
+        if (ast.category === "Maintenance Zones" && curBlockStatus !== "Maintenance Zones") return;
+      }
 
-    // Search query filter
-    if (query) {
-      const matchText = (ast.name + " " + ast.id + " " + ast.section + " " + (ast.river || "") + " " + (ast.km || "")).toLowerCase();
-      if (!matchText.includes(query)) return;
-    }
+      // Search query filter
+      if (query) {
+        const matchText = (ast.name + " " + ast.id + " " + ast.section + " " + (ast.river || "") + " " + (ast.km || "")).toLowerCase();
+        if (!matchText.includes(query)) return;
+      }
 
-    let targetLayer = smartLayerGroups.bridges;
-    let pinClass = "pro-pin-bridges";
+      let targetLayer = smartLayerGroups.bridges;
+      let pinClass = "pro-pin-bridges";
 
-    if (ast.category === "Loco Sheds") {
-      targetLayer = smartLayerGroups.locoSheds;
-      pinClass = "pro-pin-locosheds";
-    } else if (ast.category === "Coach Depots") {
-      targetLayer = smartLayerGroups.coachDepots;
-      pinClass = "pro-pin-coachdepots";
-    } else if (ast.category === "Workshops") {
-      targetLayer = smartLayerGroups.workshops;
-      pinClass = "pro-pin-workshops";
-    } else if (ast.category === "Railway Yards") {
-      targetLayer = smartLayerGroups.yards;
-      pinClass = "pro-pin-railwayyards";
-    } else if (ast.category === "Goods Sheds") {
-      targetLayer = smartLayerGroups.goodsSheds;
-      pinClass = "pro-pin-goodssheds";
-    } else if (ast.category === "Tunnels") {
-      targetLayer = smartLayerGroups.tunnels;
-      pinClass = "pro-pin-tunnels";
-    } else if (ast.category === "Active Blocks") {
-      targetLayer = smartLayerGroups.activeBlocks;
-      pinClass = "pro-pin-activeblocks";
-    } else if (ast.category === "Planned Blocks") {
-      targetLayer = smartLayerGroups.plannedBlocks;
-      pinClass = "pro-pin-plannedblocks";
-    } else if (ast.category === "Maintenance Zones") {
-      targetLayer = smartLayerGroups.maintenanceZones;
-      pinClass = "pro-pin-maintenancezones";
-    }
+      if (ast.category === "Loco Sheds") {
+        targetLayer = smartLayerGroups.locoSheds;
+        pinClass = "pro-pin-locosheds";
+      } else if (ast.category === "Coach Depots") {
+        targetLayer = smartLayerGroups.coachDepots;
+        pinClass = "pro-pin-coachdepots";
+      } else if (ast.category === "Workshops") {
+        targetLayer = smartLayerGroups.workshops;
+        pinClass = "pro-pin-workshops";
+      } else if (ast.category === "Railway Yards") {
+        targetLayer = smartLayerGroups.yards;
+        pinClass = "pro-pin-railwayyards";
+      } else if (ast.category === "Goods Sheds") {
+        targetLayer = smartLayerGroups.goodsSheds;
+        pinClass = "pro-pin-goodssheds";
+      } else if (ast.category === "Tunnels") {
+        targetLayer = smartLayerGroups.tunnels;
+        pinClass = "pro-pin-tunnels";
+      } else if (ast.category === "Active Blocks") {
+        targetLayer = smartLayerGroups.activeBlocks;
+        pinClass = "pro-pin-activeblocks";
+      } else if (ast.category === "Planned Blocks") {
+        targetLayer = smartLayerGroups.plannedBlocks;
+        pinClass = "pro-pin-plannedblocks";
+      } else if (ast.category === "Maintenance Zones") {
+        targetLayer = smartLayerGroups.maintenanceZones;
+        pinClass = "pro-pin-maintenancezones";
+      }
 
-    const iconSvg = ASSET_SVG_ICONS[ast.category] || ASSET_SVG_ICONS["Bridges"];
+      const iconSvg = ASSET_SVG_ICONS[ast.category] || ASSET_SVG_ICONS["Bridges"];
 
-    const pinIcon = L.divIcon({
-      html: `
-        <div class="pro-gis-asset-pin ${pinClass}" title="${ast.name} [${ast.id}]">
-          ${iconSvg}
+      const pinIcon = L.divIcon({
+        html: `
+          <div class="pro-gis-asset-pin ${pinClass}" title="${ast.name} [${ast.id}]">
+            ${iconSvg}
+          </div>
+        `,
+        className: "",
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+
+      const marker = L.marker(ast.coords, { icon: pinIcon }).addTo(targetLayer);
+      marker.on('click', () => {
+        window.selectSmartAsset(ast.id);
+      });
+
+      marker.bindPopup(`
+        <div style="font-family:Inter,sans-serif;padding:4px;min-width:180px">
+          <div style="font-size:10px;color:#94a3b8;font-weight:700">${ast.category} • ${ast.div} Division</div>
+          <strong style="font-size:12.5px;color:#fff">${ast.name}</strong>
+          <div style="font-size:10.5px;color:#60a5fa;margin-top:2px">${ast.id}</div>
+          <div style="font-size:10.5px;color:#cbd5e1;margin-top:4px">${ast.section}</div>
+          <button style="width:100%;margin-top:6px;background:#2563eb;color:#fff;border:none;border-radius:4px;padding:5px;font-size:10.5px;font-weight:700;cursor:pointer" onclick="window.selectSmartAsset('${ast.id}')">
+            Inspect Asset Dossier
+          </button>
         </div>
-      `,
-      className: "",
-      iconSize: [24, 24],
-      iconAnchor: [12, 12]
+      `);
     });
+  }
 
-    const marker = L.marker(ast.coords, { icon: pinIcon }).addTo(targetLayer);
-    marker.on('click', () => {
-      window.selectSmartAsset(ast.id);
-    });
-
-    marker.bindPopup(`
-      <div style="font-family:Inter,sans-serif;padding:4px;min-width:180px">
-        <div style="font-size:10px;color:#94a3b8;font-weight:700">${ast.category} • ${ast.div} Division</div>
-        <strong style="font-size:12.5px;color:#fff">${ast.name}</strong>
-        <div style="font-size:10.5px;color:#60a5fa;margin-top:2px">${ast.id}</div>
-        <div style="font-size:10.5px;color:#cbd5e1;margin-top:4px">${ast.section}</div>
-        <button style="width:100%;margin-top:6px;background:#2563eb;color:#fff;border:none;border-radius:4px;padding:5px;font-size:10.5px;font-weight:700;cursor:pointer" onclick="window.selectSmartAsset('${ast.id}')">
-          Inspect Asset Dossier
-        </button>
-      </div>
-    `);
-  });
-
-  // 4. RENDER ACTIVE MAINTENANCE WORKSITES
-  if (curBlockStatus === "ALL" || curBlockStatus === "Active Blocks") {
+  // 4. RENDER ACTIVE MAINTENANCE WORKSITES (Only visible when zoomed in to prevent cluster pileup)
+  if (isZoomedIn && (curBlockStatus === "ALL" || curBlockStatus === "Active Blocks")) {
     ACTIVE_BLOCK_WORKSITES.forEach(blk => {
       if (curDiv !== "ALL" && blk.div !== curDiv) return;
       if (query && !blk.name.toLowerCase().includes(query) && !blk.id.toLowerCase().includes(query)) return;
@@ -11428,8 +12064,8 @@ window.rebuildCorridorMapLayers = () => {
     });
   }
 
-  // 5. RENDER LIVE TRAIN TELEMETRY
-  if (smartLayerGroups.liveTrains) {
+  // 5. RENDER LIVE TRAIN TELEMETRY (Only visible when zoomed in to prevent cluster pileup)
+  if (isZoomedIn && smartLayerGroups.liveTrains) {
     LIVE_TRAIN_SERVICES.forEach(tr => {
       if (curDiv !== "ALL" && tr.div !== curDiv) return;
       if (query && !tr.train.includes(query) && !tr.name.toLowerCase().includes(query)) return;
@@ -11465,6 +12101,9 @@ window.rebuildCorridorMapLayers = () => {
       `);
     });
   }
+
+  // Update HUD indicator badge
+  window.updateCorridorZoomHud();
 };
 
 function initCorridorMap() {
@@ -11491,6 +12130,11 @@ function initCorridorMap() {
     zoomControl: true,
   });
   leafletMapInstance = map;
+
+  // Automatically re-evaluate layer visibility on zoom change (eliminate cluster clutter when zoomed out)
+  map.on("zoomend", () => {
+    window.rebuildCorridorMapLayers();
+  });
 
   try {
     map.fitBounds(ALL_INDIA_BOUNDS, { padding: [15, 15] });
@@ -11557,6 +12201,14 @@ function initCorridorMap() {
   // Connect and sync live API blocks, stations, and corridors
   window.syncMapWithBackendAPI(false);
 
+  // Attach free-roaming draggable handlers to GIS Layers and Asset panels
+  if (typeof window.attachDraggableSmartLayersPanel === 'function') {
+    window.attachDraggableSmartLayersPanel();
+  }
+  if (typeof window.attachDraggableSmartAssetPanel === 'function') {
+    window.attachDraggableSmartAssetPanel();
+  }
+
   setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 100);
   setTimeout(() => { try { map.invalidateSize(); } catch(e) {} }, 400);
 }
@@ -11608,16 +12260,22 @@ function renderCorridorsSectionsPage() {
       <!-- Corridor Grid Cards -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
         ${SR_CORRIDORS.map(c => `
-          <div style="background:var(--bg-card);border:1px solid var(--border-light);border-left:4px solid ${c.color};border-radius:8px;padding:14px">
+          <div style="background:var(--bg-card);border:1px solid var(--border-light);border-left:4px solid ${c.color};border-radius:8px;padding:14px;cursor:pointer;transition:transform 0.15s ease,box-shadow 0.15s ease" onclick="window.filterCorridorSections('${c.name}')" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform='none'" title="Click to filter sections by ${c.name}">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
               <strong style="font-size:13px;color:${c.color}">${c.name}</strong>
               <span style="font-size:10px;background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-weight:700">${c.div || 'SR'}</span>
             </div>
             <div style="font-size:12px;color:var(--text-heading);margin-bottom:4px">Route Length: <b>${c.km}</b> • Stations: <b>${c.stations}</b></div>
             <div style="font-size:10.5px;color:var(--text-muted);margin-bottom:8px">${c.desc}</div>
-            <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border-light);padding-top:6px;font-size:11px">
-              <span>Planned: <b style="color:#60a5fa">${c.blocks?.planned || 4}</b></span>
-              <span>Live Blocks: <b style="color:#ef4444">${c.blocks?.live || 2}</b></span>
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border-light);padding-top:8px;font-size:11px">
+              <div>
+                <span>Planned: <b style="color:#60a5fa">${c.blocks?.planned || 4}</b></span> &bull; 
+                <span>Live: <b style="color:#ef4444">${c.blocks?.live || 2}</b></span>
+              </div>
+              <div style="display:flex;gap:4px">
+                <button onclick="event.stopPropagation(); window.filterCorridorSections('${c.name}')" style="background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid #3b82f6;border-radius:4px;padding:3px 8px;font-size:10px;font-weight:800;cursor:pointer">🔍 Sections</button>
+                <button onclick="event.stopPropagation(); window.navigateTo('Corridor Map')" style="background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid #10b981;border-radius:4px;padding:3px 8px;font-size:10px;font-weight:800;cursor:pointer">🗺️ Map</button>
+              </div>
             </div>
           </div>
         `).join('')}
@@ -11625,10 +12283,10 @@ function renderCorridorsSectionsPage() {
 
       <!-- Track Sections Filter & Table -->
       <div class="panel" style="padding:0;overflow:hidden">
-        <div style="padding:14px 18px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
           <div style="font-size:14px;font-weight:800;color:var(--text-heading)">Monitored Track Sections (TMS / TDMS Sync)</div>
-          <div style="display:flex;gap:10px">
-            <select id="selSectionCorridorFilter" style="background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);padding:4px 8px;border-radius:4px;font-size:12px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <select id="selSectionCorridorFilter" onchange="window.filterCorridorSections(this.value)" style="background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);padding:5px 10px;border-radius:5px;font-size:12px;cursor:pointer">
               <option value="All" ${selectedCorridorFilter === "All" ? "selected" : ""}>All Corridors & Trunks (${MOCK_SECTIONS_DATA.length})</option>
               <optgroup label="Pan-India Golden Quadrilateral & National Trunks">
                 <option value="Delhi - Mumbai" ${selectedCorridorFilter === "Delhi - Mumbai" ? "selected" : ""}>Delhi - Mumbai Western Trunk (WCR/WR)</option>
@@ -11650,6 +12308,7 @@ function renderCorridorsSectionsPage() {
                 <option value="Pamban" ${selectedCorridorFilter === "Pamban" ? "selected" : ""}>Madurai - Rameswaram Pamban (MDU)</option>
               </optgroup>
             </select>
+            ${selectedCorridorFilter !== "All" ? `<button onclick="window.filterCorridorSections('All')" style="background:rgba(255,255,255,0.08);border:1px solid var(--border-light);color:var(--text-muted);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer">✕ Clear</button>` : ''}
           </div>
         </div>
 
@@ -11665,7 +12324,7 @@ function renderCorridorsSectionsPage() {
                 <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">MAX SPEED</th>
                 <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">GMT LOAD</th>
                 <th style="text-align:left;padding:10px 14px;color:var(--text-muted)">TSR RESTRICTION</th>
-                <th style="text-align:center;padding:10px 14px;color:var(--text-muted)">ACTION</th>
+                <th style="text-align:center;padding:10px 14px;color:var(--text-muted);min-width:140px">ACTIONS</th>
               </tr>
             </thead>
             <tbody>
@@ -11680,7 +12339,14 @@ function renderCorridorsSectionsPage() {
                   <td style="padding:10px 14px">${s.gmt} GMT</td>
                   <td style="padding:10px 14px"><span style="color:${s.tsr.includes('TSR') ? '#ef4444' : '#22c55e'};font-weight:700">${s.tsr}</span></td>
                   <td style="padding:10px 14px;text-align:center">
-                    <button style="background:transparent;border:none;color:#60a5fa;cursor:pointer" onclick="showToast('Section details for ${s.id}')">👁</button>
+                    <div style="display:flex;gap:6px;justify-content:center;align-items:center">
+                      <button style="background:#0284c7;color:#ffffff;border:none;cursor:pointer;padding:5px 12px;border-radius:5px;font-size:11.5px;display:inline-flex;align-items:center;gap:5px;font-weight:800;box-shadow:0 2px 6px rgba(2,132,199,0.35)" onclick="window.openTrackSectionDetailsModal('${s.id}')" title="Inspect Section Technical Dossier">
+                        👁 <span>Inspect</span>
+                      </button>
+                      <button style="background:rgba(16,185,129,0.18);border:1px solid #10b981;color:#10b981;cursor:pointer;padding:5px 9px;border-radius:5px;font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-weight:800" onclick="window.navigateToSectionOnMap('${s.id}')" title="View on GIS Corridor Map">
+                        🗺️ <span>GIS</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               `).join('')}
@@ -11691,6 +12357,237 @@ function renderCorridorsSectionsPage() {
     </main>
   `;
 }
+
+window.openTrackSectionDetailsModal = function(secId) {
+  const s = MOCK_SECTIONS_DATA.find(x => x.id === secId) || MOCK_SECTIONS_DATA[0];
+  if (!s) return;
+
+  const existing = document.querySelector(".modal-overlay");
+  if (existing) existing.remove();
+
+  // Coordinates lookup for map fly-to
+  const sectionCoordsMap = {
+    "SEC-001": { lat: 12.9757, lng: 79.1325, zoom: 12, name: "Katpadi Jn – Jolarpettai Jn" },
+    "SEC-002": { lat: 11.6643, lng: 78.1460, zoom: 12, name: "Salem Jn – Erode Jn" },
+    "SEC-003": { lat: 10.5276, lng: 76.2144, zoom: 12, name: "Thrissur – Ernakulam Jn" },
+    "SEC-004": { lat: 11.9401, lng: 79.4861, zoom: 12, name: "Villupuram – Vriddhachalam" },
+    "SEC-005": { lat: 10.3673, lng: 77.9803, zoom: 12, name: "Dindigul Jn – Madurai Jn" },
+    "SEC-006": { lat: 9.5916, lng: 76.5222, zoom: 12, name: "Kottayam – Kollam Jn" },
+    "SEC-007": { lat: 10.7870, lng: 79.1378, zoom: 12, name: "Thanjavur – Tiruchirappalli Jn" },
+    "SEC-008": { lat: 10.7634, lng: 76.2758, zoom: 12, name: "Shoranur Jn – Kozhikode" },
+    "SEC-009": { lat: 9.2876, lng: 79.1993, zoom: 13, name: "Mandapam – Pamban Sea Bridge" },
+    "SEC-010": { lat: 25.1825, lng: 75.8340, zoom: 11, name: "Kota Jn – Ratlam Jn" },
+    "SEC-011": { lat: 26.4499, lng: 80.3319, zoom: 11, name: "Kanpur Central – Prayagraj Jn" },
+    "SEC-012": { lat: 23.2599, lng: 77.4126, zoom: 12, name: "Bhopal Jn – Itarsi Jn" },
+    "SEC-013": { lat: 21.1458, lng: 79.0882, zoom: 11, name: "Nagpur Jn – Raipur Jn" },
+    "SEC-014": { lat: 18.5204, lng: 73.8567, zoom: 11, name: "Pune Jn – Solapur Jn" },
+    "SEC-015": { lat: 20.2961, lng: 85.8245, zoom: 11, name: "Bhubaneswar – Visakhapatnam Jn" },
+    "SEC-016": { lat: 30.3752, lng: 76.7794, zoom: 12, name: "Ambala Cantt – Ludhiana Jn" },
+    "SEC-017": { lat: 26.9124, lng: 75.7873, zoom: 12, name: "Jaipur Jn – Ajmer Jn" }
+  };
+  const targetGeo = sectionCoordsMap[s.id] || { lat: 13.0827, lng: 80.2707, zoom: 11, name: s.name };
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal-card modal-card-extra-wide" style="max-width:920px;width:95vw;max-height:92vh;overflow-y:auto;background:#061427;border:1.5px solid #1e4976;box-shadow:0 12px 40px rgba(0,0,0,0.6);border-radius:10px;padding:22px">
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #1e4976;padding-bottom:12px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="background:rgba(56,189,248,0.15);border:1.5px solid #38bdf8;padding:8px 12px;border-radius:8px;font-size:22px">🛤️</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <h3 style="margin:0;font-size:18px;color:#ffffff;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px">${esc(s.name)}</h3>
+              <span style="background:rgba(59,130,246,0.2);border:1px solid #3b82f6;color:#93c5fd;font-size:11px;font-weight:800;padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace">${s.id}</span>
+              <span style="background:rgba(16,185,129,0.2);border:1px solid #10b981;color:#6ee7b7;font-size:11px;font-weight:800;padding:2px 8px;border-radius:4px">${s.div} Division</span>
+            </div>
+            <div style="font-size:11.5px;color:#94a3b8;margin-top:3px">
+              <b>Corridor:</b> ${esc(s.corridor)} &bull; <b>Kilometer Posts:</b> KM ${s.km_start} – ${s.km_end} (${s.length_km} route km) &bull; <b>Track Type:</b> ${s.tracks}
+            </div>
+          </div>
+        </div>
+        <button class="secondary" id="secModalCloseBtn" style="padding:4px 10px;font-size:12px;cursor:pointer;background:rgba(255,255,255,0.06);border:1px solid #334155;color:#e2e8f0;border-radius:6px">✕ Close</button>
+      </div>
+
+      <!-- KPI Status Badges Grid -->
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;margin-bottom:18px">
+        <div style="background:rgba(15,23,42,0.6);border:1px solid #1e3a5f;border-radius:8px;padding:12px">
+          <div style="font-size:10.5px;font-weight:800;text-transform:uppercase;color:#94a3b8">Max Permissible Speed</div>
+          <div style="font-size:22px;font-weight:900;color:#22c55e;margin:2px 0">${s.max_speed} <span style="font-size:12px;color:#94a3b8">km/h</span></div>
+          <div style="font-size:10px;color:#86efac">High-Speed Trunk Clearance</div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.6);border:1px solid #1e3a5f;border-radius:8px;padding:12px">
+          <div style="font-size:10.5px;font-weight:800;text-transform:uppercase;color:#94a3b8">Annual Traffic Density</div>
+          <div style="font-size:22px;font-weight:900;color:#38bdf8;margin:2px 0">${s.gmt} <span style="font-size:12px;color:#94a3b8">GMT</span></div>
+          <div style="font-size:10px;color:#7dd3fc">Heavy Haul &amp; Passenger Combined</div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.6);border:1px solid #1e3a5f;border-radius:8px;padding:12px">
+          <div style="font-size:10.5px;font-weight:800;text-transform:uppercase;color:#94a3b8">Track Health Index (TGI)</div>
+          <div style="font-size:22px;font-weight:900;color:#a855f7;margin:2px 0">94.8 <span style="font-size:12px;color:#94a3b8">/ 100</span></div>
+          <div style="font-size:10px;color:#c084fc">Category 'A' OMS-2000 Certified</div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.6);border:1px solid #1e3a5f;border-radius:8px;padding:12px">
+          <div style="font-size:10.5px;font-weight:800;text-transform:uppercase;color:#94a3b8">Caution Order / TSR</div>
+          <div style="font-size:14px;font-weight:900;color:${s.tsr.includes('TSR') ? '#f87171' : '#4ade80'};margin:6px 0 2px;line-height:1.2">
+            ${esc(s.tsr)}
+          </div>
+          <div style="font-size:10px;color:#94a3b8">Live Speed Restriction Status</div>
+        </div>
+      </div>
+
+      <!-- 2-Column Technical & Telemetry Dossier -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+        <!-- Col 1: P-Way Infrastructure Specifications -->
+        <div style="background:rgba(11,29,54,0.7);border:1px solid #1e3a5f;border-radius:8px;padding:14px">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:#38bdf8;border-bottom:1px solid #1e4976;padding-bottom:6px;margin-bottom:10px">
+            <span>⚙️</span> Permanent Way Infrastructure Profile
+          </div>
+          <table style="width:100%;font-size:11.5px;border-collapse:collapse;color:#cbd5e1">
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Rail Section</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">60 kg / 110-UTS Continuous Welded (LWR)</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Sleeper Type &amp; Density</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">Pre-stressed Concrete (PSC-60), 1660 / km</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Ballast Cushion Profile</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">350 mm Clean Crushed Stone (Crib 100%)</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Fastenings</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">Elastic Rail Clip (ERC MK-III) with GFN Liners</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Electrification Traction</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">25 kV AC 50 Hz OHE (SCADA Monitored)</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;color:#94a3b8">ATP Safety System</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#22c55e">Kavach 4.0 SIL-4 Interlocked</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Col 2: Telemetry & Maintenance Forecast -->
+        <div style="background:rgba(11,29,54,0.7);border:1px solid #1e3a5f;border-radius:8px;padding:14px">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:#4ade80;border-bottom:1px solid #1e4976;padding-bottom:6px;margin-bottom:10px">
+            <span>📡</span> Live TMS / TDMS Telemetry &amp; Schedule
+          </div>
+          <table style="width:100%;font-size:11.5px;border-collapse:collapse;color:#cbd5e1">
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">USFD Ultrasonic Flaw Test</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#22c55e">Passed 0 IMR/OBS (Tested 3 days ago)</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Axle Counter Signaling</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">MSDAC Dual Redundant Auto Block</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Next Machine Window</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#38bdf8">01:30 - 04:30 IST (Night Tamping Slot)</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Assigned Heavy Machinery</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">Plasser CSM-09-32 Continuous Tamper</td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                <td style="padding:6px 0;color:#94a3b8">Adjacent Line Status</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">Normal Revenue Operations (Clear Headway)</td>
+              </tr>
+              <tr>
+                <td style="padding:6px 0;color:#94a3b8">Zonal Control Desk</td>
+                <td style="padding:6px 0;text-align:right;font-weight:700;color:#f8fafc">${s.div} Divisional Operations Center</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Action Footer Buttons -->
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-top:1px solid #1e4976;padding-top:14px">
+        <div style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:6px">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e"></span>
+          <span>CRIS TDMS Database Synchronized</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="primary" style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 14px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:5px" onclick="
+            document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+            window.navigateTo('Dashboard');
+            setTimeout(() => {
+              if (window.leafletMapInstance) {
+                window.leafletMapInstance.flyTo([${targetGeo.lat}, ${targetGeo.lng}], ${targetGeo.zoom});
+                showToast('📍 Centered GIS Map on ${esc(targetGeo.name)} (${s.id})');
+              }
+            }, 300);
+          ">
+            <span>🗺️</span> Locate Section on GIS Map
+          </button>
+          <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 14px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:5px" onclick="
+            document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+            if (typeof window.triggerEmergencyBlockModal === 'function') {
+              window.triggerEmergencyBlockModal();
+            } else {
+              showToast('⚡ Initiating Maintenance Block Request for ${s.id}...');
+            }
+          ">
+            <span>⚡</span> Sanction Maintenance Block
+          </button>
+          <button class="secondary" style="font-size:11.5px;font-weight:700;padding:8px 12px;border-radius:6px;cursor:pointer" onclick="
+            document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+            window.navigateTo('Cost Asset Maintenance');
+          ">
+            <span>💰</span> Corridor Lifecycle Cost
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const closeBtn = overlay.querySelector('#secModalCloseBtn');
+  if (closeBtn) closeBtn.onclick = () => overlay.remove();
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+};
+
+window.filterCorridorSections = function(corridorName) {
+  selectedCorridorFilter = corridorName;
+  render();
+};
+
+window.navigateToSectionOnMap = function(secId) {
+  const s = MOCK_SECTIONS_DATA.find(x => x.id === secId) || MOCK_SECTIONS_DATA[0];
+  window.navigateTo("Dashboard");
+  setTimeout(() => {
+    if (window.leafletMapInstance && s) {
+      const sectionCoordsMap = {
+        "SEC-001": [12.9757, 79.1325],
+        "SEC-002": [11.6643, 78.1460],
+        "SEC-003": [10.5276, 76.2144],
+        "SEC-004": [11.9401, 79.4861],
+        "SEC-005": [10.3673, 77.9803],
+        "SEC-006": [9.5916, 76.5222],
+        "SEC-007": [10.7870, 79.1378],
+        "SEC-008": [10.7634, 76.2758],
+        "SEC-009": [9.2876, 79.1993]
+      };
+      const pt = sectionCoordsMap[s.id] || [13.0827, 80.2707];
+      try {
+        window.leafletMapInstance.flyTo(pt, 13, { animate: true, duration: 1.2 });
+        if (typeof window.showToast === 'function') {
+          window.showToast(`📍 Centered GIS Map on ${s.name} (${s.id})`);
+        }
+      } catch (e) {}
+    }
+  }, 250);
+};
 
 function showCreateSectionModal() {
   showModal(
@@ -21041,8 +21938,8 @@ function render() {
     }
     return;
   } else {
-    document.body.className = currentTheme === "light" ? "theme-light" : "theme-dark";
-    document.documentElement.setAttribute("data-theme", currentTheme);
+    document.body.className = "theme-dark";
+    document.documentElement.setAttribute("data-theme", "dark");
     const launcher = document.querySelector("#crisCopilotLauncher");
     if (launcher) launcher.style.display = "flex";
   }
@@ -21081,8 +21978,8 @@ function render() {
       item.classList.toggle("active", item.dataset.nav === current);
     });
 
-    // 1b. Update active item in topbar center action buttons
-    document.querySelectorAll(".header-center .btn-topbar-action").forEach(btn => {
+    // 1b. Update active item in topbar center action buttons and more menu items
+    document.querySelectorAll(".header-center .btn-topbar-action, .more-menu-item").forEach(btn => {
       const onclickAttr = btn.getAttribute("onclick") || "";
       btn.classList.toggle("active", onclickAttr.includes(`'${current}'`) || onclickAttr.includes(`"${current}"`));
     });
@@ -21098,6 +21995,10 @@ function render() {
 
     // 3. Swap only the main page content slot and update live countdown banner
     existingContent.outerHTML = bodyHtml;
+    const authMount = document.querySelector("#dashboardAuthBannerMount");
+    if (authMount) {
+      authMount.innerHTML = renderDashboardAuthorizedBanner();
+    }
     const countdownMount = document.querySelector("#liveCountdownMount");
     if (countdownMount) {
       countdownMount.innerHTML = renderLiveCountdownBanner();
@@ -21532,21 +22433,6 @@ function bindEvents() {
     };
   }
 
-  // Theme Toggle Button & Global Function
-  window.toggleTheme = () => {
-    currentTheme = currentTheme === "light" ? "dark" : "light";
-    localStorage.setItem("sr_portal_theme", currentTheme);
-    document.documentElement.setAttribute("data-theme", currentTheme);
-    document.body.className = currentTheme === "light" ? "theme-light" : "theme-dark";
-    selectedMapLayer = currentTheme === "light" ? "osm" : "dark";
-    showToast(`Theme switched to ${currentTheme === 'light' ? 'Light Executive' : 'Dark Navy'} Mode`);
-    render();
-  };
-
-  const themeBtn = document.querySelector("#btnToggleTheme");
-  if (themeBtn) {
-    themeBtn.onclick = () => window.toggleTheme();
-  }
 
   // Asset Management: filter events
   const assetCorSel = document.querySelector("#assetCorridorSelect");
@@ -21659,11 +22545,9 @@ function bindEvents() {
   // Map Controls
   document.querySelectorAll("[data-layer]").forEach(b => {
     b.onclick = () => {
-      selectedMapLayer = b.dataset.layer;
-      initHighResMap();
-      showToast(`Cartography layer switched to ${b.textContent.trim()}`);
-      document.querySelectorAll("[data-layer]").forEach(btn => btn.classList.remove("active"));
-      b.classList.add("active");
+      if (b.dataset.layer && window.switchMapCartographyLayer) {
+        window.switchMapCartographyLayer(b.dataset.layer);
+      }
     };
   });
 
@@ -22038,17 +22922,92 @@ let copilotMessages = [
   }
 ];
 window.copilotMessages = copilotMessages;
+window.isCopilotMinimized = false;
+
+window.toggleMinimizeCopilot = function(e) {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+  window.isCopilotMinimized = !window.isCopilotMinimized;
+  const drawer = document.querySelector("#crisCopilotDrawer");
+  if (!drawer) return;
+  drawer.classList.toggle("minimized", window.isCopilotMinimized);
+  const minBtn = drawer.querySelector(".cris-copilot-ctrl-btn.min-btn");
+  if (minBtn) {
+    minBtn.textContent = window.isCopilotMinimized ? '□' : '—';
+    minBtn.title = window.isCopilotMinimized ? 'Restore Copilot' : 'Minimize Copilot';
+  }
+  const titleEl = drawer.querySelector(".cris-copilot-header-info h3");
+  if (titleEl) {
+    if (window.isCopilotMinimized) {
+      titleEl.innerHTML = `<span>🏛️</span> CRIS Copilot (Minimized) <span style="font-size:10px;color:#38bdf8;margin-left:6px;font-weight:600">Click to expand</span>`;
+    } else {
+      titleEl.innerHTML = `<span>🏛️</span> ${currentLang === 'hi' ? 'क्रिस परिचालन एआई कोपायलट' : 'CRIS Operations AI Copilot'}`;
+    }
+  }
+};
+
+window.submitCopilotChat = function() {
+  const inp = document.querySelector("#crisCopilotInput");
+  if (!inp) return;
+  const val = (inp.value || "").trim();
+  if (!val) return;
+  inp.value = "";
+  window.handleCopilotInputChange(inp);
+  window.sendCopilotMessage(val);
+};
+
+window.handleCopilotInputChange = function(inputEl) {
+  const val = inputEl ? inputEl.value : "";
+  const clearBtn = document.querySelector("#crisCopilotClearBtn");
+  if (clearBtn) clearBtn.style.display = val.length > 0 ? "flex" : "none";
+  const sendBtn = document.querySelector("#crisCopilotSendBtn");
+  if (sendBtn) sendBtn.classList.toggle("active", val.trim().length > 0);
+};
+
+window.clearCopilotInput = function() {
+  const inp = document.querySelector("#crisCopilotInput");
+  if (inp) {
+    inp.value = "";
+    inp.focus();
+    window.handleCopilotInputChange(inp);
+  }
+};
+
+window.simulateVoiceInput = function() {
+  const prompts = [
+    "Give me complete cost cutting report for Train #12675 Kovai Express",
+    "Block has occurred between Katpadi and Jolarpettai for 4 hours",
+    "What is the permissible speed limit on Chennai to Katpadi section?",
+    "Explain Kavach automatic train protection system and deployment status",
+    "Inspect Coimbatore junction headway capacity and platform slots",
+    "Why did you choose the recommended detour route?",
+    "Show me all 6 Indian Railways operational divisions",
+    "How does CRIS co-schedule multi-disciplinary shadow blocks?"
+  ];
+  const chosen = prompts[Math.floor(Math.random() * prompts.length)];
+  const inp = document.querySelector("#crisCopilotInput");
+  if (inp) {
+    inp.value = chosen;
+    window.handleCopilotInputChange(inp);
+    inp.focus();
+  }
+  showToast(`🎙️ Voice prompt simulated: "${chosen}"`);
+};
 
 window.toggleAutonomousCopilot = function(forceState) {
   isCopilotOpen = typeof forceState === "boolean" ? forceState : !isCopilotOpen;
   const drawer = document.querySelector("#crisCopilotDrawer");
+  const backdrop = document.querySelector("#crisCopilotBackdrop");
   if (drawer) {
     drawer.classList.toggle("open", isCopilotOpen);
+    if (backdrop) {
+      backdrop.classList.toggle("open", isCopilotOpen);
+    }
     if (isCopilotOpen) {
+      // If was minimized and user opens, ensure messages are fresh and focus input
       window.renderCopilotMessages();
       setTimeout(() => {
         const inp = document.querySelector("#crisCopilotInput");
-        if (inp) inp.focus();
+        if (inp && !window.isCopilotMinimized) inp.focus();
       }, 300);
     }
   }
@@ -22060,11 +23019,26 @@ window.renderCopilotMessages = function() {
 
   container.innerHTML = copilotMessages.map(m => {
     const isAsst = m.sender === "assistant";
+    if (m.isTyping) {
+      return `
+        <div class="copilot-msg assistant">
+          <div class="copilot-bubble" style="background:#131d36;border:1px solid rgba(59,130,246,0.3);padding:9px 12px">
+            <div class="copilot-typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+            <div style="font-size:10.5px;color:#94a3b8;margin-top:5px;font-style:italic">
+              ${esc(m.text || 'Analyzing CRIS network telemetry & train schedules...')}
+            </div>
+          </div>
+          <div class="copilot-msg-meta">CRIS Autonomous Controller • Just now</div>
+        </div>
+      `;
+    }
     return `
       <div class="copilot-msg ${isAsst ? 'assistant' : 'user'}">
         <div class="copilot-bubble">
-          ${m.text ? `<div class="copilot-text-body" style="white-space:pre-line;line-height:1.55;font-size:12.5px">${esc(m.text)}</div>` : ''}
-          ${m.html ? `<div class="copilot-custom-html" style="${m.text ? 'margin-top:10px;' : ''}">${m.html}</div>` : ''}
+          ${m.text ? `<div class="copilot-text-body" style="white-space:pre-line;line-height:1.52;font-size:12px">${esc(m.text)}</div>` : ''}
+          ${m.html ? `<div class="copilot-custom-html" style="${m.text ? 'margin-top:8px;' : ''}">${m.html}</div>` : ''}
           ${m.action_card ? `
             <div class="copilot-action-card" id="${m.action_card.id}">
               <div class="copilot-action-header">
@@ -22080,6 +23054,15 @@ window.renderCopilotMessages = function() {
               </button>
             </div>
           ` : ''}
+          ${m.suggestions && m.suggestions.length > 0 ? `
+            <div class="copilot-msg-suggestions" style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">
+              ${m.suggestions.map(s => `
+                <button onclick="window.sendCopilotMessage('${esc(s).replace(/'/g, "\\'")}')" class="copilot-reply-chip" style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.35);color:#93c5fd;font-size:10px;padding:3px 8px;border-radius:12px;cursor:pointer;font-weight:600;transition:all 0.15s">
+                  💬 ${esc(s)}
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
         </div>
         <div class="copilot-msg-meta">${isAsst ? 'CRIS Autonomous Controller' : (currentOfficial?.name || 'Supervisor')} • ${m.time}</div>
       </div>
@@ -22093,7 +23076,10 @@ window.sendCopilotMessage = async function(explicitPrompt) {
   const inp = document.querySelector("#crisCopilotInput");
   const text = (explicitPrompt || (inp ? inp.value : "")).trim();
   if (!text) return;
-  if (inp) inp.value = "";
+  if (inp) {
+    inp.value = "";
+    window.handleCopilotInputChange(inp);
+  }
 
   const timeStr = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + " IST";
   copilotMessages.push({
@@ -22103,11 +23089,12 @@ window.sendCopilotMessage = async function(explicitPrompt) {
   });
   window.renderCopilotMessages();
 
-  // Assistant typing indicator
+  // Assistant animated typing indicator
   const loadId = "load-" + Date.now();
   copilotMessages.push({
     id: loadId,
     sender: "assistant",
+    isTyping: true,
     time: timeStr,
     text: "Analyzing CRIS network telemetry, GBDT risk matrix, and COA train schedules..."
   });
@@ -22117,6 +23104,680 @@ window.sendCopilotMessage = async function(explicitPrompt) {
   const lower = text.toLowerCase();
 
   try {
+    // =========================================================================
+    // 0. HUMAN CONVERSATION & IN-APP ACTION DISPATCHER
+    // 1. Responds naturally to greetings ("hi", "hello") with capable tasks list.
+    // 2. Responds to casual human conversations ("how are you", "who made you", etc.).
+    // 3. Executes ANY and ALL in-app actions directly (navigation, modals, themes, etc.)!
+    // =========================================================================
+    const cleanLower = lower.replace(/[!.,?]/g, " ").trim();
+    const words = cleanLower.split(/\s+/).filter(Boolean);
+    const hasTrainNumber = /\b\d{4,5}\b/.test(text);
+
+    // 0.1 GREETINGS & "CAPABLE TASKS" INTENT
+    const isGreeting = (
+      cleanLower === "hi" || cleanLower === "hello" || cleanLower === "hey" ||
+      cleanLower === "namaste" || cleanLower === "vanakkam" || cleanLower === "pranam" ||
+      cleanLower === "sup" || cleanLower === "greetings" || cleanLower === "yo" ||
+      cleanLower.startsWith("hi ") || cleanLower.startsWith("hello ") || cleanLower.startsWith("hey ") ||
+      cleanLower.includes("capable task") || cleanLower.includes("what can you do") ||
+      cleanLower.includes("tell me what to do") || cleanLower.includes("what are your tasks") ||
+      cleanLower === "good morning" || cleanLower === "good afternoon" || cleanLower === "good evening" ||
+      (words.length <= 3 && ["hi", "hello", "hey", "namaste", "vanakkam"].some(w => words.includes(w)))
+    );
+
+    if (isGreeting) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Hello there! I am your **CRIS Operations & Autonomous AI Assistant** for Southern Railway.\n\nThese are my **capable tasks**, tell me what to do:\n\n` +
+          `1. **🧭 App Navigation & Control:** Ask me to open or go to any page:\n` +
+          `   • *"open dashboard"* or *"show map"*\n` +
+          `   • *"go to schedule"* or *"open timetable"*\n` +
+          `   • *"open corridors and sections"*\n` +
+          `   • *"open corridor map"*\n` +
+          `   • *"open stations"* (Stations Master)\n` +
+          `   • *"open station planning"* (Headway & Platforms)\n` +
+          `   • *"open asset maintenance"*\n` +
+          `   • *"open cost maintenance"* (Economics & Avoided Costs)\n` +
+          `   • *"open dynamic dispatch"*\n` +
+          `   • *"open conflict resolution"*\n` +
+          `   • *"open block optimization"*\n\n` +
+          `2. **🚨 Emergency Line Possession:** Command me to *"declare emergency block"*, *"surrender active block"*, or *"extend block by 30 mins"*.\n\n` +
+          `3. **⚡ 1-Click Operations Demos:** Say *"run demos"* to launch the presentation demo suite (Vande Bharat 2.0, Katpadi rail fracture, 30m Kovai delay).\n\n` +
+          `4. **🛰️ Live Train Running & RTIS:** Say *"live train status"* or *"where is train 12675"* to view real-time satellite GPS tracking.\n\n` +
+          `5. **💰 330-Train & Infra Cost Cuttings:** Ask for train economics (*"12675 cost cutting"*, *"20608 savings"*, or *"infrastructure costs"*).\n\n` +
+          `6. **🚦 Station Capacity & Headways:** Ask about platform berthing (*"Tambaram station capacity"* or *"Coimbatore headway"*).\n\n` +
+          `7. **📄 Official Paperwork & Audits:** Ask me to *"show sanction memo T/A 912"*, *"open audit report"*, or *"open fleet manager"*.\n\n` +
+          `8. **🌓 Display & Console Controls:** Say *"toggle theme"* (Dark/Light), *"open command palette"* (⌘K), *"switch to Hindi/English"*, or *"close chat"*.\n\n` +
+          `Just tell me what you would like to do, and I will execute it inside the app immediately!`,
+        suggestions: [
+          "🗺️ Open Map",
+          "🚨 Emergency Block",
+          "⚡ Run Demos",
+          "🛰️ Live Trains",
+          "💰 12675 Cost Cutting",
+          "📊 Audit Report",
+          "📄 Sanction Memo",
+          "🌓 Toggle Theme"
+        ],
+        action_card: {
+          id: "act-greet-" + Date.now(),
+          badge: "OPERATIONAL AI READY",
+          title: "CRIS Autonomous Copilot Active",
+          description: "All 101 TMS sections, 49 TDMS defects, and 330 timetable trains online.",
+          action_type: "SHOW_TOAST",
+          message: "CRIS AI Operations Ready.",
+          button_label: "⚡ Tell Me What To Do"
+        }
+      });
+      return;
+    }
+
+    // 0.2 NATURAL HUMAN CONVERSATIONS & SMALL TALK
+    if (cleanLower.includes("how are you") || cleanLower.includes("how r u") || cleanLower.includes("how do you do") || cleanLower.includes("how is it going")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `I'm operating at peak efficiency across all 6 Southern Railway divisions (MAS, SA, TPJ, MDU, PGT, TVC)! 🚂\n\n` +
+          `• **Network Telemetry:** 100% track circuit nominality\n` +
+          `• **Punctuality Index:** 99.4% on trunk corridors\n` +
+          `• **Autonomous Solver:** Synchronized with live COA & NTES feeds\n\n` +
+          `How can I assist your operations today? Just tell me what you want to do in the app!`,
+        suggestions: ["🗺️ Open Map", "⚡ Run Demos", "💰 12675 Cost Cutting", "🚨 Emergency Block"]
+      });
+      return;
+    }
+
+    if (cleanLower.includes("who are you") || cleanLower.includes("what are you") || cleanLower.includes("who made you") || cleanLower.includes("who created you") || cleanLower === "help" || cleanLower.includes("what can you do")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `I am the **CRIS Autonomous Operations AI Assistant**, engineered for the Ministry of Railways / Southern Railway Zone.\n\n` +
+          `I am designed to assist Section Controllers and Chief Controllers in executing fast, error-free decisions:\n\n` +
+          `• **Autonomous Slot Optimization:** Finding conflict-free maintenance windows using combinatorial search.\n` +
+          `• **Dynamic Replanning:** Adjusting train paths and detours within 0.04s during unexpected track fractures or delays.\n` +
+          `• **Economic Cost Cuttings:** Analyzing avoided detention penalties and concurrent pit-line maintenance across all 330 scheduled trains.\n` +
+          `• **Direct App Automation:** You can tell me to open any screen, declare emergency blocks, toggle themes, or generate memos directly!\n\n` +
+          `Tell me what to do, and I'll take care of it right away!`,
+        suggestions: ["🗺️ Open Map", "🚨 Emergency Block", "⚡ Run Demos", "📊 Audit Report"]
+      });
+      return;
+    }
+
+    if (words.some(w => ["thanks", "thank", "thx", "dhanyawad", "nandri", "shukriya"].includes(w))) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `You're most welcome, Controller! Always at your service to keep Southern Railway safe, punctual, and optimized. Let me know what to do next!`,
+        suggestions: ["🗺️ Open Map", "⚡ Run Demos", "💰 12675 Cost Cutting", "📄 Sanction Memo"]
+      });
+      return;
+    }
+
+    if (cleanLower.includes("joke") || cleanLower.includes("funny") || cleanLower.includes("laugh")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Here's an Indian Railways special for you! 😄\n\n*Why did the locomotive join the gym?*\nBecause it wanted to stay on the right track and build up its steam! 🚂💨\n\nWhenever you're ready, tell me which operational task or screen to open!`,
+        suggestions: ["🗺️ Open Map", "⚡ Run Demos", "🚨 Emergency Block"]
+      });
+      return;
+    }
+
+    if (cleanLower.includes("what time") || cleanLower.includes("current time") || cleanLower === "time") {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `The current operational time is **${respTime}**, synchronized with the CRIS Central Network Time Protocol (NTP) server. All 330 scheduled services are indexed against this reference.`,
+        suggestions: ["🛰️ Live Trains", "🗺️ Open Map", "⚡ Run Demos"]
+      });
+      return;
+    }
+
+    if (words.some(w => ["bye", "goodbye", "tata", "see you", "cya"].includes(w))) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Goodbye, Chief Controller! Have a safe and punctual operational shift. You can call on me anytime or say *"close chat"* to minimize this drawer.`,
+        suggestions: ["❌ Close Chat", "🗺️ Open Map"]
+      });
+      return;
+    }
+
+    // 0.3 IN-APP ACTIONS: CLOSE / HIDE COPILOT DRAWER
+    if (cleanLower.includes("close chat") || cleanLower.includes("hide chat") || cleanLower.includes("minimize chat") || cleanLower.includes("close copilot") || cleanLower.includes("hide copilot") || cleanLower.includes("exit chat")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "Chief Controller, minimizing the CRIS Autonomous Copilot drawer now. You can re-open me at any time from the bottom-right AI button or topbar!"
+      });
+      window.renderCopilotMessages();
+      setTimeout(() => {
+        if (typeof window.toggleAutonomousCopilot === 'function') {
+          window.toggleAutonomousCopilot(false);
+        }
+      }, 400);
+      return;
+    }
+
+    // 0.4 IN-APP ACTIONS: TOGGLE THEME (DARK / LIGHT)
+    if (cleanLower.includes("toggle theme") || cleanLower.includes("switch theme") || cleanLower.includes("change theme") || cleanLower.includes("dark mode") || cleanLower.includes("light mode") || cleanLower.includes("switch to dark") || cleanLower.includes("switch to light")) {
+      if (typeof window.toggleTheme === "function") {
+        window.toggleTheme();
+      }
+      const isDark = document.body.classList.contains("theme-dark") || document.documentElement.getAttribute("data-theme") === "dark";
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Chief Controller, the display theme has been successfully toggled to **${isDark ? 'Dark Mode (Night Shift)' : 'Light Mode (Day Shift)'}**.`,
+        action_card: {
+          id: "act-theme-" + Date.now(),
+          badge: "THEME SWITCHED",
+          title: `Console Mode: ${isDark ? 'Dark Theme' : 'Light Theme'}`,
+          description: "Display contrast and high-legibility railway colors updated.",
+          action_type: "SHOW_TOAST",
+          message: "Theme toggled successfully",
+          button_label: "🌓 Toggle Theme Again"
+        }
+      });
+      return;
+    }
+
+    // 0.5 IN-APP ACTIONS: SWITCH LANGUAGE
+    if (cleanLower.includes("switch to hindi") || cleanLower.includes("change to hindi") || cleanLower.includes("hindi language") || cleanLower === "hindi" || cleanLower === "हिंदी") {
+      if (typeof window.setLanguage === "function") window.setLanguage("hi");
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "भाषा को सफलतापूर्वक **हिंदी (Hindi)** में बदल दिया गया है। संपूर्ण कमान केंद्र और जोनल मंडल डेटा अद्यतन हो गए हैं।"
+      });
+      return;
+    }
+    if (cleanLower.includes("switch to english") || cleanLower.includes("change to english") || cleanLower.includes("english language") || cleanLower === "english") {
+      if (typeof window.setLanguage === "function") window.setLanguage("en");
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: "Language successfully switched to **English**. All divisional telemetry and system interfaces updated."
+      });
+      return;
+    }
+
+    // 0.6 IN-APP ACTIONS: DECLARE EMERGENCY BLOCK
+    if (cleanLower.includes("declare emergency") || cleanLower.includes("emergency block") || cleanLower.includes("emergency possession") || cleanLower.includes("open emergency") || cleanLower.includes("trigger emergency")) {
+      if (typeof window.triggerEmergencyBlockModal === "function") {
+        window.triggerEmergencyBlockModal();
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `🚨 **EMERGENCY BLOCK CONSOLE ACTIVATED**\n\nI have launched the **Emergency Line Block Possession Dialog** on your screen. You can select the affected corridor section, track KM, and enforce instant safety interlocks to halt approaching rakes.`,
+        action_card: {
+          id: "act-emerg-" + Date.now(),
+          badge: "EMERGENCY SAFETY OVERRIDE",
+          title: "Emergency Line Block Dialog Open",
+          description: "Sectional Controller notified. Imposes 0 km/h absolute caution stop.",
+          action_type: "EMERGENCY_BLOCK",
+          payload: { section: "SEC-MAS-CBE", reason: "Critical Track Defect" },
+          button_label: "🚨 Re-open Emergency Modal"
+        }
+      });
+      return;
+    }
+
+    // 0.7 IN-APP ACTIONS: OPEN 1-CLICK DEMO SCENARIOS
+    if (cleanLower.includes("demo scenario") || cleanLower.includes("demo scenarios") || cleanLower.includes("open demo") || cleanLower.includes("run demo") || cleanLower.includes("show demo") || cleanLower === "demo" || cleanLower === "demos" || cleanLower.includes("1-click demo") || cleanLower.includes("open demos")) {
+      if (typeof window.openDemoScenariosModal === "function") {
+        window.openDemoScenariosModal();
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `⚡ **1-CLICK DEMO SCENARIOS LAUNCHED**\n\nI have opened the **1-Click Presentation Demos Modal** on your screen. You can execute:\n\n1. **Vande Bharat 2.0 Introduction (Train #20611)**: Dynamic commissioning & conflict-free slotting.\n2. **Critical Rail Fracture Katpadi-Jolarpettai**: Emergency detour pathing via Renigunta.\n3. **30-Minute Dynamic Delay Replanning**: Instant sub-second timetable rescheduling.\n4. **Cost Cutting Economics & BPC Showcase**: Itemized savings and certificate generation.`,
+        action_card: {
+          id: "act-demos-" + Date.now(),
+          badge: "1-CLICK DEMO SUITE",
+          title: "Demo Scenarios Modal Open",
+          description: "Interactive simulation scenarios ready for presentation.",
+          action_type: "OPEN_DEMOS",
+          payload: {},
+          button_label: "⚡ Re-open Demos Modal"
+        }
+      });
+      return;
+    }
+
+    // 0.8 IN-APP ACTIONS: LIVE TRAIN RUNNING STATUS (NTES / RTIS)
+    if (!hasTrainNumber && !cleanLower.includes("cost") && (cleanLower.includes("live train") || cleanLower.includes("live status") || cleanLower.includes("where is train") || cleanLower.includes("track train") || cleanLower.includes("running status") || cleanLower === "rtis" || cleanLower === "ntes" || cleanLower === "live")) {
+      if (typeof window.openLiveTrainStatusModal === "function") {
+        window.openLiveTrainStatusModal();
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `🛰️ **LIVE TRAIN RUNNING STATUS OPENED**\n\nI have opened the **Live Train Telemetry & RTIS Satellite Tracker** on your screen. You can monitor live GPS coordinates, current sectional speeds, and delay status across all active services.`,
+        action_card: {
+          id: "act-live-" + Date.now(),
+          badge: "ISRO RTIS + NTES SATELLITE FEED",
+          title: "Live Train Running Status Active",
+          description: "Real-time train positioning and automatic timetable feeds.",
+          action_type: "OPEN_LIVE_TRAINS",
+          payload: {},
+          button_label: "🛰️ Re-open Live Train Status"
+        }
+      });
+      return;
+    }
+
+    // 0.9 IN-APP ACTIONS: FLEET & STATIONS MANAGER
+    if (cleanLower.includes("fleet manager") || cleanLower.includes("manage fleet") || cleanLower.includes("manage stations") || cleanLower.includes("fleet and station") || cleanLower.includes("fleet & station") || cleanLower.includes("open fleet manager")) {
+      if (typeof window.openFleetStationManagerModal === "function") {
+        window.openFleetStationManagerModal();
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `🚆 **FLEET & STATIONS MANAGER OPENED**\n\nI have opened the **Fleet & Stations Manager Modal** on your screen. You can add new trains, modify locomotive rake assignments, commission platforms, and update yard geometries.`,
+        action_card: {
+          id: "act-fleet-" + Date.now(),
+          badge: "ROLLING STOCK & YARD MANAGER",
+          title: "Fleet & Stations Manager Active",
+          description: "Manage locomotives, passenger coaches, and station platforms.",
+          action_type: "OPEN_FLEET_MANAGER",
+          payload: {},
+          button_label: "🚆 Re-open Fleet Manager"
+        }
+      });
+      return;
+    }
+
+    // 0.10 IN-APP ACTIONS: ZONAL AUDIT REPORTS MODAL
+    if (cleanLower.includes("audit report") || cleanLower.includes("zonal audit") || cleanLower.includes("technical audit") || cleanLower.includes("open audit") || cleanLower.includes("generate report") || cleanLower.includes("download report") || cleanLower.includes("report studio")) {
+      if (typeof window.openZonalAuditReportModal === "function") {
+        window.openZonalAuditReportModal();
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `📊 **ZONAL AUDIT REPORT STUDIO OPENED**\n\nI have launched the **Official Zonal Technical Audit Report Modal** on your screen. You can generate and export formal Ministry of Railways PDF/CSV compliance dossiers covering all 128 sanctioned maintenance possessions.`,
+        action_card: {
+          id: "act-audit-" + Date.now(),
+          badge: "MINISTRY OF RAILWAYS AUDIT",
+          title: "Zonal Audit Report Studio Active",
+          description: "Export official compliance reports with divisional breakdowns.",
+          action_type: "OPEN_AUDIT_REPORT",
+          payload: {},
+          button_label: "📊 Re-open Audit Studio"
+        }
+      });
+      return;
+    }
+
+    // 0.11 IN-APP ACTIONS: PROFORMA T/A 912 SANCTION MEMO
+    if (cleanLower.includes("sanction memo") || cleanLower.includes("ta 912") || cleanLower.includes("t/a 912") || cleanLower.includes("proforma 912") || cleanLower.includes("show memo") || cleanLower.includes("view memo") || cleanLower.includes("open memo") || cleanLower === "memo") {
+      if (typeof window.showSanctionMemo === "function") window.showSanctionMemo();
+      else if (typeof showSanctionMemo === "function") showSanctionMemo();
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `📄 **PROFORMA T/A 912 SANCTION MEMO GENERATED**\n\nI have opened the official **Combined Line Block Sanction & Caution Advice Memo (Proforma T/A 912)** on your screen with authorized counter-signatures, speed limits, and power disconnection notices.`,
+        action_card: {
+          id: "act-memo-" + Date.now(),
+          badge: "FORMAL OPERATIONAL SANCTION",
+          title: "Proforma T/A 912 Memo Active",
+          description: "Official Combined Line Block Sanction & Advice Memo.",
+          action_type: "SHOW_SANCTION_MEMO",
+          payload: {},
+          button_label: "📄 Re-open Sanction Memo"
+        }
+      });
+      return;
+    }
+
+    // 0.12 IN-APP ACTIONS: COMMAND PALETTE / QUICK JUMP (⌘K)
+    if (cleanLower.includes("command palette") || cleanLower.includes("quick jump") || cleanLower.includes("quick search") || cleanLower.includes("open palette") || cleanLower === "palette") {
+      if (typeof window.openCommandPalette === "function") {
+        window.openCommandPalette();
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `⌨️ **COMMAND PALETTE (⌘K) OPENED**\n\nI have opened the **Quick Jump Command Palette** on your screen. Type any station code (e.g. MAS, CBE), corridor section, or train number to jump directly.`
+      });
+      return;
+    }
+
+    // 0.13 IN-APP ACTIONS: SURRENDER ACTIVE BLOCK EARLY
+    if (cleanLower.includes("surrender block") || cleanLower.includes("surrender possession") || cleanLower.includes("cancel block early")) {
+      if (typeof window.surrenderActiveBlockEarly === "function") {
+        window.surrenderActiveBlockEarly();
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `✅ **ACTIVE LINE BLOCK SURRENDERED EARLY**\n\nPossession safely cancelled ahead of schedule. Track section returned to Operating department; Caution Order cancelled and normal line speed restored.`
+      });
+      return;
+    }
+
+    // 0.14 IN-APP ACTIONS: EXTEND ACTIVE BLOCK
+    if (cleanLower.includes("extend block") || cleanLower.includes("give more time") || cleanLower.includes("extend possession") || cleanLower.includes("extend time")) {
+      if (typeof window.extendActiveBlock === "function") {
+        window.extendActiveBlock(30);
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `⏱️ **ACTIVE LINE BLOCK EXTENDED (+30 MINS)**\n\nPossession window extended by +30 minutes. Sectional controllers notified and downstream schedule margins re-adjusted.`
+      });
+      return;
+    }
+
+    // 0.15 IN-APP ACTIONS: INGEST TRAINS DATASET
+    if (cleanLower.includes("ingest trains") || cleanLower.includes("import trains") || cleanLower.includes("import timetable") || cleanLower.includes("upload timetable")) {
+      if (typeof window.openIngestTrainsModal === "function") {
+        window.openIngestTrainsModal();
+      }
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `📥 **TIMETABLE DATASET INGESTION STUDIO OPENED**\n\nI have opened the **Train Dataset Ingestion Modal** on your screen. You can upload custom CSV or JSON train timetables for automatic indexing.`
+      });
+      return;
+    }
+
+    // 0.16 IN-APP PAGE NAVIGATION DIRECTIVES
+    const isNavigationAsk = (
+      cleanLower.startsWith("open ") || cleanLower.startsWith("go to ") || cleanLower.startsWith("show ") ||
+      cleanLower.startsWith("view ") || cleanLower.startsWith("navigate to ") || cleanLower.startsWith("switch to ") ||
+      cleanLower.startsWith("take me to ") || cleanLower.endsWith(" page") || cleanLower.endsWith(" screen") ||
+      cleanLower.endsWith(" console") || cleanLower.endsWith(" module") ||
+      ["dashboard", "schedule", "timetable", "corridors", "sections", "stations", "station planning", "asset maintenance", "cost maintenance", "dynamic dispatch", "dispatch", "conflicts", "conflict resolution", "block optimization"].includes(cleanLower)
+    );
+
+    if (isNavigationAsk && !hasTrainNumber && !cleanLower.includes("block has occurred") && !cleanLower.includes("maintenance block is required")) {
+      // 1. Dashboard / Map
+      if (cleanLower.includes("dashboard") || cleanLower.includes("overview") || cleanLower.includes("home page") || cleanLower.includes("main screen") || cleanLower.includes("live map") || cleanLower.includes("gis map") || cleanLower.includes("show map") || cleanLower.includes("open map") || cleanLower.includes("view map")) {
+        window.navigateTo("Dashboard");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, navigated directly to the **GIS Live Operations Map & Dashboard**.\n\nDisplaying real-time track circuits, 25kV traction, and live train positions across Southern Railway.`,
+          action_card: {
+            id: "act-nav-dash-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "GIS Operations Dashboard",
+            description: "Live digital twin of the railway network.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Dashboard" },
+            button_label: "🗺️ On Dashboard"
+          }
+        });
+        return;
+      }
+
+      // 2. Schedule / Timetable / Block Planning
+      if (cleanLower.includes("schedule") || cleanLower.includes("timetable") || cleanLower.includes("time table") || cleanLower.includes("block planning") || cleanLower.includes("calendar")) {
+        window.navigateTo("Block Planning");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, navigated directly to the **Integrated Train Timetable & Block Schedule**.\n\nAll 330 scheduled passenger and freight services are listed with track occupancy slots.`,
+          action_card: {
+            id: "act-nav-sched-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Timetable & Block Schedule",
+            description: "Live schedule view with slot allocations.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Block Planning" },
+            button_label: "📅 On Schedule View"
+          }
+        });
+        return;
+      }
+
+      // 3. Corridors & Sections
+      if (cleanLower.includes("corridor and section") || cleanLower.includes("corridors & sections") || cleanLower.includes("corridors and sections") || cleanLower.includes("corridor list") || cleanLower.includes("sections") || cleanLower.includes("track section") || cleanLower === "corridors" || cleanLower.includes("open corridor") || cleanLower.includes("show corridor") || cleanLower.includes("view corridor")) {
+        window.navigateTo("Corridors & Sections");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, navigated directly to **Corridors & Track Sections**.\n\nShowing all 6 major railway corridors, line health, maximum permissible speeds (MPS), and defect hotspots.`,
+          action_card: {
+            id: "act-nav-corr-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Corridors & Sections Directory",
+            description: "Inspection of section geometry and track classifications.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Corridors & Sections" },
+            button_label: "🛤️ On Corridors & Sections"
+          }
+        });
+        return;
+      }
+
+      // 4. Corridor Map
+      if (cleanLower.includes("corridor map") || cleanLower.includes("corridor gis") || cleanLower.includes("corridor intelligence") || cleanLower.includes("track map")) {
+        window.navigateTo("Corridor Map");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, opened **Corridor Map Intelligence**.\n\nHigh-density vector layout of track alignments, signaling block sections, and traction substations.`,
+          action_card: {
+            id: "act-nav-cmap-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Corridor Map Intelligence",
+            description: "Detailed track alignment GIS viewer.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Corridor Map" },
+            button_label: "🗺️ On Corridor Map"
+          }
+        });
+        return;
+      }
+
+      // 5. Station Planning & Headway
+      if (cleanLower.includes("station planning") || cleanLower.includes("headway") || cleanLower.includes("platform planning") || cleanLower.includes("station capacity") || cleanLower.includes("berthing")) {
+        window.navigateTo("Station Planning");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, opened **Station Planning & Headway Console**.\n\nShowing platform line occupancy charts, route overlap locking, and moving-block headway margins.`,
+          action_card: {
+            id: "act-nav-stnplan-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Station Headway & Planning",
+            description: "Platform berthing and interlocking headway optimization.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Station Planning" },
+            button_label: "🚦 On Station Planning"
+          }
+        });
+        return;
+      }
+
+      // 6. Stations Master Directory
+      if (cleanLower.includes("stations master") || cleanLower.includes("station master") || cleanLower.includes("all stations") || cleanLower.includes("stations list") || cleanLower.includes("stations directory") || cleanLower.includes("open station") || cleanLower.includes("show station") || cleanLower.includes("view station") || cleanLower === "stations") {
+        window.navigateTo("Stations Master");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, navigated to the **Stations Master Directory**.\n\nListing all major junction points, terminal yards, and interlocking cabins across MAS, SA, TPJ, MDU, PGT, and TVC.`,
+          action_card: {
+            id: "act-nav-stn-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Stations Master Directory",
+            description: "Complete inventory of Southern Railway stations.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Stations Master" },
+            button_label: "🚉 On Stations Master"
+          }
+        });
+        return;
+      }
+
+      // 7. Cost Asset Maintenance
+      if (cleanLower.includes("cost asset maintenance") || cleanLower.includes("cost maintenance") || cleanLower.includes("cost asset") || cleanLower.includes("economics") || cleanLower.includes("open cost") || cleanLower.includes("view cost") || cleanLower.includes("show cost")) {
+        window.navigateTo("Cost Asset Maintenance");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, opened **Cost Asset Maintenance & Economics**.\n\nItemized breakdown of concurrent maintenance savings, avoided daytime train detentions, and BPC issuance history.`,
+          action_card: {
+            id: "act-nav-cost-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Cost Asset Maintenance",
+            description: "Avoided detention cost calculations and BPC economics.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Cost Asset Maintenance" },
+            button_label: "💰 On Cost Maintenance"
+          }
+        });
+        return;
+      }
+
+      // 8. Asset Maintenance
+      if (cleanLower.includes("asset maintenance") || cleanLower.includes("asset management") || cleanLower.includes("rolling stock") || cleanLower.includes("open asset") || cleanLower.includes("show asset") || cleanLower.includes("view asset") || cleanLower === "assets") {
+        window.navigateTo("Asset Maintenance");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, navigated to **Asset Maintenance Management**.\n\nReal-time monitoring of locomotive health, WAP-7 / WAG-9 electric locos, LHB rakes, and primary pit-line schedules.`,
+          action_card: {
+            id: "act-nav-asset-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Asset Maintenance Console",
+            description: "Rolling stock and locomotive scheduled maintenance.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Asset Maintenance" },
+            button_label: "🤖 On Asset Maintenance"
+          }
+        });
+        return;
+      }
+
+      // 9. Dynamic Dispatch AI
+      if (cleanLower.includes("dynamic dispatch") || cleanLower.includes("dispatch ai") || cleanLower.includes("dispatch console") || cleanLower.includes("open dispatch") || cleanLower.includes("show dispatch") || cleanLower.includes("view dispatch") || cleanLower === "dispatch") {
+        window.navigateTo("Dynamic Dispatch AI");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, navigating to the **Dynamic Dispatch AI Console**.\n\nAI precedence optimizer and heuristic speed advisory active for real-time section regulation.`,
+          action_card: {
+            id: "act-nav-disp-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Dynamic Dispatch AI",
+            description: "Sub-second traffic regulation and train precedence.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Dynamic Dispatch AI" },
+            button_label: "🧠 On Dynamic Dispatch"
+          }
+        });
+        return;
+      }
+
+      // 10. Conflict Resolution
+      if (cleanLower.includes("conflict resolution") || cleanLower.includes("conflicts") || cleanLower.includes("conflict detector") || cleanLower.includes("open conflict") || cleanLower.includes("show conflict") || cleanLower === "conflicts") {
+        window.navigateTo("Block Optimization");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, opened the **Conflict Resolution Hub**.\n\nGBDT risk classifiers evaluating route cross-overs and headway buffer violations in real time.`,
+          action_card: {
+            id: "act-nav-conf-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Conflict Resolution Hub",
+            description: "Zero headway violation monitoring and preemptive resolutions.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Block Optimization" },
+            button_label: "⚠️ On Conflict Resolution"
+          }
+        });
+        return;
+      }
+
+      // 11. Block Optimization
+      if (cleanLower.includes("block optimization") || cleanLower.includes("run optimization") || cleanLower.includes("optimize blocks") || cleanLower.includes("combinatorial solver") || cleanLower.includes("open optimization") || cleanLower === "optimize") {
+        window.navigateTo("Block Optimization");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, opened the **Block Optimization Console**.\n\nCombinatorial solver ready to compute optimal multi-corridor maintenance windows with zero passenger delay.`,
+          action_card: {
+            id: "act-nav-opt-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Block Optimization Console",
+            description: "Multi-department co-scheduled possession solver.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Block Optimization" },
+            button_label: "⚡ On Block Optimization"
+          }
+        });
+        return;
+      }
+
+      // 12. Defects & USFD
+      if (cleanLower.includes("defect") || cleanLower.includes("usfd") || cleanLower.includes("track health")) {
+        window.navigateTo("Defects & USFD");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, navigated to **Defects & USFD Telemetry**.\n\nInspecting Ultrasonic Flaw Detection acoustic rail scans and crack risk classifications.`,
+          action_card: {
+            id: "act-nav-def-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Defects & USFD Console",
+            description: "Acoustic sensor flaw detection data.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Defects & USFD" },
+            button_label: "⚠️ On Defects & USFD"
+          }
+        });
+        return;
+      }
+
+      // 13. Weather & Incidents
+      if (cleanLower.includes("weather") || cleanLower.includes("incident") || cleanLower.includes("cyclone") || cleanLower.includes("rain") || cleanLower.includes("wind")) {
+        window.navigateTo("Weather & Incidents");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, opened **Weather & Incident Management**.\n\nIMD Doppler radar integration and monsoon water-logging sensors monitoring Southern Railway sections.`,
+          action_card: {
+            id: "act-nav-weath-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Weather & Incidents Console",
+            description: "Doppler radar and incident logging.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Weather & Incidents" },
+            button_label: "🌦️ On Weather & Incidents"
+          }
+        });
+        return;
+      }
+
+      // 14. Settings & Audit Logs
+      if (cleanLower.includes("setting") || cleanLower.includes("settings") || cleanLower.includes("audit log") || cleanLower.includes("preferences")) {
+        window.navigateTo("Settings");
+        copilotMessages.push({
+          sender: "assistant",
+          time: respTime,
+          text: `Chief Controller, opened **Settings & Zonal Audit Logs**.\n\nSystem configuration, API endpoints, and immutable shift audit log ledger ready for review.`,
+          action_card: {
+            id: "act-nav-set-" + Date.now(),
+            badge: "NAVIGATION EXECUTED",
+            title: "Settings & Audit Logs",
+            description: "System parameters and official activity audit ledger.",
+            action_type: "NAVIGATE",
+            payload: { target_screen: "Settings" },
+            button_label: "⚙️ On Settings"
+          }
+        });
+        return;
+      }
+    }
+
     // 1. Attempt fast backend chat with 1500ms race timeout
     let backendReply = null;
     try {
@@ -23562,13 +25223,14 @@ To view exact numbers for any train, simply ask (e.g. \`12675 cost cutting\`, \`
     }
 
     // =========================================================================
-    // 8. GENERAL GREETINGS, HELP & SEMANTIC RESPONSES
+    // 8. GENERAL GREETINGS, HELP & CONVERSATIONAL NLP
     // =========================================================================
     if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey") || lower.includes("namaste") || lower.includes("vanakkam") || lower.includes("good morning") || lower.includes("good afternoon") || lower.includes("good evening")) {
       copilotMessages.push({
         sender: "assistant",
         time: respTime,
-        text: `Greetings Chief Controller. I am your **CRIS Operations AI Copilot**, synchronized with the Control Office Application (COA), Track Management System (TMS), and Integrated Coaching Management System (ICMS).\n\nAll 6 Indian Railways divisions are currently operating under nominal headway spacing with zero active signal failures. How may I assist your shift today?`,
+        text: `Greetings Chief Controller. I am your **CRIS Operations AI Copilot**, synchronized with the Control Office Application (COA), Track Management System (TMS), and Integrated Coaching Management System (ICMS).\n\nAll 6 Southern Railway divisions are currently operating under nominal headway spacing with zero active signal failures. How may I assist your shift today?`,
+        suggestions: ["💰 12675 cost cutting", "🚨 Block KPD–JTJ", "🛡️ Explain Kavach", "⚡ Speed Limits"],
         action_card: {
           id: "act-" + Date.now(),
           badge: "CRIS OPERATIONS STANDBY",
@@ -23582,11 +25244,52 @@ To view exact numbers for any train, simply ask (e.g. \`12675 cost cutting\`, \`
       return;
     }
 
+    if (lower.includes("thank") || lower.includes("thanks") || lower.includes("dhanyavad") || lower.includes("nandri") || lower.includes("great job") || lower.includes("awesome") || lower.includes("good job") || lower.includes("perfect") || lower.includes("excellent")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `Always at your service, Chief Controller. CRIS Autonomous systems remain nominal across Southern Railway.\n\n• Corridor Headways: Nominal (3-5 min ABS buffers)\n• Pending Critical Defects: 0 unscheduled\n• Next Scheduled Possessions: Synchronized with nocturnal freight lulls.\n\nFeel free to type any train number, corridor, or block query whenever you need!`,
+        suggestions: ["💰 12675 cost cutting", "🚨 Block KPD–JTJ", "🚉 Tambaram Station", "⚡ Speed Limits"]
+      });
+      return;
+    }
+
+    if (lower.includes("how does ai work") || lower.includes("algorithm") || lower.includes("gbdt") || lower.includes("csp") || lower.includes("combinatorial") || lower.includes("degradation model") || lower.includes("solver")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `### 🧠 CRIS Autonomous AI Optimization Architecture\n\nOur system combines two advanced mathematical formulations:\n\n1. **GBDT (Gradient Boosted Decision Tree) Infrastructure Risk Engine:**\n   • Analyzes acoustic USFD flaw logs, track gross million tonnes (GMT), sleeper age, and ambient temperature.\n   • Computes rail fracture hazard probability (e.g. 89.2% -> 4.1% post-weld).\n   • Triggers predictive shadow maintenance 72 hours before catastrophic track failure.\n\n2. **CSP (Constraint Satisfaction Problem) Combinatorial Solver:**\n   • Ingests 330+ trains from Control Office Application (COA).\n   • Multi-department synchronization: Civil track tamping, 25kV TRD power blocks, and S&T axle counter calibration.\n   • Solves 6 corridors in 0.04s, guaranteeing **zero passenger cancellations** and 100% punctuality preservation.`,
+        suggestions: ["⚡ Run Master Optimization", "🗺️ View Live Dashboard Map", "💰 12675 cost cutting"]
+      });
+      return;
+    }
+
+    if (lower.includes("how do you save cost") || lower.includes("why cost cutting") || lower.includes("concurrent cost") || lower.includes("cost cutting explanation") || lower.includes("economic benefit")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `### 💰 Indian Railways Autonomous Cost Cutting Economics\n\nTraditional maintenance incurs immense financial waste through fragmented possessions. Our system achieves **72% to 84% net expenditure savings** via:\n\n1. **Concurrent Possession Bundling:**\n   • Instead of taking 3 separate 3.5h blocks for Civil P-Way, Electrical TRD, and S&T, we execute all 3 in a SINGLE nocturnal gap.\n   • Avoids ₹1.80L to ₹3.80L in traditional line-closure compensation.\n\n2. **Predictive Component Replacement (RDSO BOM Standards):**\n   • Replaces high-stress wear parts (SKV Thermit portions, CMS crossing hardfacing, PTFE insulators) during scheduled stabling.\n   • Prevents unscheduled en-route locomotive failure penalties (saving ₹35,000/hr in line obstruction costs).\n\n3. **Preserved Freight Pathing:**\n   • Nocturnal freight bypass routing prevents demurrage charges and rakes idling at yard outer signals.`,
+        suggestions: ["💰 12675 cost cutting", "💰 20608 cost cutting", "📑 Open Technical Audit Studio"]
+      });
+      return;
+    }
+
+    if (lower.includes("p-way") || lower.includes("permanent way") || lower.includes("ballast") || lower.includes("tamping") || lower.includes("sleeper") || lower.includes("track maintenance") || lower.includes("rail renewal")) {
+      copilotMessages.push({
+        sender: "assistant",
+        time: respTime,
+        text: `### 🛤️ Permanent Way (P-Way) Civil Engineering Profile\n\nGoverned by the **Indian Railways Permanent Way Manual (IRPWM 2020)** and RDSO specifications:\n\n• **Rail Profile:** 60kg / 110-UTS Continuous Welded Rails (CWR) resting on 1660 prestressed concrete (PSC) sleepers per kilometer.\n• **Ballast Cushion:** Minimum 350 mm clean, crushed stone ballast cushion providing 50 kN/mm track modulus resilience.\n• **Continuous Tamping (CSM-09-32):** Consolidates ballast bed to restore longitudinal level, cross-level, and track alignment.\n• **Deep Screening (BCM-4):** Cleans fouled ballast to restore water drainage and eliminate track slurry during monsoon seasons.\n• **Thermit SKV Welding:** Joins rail sections at 25mm weld gap using Alumino-Thermit reaction producing molten steel at 2,400°C.`,
+        suggestions: ["🚨 Report Block", "⚡ Speed Limits & TSR", "🛡️ Kavach System"]
+      });
+      return;
+    }
+
     if (lower.includes("help") || lower.includes("who are you") || lower.includes("what can you do") || lower.includes("command") || lower.includes("features")) {
       copilotMessages.push({
         sender: "assistant",
         time: respTime,
-        text: `### 🤖 CRIS AI Autonomous Copilot - Operational Capability Matrix\n\nYou can issue natural language commands or ask technical questions across the following domains:\n\n1. **Train Economics & Cost Cuttings**: Type any train number (e.g. \`12675 cost cutting\`, \`20608 savings\`) for a 4-pillar RDSO BOM repair and net savings ledger.\n2. **Maintenance Blocks & Detours**: Report track closures (e.g. \`Block between Katpadi and Jolarpettai\`), ask \`Why recommended route?\`, or simulate \`What if Route 1 is unavailable?\`.\n3. **37 Stations & Divisions**: Ask about platforms, throughput, or headways for any station (e.g. \`Katpadi junction\`, \`Chennai Central platforms\`, \`Salem division\`).\n4. **Signaling & Safety Rules**: Inquire about \`Kavach\`, \`ABS signaling\`, \`MACLS 4-aspects\`, \`Speed limits\`, \`25kV OHE catenary\`, or \`BPC Form 402\`.\n5. **Corridor Optimizations**: Command \`optimize all corridors\`, \`resolve defect\`, or \`simulate 30m delay\`.`
+        text: `### 🤖 CRIS AI Autonomous Copilot - Operational Capability Matrix\n\nYou can converse naturally, issue commands, or ask technical questions across the following domains:\n\n1. **Train Economics & Cost Cuttings**: Type any train number (e.g. \`12675 cost cutting\`, \`20608 savings\`) for a 4-pillar RDSO BOM repair and net savings ledger.\n2. **Maintenance Blocks & Detours**: Report track closures (e.g. \`Block between Katpadi and Jolarpettai\`), ask \`Why recommended route?\`, or simulate \`What if Route 1 is unavailable?\`.\n3. **37 Stations & Divisions**: Ask about platforms, throughput, or headways for any station (e.g. \`Katpadi junction\`, \`Chennai Central platforms\`, \`Salem division\`).\n4. **Signaling & Safety Rules**: Inquire about \`Kavach\`, \`ABS signaling\`, \`MACLS 4-aspects\`, \`Speed limits\`, \`25kV OHE catenary\`, or \`BPC Form 402\`.\n5. **Corridor Optimizations**: Command \`optimize all corridors\`, \`resolve defect\`, or \`simulate 30m delay\`.`,
+        suggestions: ["💰 12675 cost cutting", "🚨 Block KPD–JTJ", "🛡️ Explain Kavach", "⚡ Speed Limits"]
       });
       return;
     }
@@ -23610,11 +25313,37 @@ To view exact numbers for any train, simply ask (e.g. \`12675 cost cutting\`, \`
       return;
     }
 
-    // 8.2 Comprehensive Semantic Railway Fallback
+    // 8.2 Intelligent Dynamic Conversational NLP Fallback
+    let contextualTopic = "Operational Telemetry & Corridor Traffic";
+    let topicDetails = "";
+
+    if (lower.includes("schedule") || lower.includes("time") || lower.includes("train") || lower.includes("punctuality")) {
+      contextualTopic = "Integrated Train Scheduling & Timetable Control";
+      topicDetails = "All 330 scheduled passenger and freight services are monitored via real-time GPS (RTIS) and Control Office Application (COA). Sectional controllers maintain nominal headway margins across double-line automatic signaling sections.";
+    } else if (lower.includes("safety") || lower.includes("accident") || lower.includes("derail") || lower.includes("caution")) {
+      contextualTopic = "Safety Preemption & Track Integrity Standards";
+      topicDetails = "Indian Railways General & Subsidiary Rules (G&SR) mandate strict interlocking protocols, acoustic USFD flaw scanning, and Kavach ATP deployment to eliminate collision risk and derailment hazards.";
+    } else if (lower.includes("freight") || lower.includes("goods") || lower.includes("cargo") || lower.includes("wagon")) {
+      contextualTopic = "Freight Corridor Throughput & Possession Lulls";
+      topicDetails = "Heavy freight rakes (BOXN/BCN) operating at 25-tonne axle load are allocated nocturnal pathing windows between 01:00 and 04:30 IST to liberate daylight capacity for passenger superfast services.";
+    } else if (lower.includes("crew") || lower.includes("driver") || lower.includes("loco pilot") || lower.includes("guard")) {
+      contextualTopic = "Locomotive Crew Working Hours & Safety Regulations";
+      topicDetails = "Loco Pilots operate under Railway Servants (Hours of Work and Period of Rest) Rules with maximum 9-hour continuous running duty, protected by breathalyzer sign-on/sign-off and vigilance control devices (VCD).";
+    } else {
+      contextualTopic = "Zonal Traffic & Operational Dispatch Guidance";
+      topicDetails = "The CRIS Autonomous Dispatch Engine continuously balances track availability, traction power consumption, and train precedence across all 6 divisions (MAS, SA, TPJ, MDU, PGT, TVC).";
+    }
+
     copilotMessages.push({
       sender: "assistant",
       time: respTime,
-      text: `Chief Controller, I analyzed your operational query regarding **"${text}"** against the CRIS Zonal Operating Manual, Indian Railways Permanent Way Manual (IRPWM), and live COA telemetry.\n\n• **Network Status:** All 6 divisions (MAS, SA, TPJ, MDU, PGT, TVC) are synchronized with zero headway conflicts.\n• **Safety Telemetry:** Track circuits and MSDAC axle counters report normal clear status.\n• **Autonomous Planning:** Co-scheduling engines are standing by to simulate detours, calculate train cost cuttings, or sanction shadow maintenance possessions.\n\nSelect an operational action below or specify a train number / corridor pair for immediate analysis.`,
+      text: `Chief Controller, I analyzed your operational inquiry regarding **"${text}"**:\n\n### 📋 ${contextualTopic}\n${topicDetails}\n\n• **Operational Status:** All 6 divisions report nominal headway spacing and 100% signal availability.\n• **Autonomous Re-routing:** Real-time detour routing and shadow possession co-scheduling are active.\n• **Immediate Actions:** You can request train cost cuttings, report track blocks, inspect station platform lines, or run a master optimization.`,
+      suggestions: [
+        "💰 12675 cost cutting",
+        "🚨 Block KPD–JTJ",
+        "🛡️ Kavach System",
+        "⚡ Speed Limits"
+      ],
       action_card: {
         id: "act-" + Date.now(),
         badge: "CRIS OPERATIONS COPILOT",
@@ -23756,9 +25485,99 @@ window.mountCopilotDOM = function() {
     launcher = document.createElement("button");
     launcher.id = "crisCopilotLauncher";
     launcher.className = "cris-copilot-fab";
-    launcher.onclick = () => window.toggleAutonomousCopilot();
     document.body.appendChild(launcher);
   }
+
+  // Make Copilot launcher free-roaming and draggable across the screen
+  if (!launcher.__draggableAttached) {
+    launcher.__draggableAttached = true;
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let startLeft = 0, startTop = 0;
+    let hasMoved = false;
+
+    launcher.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      isDragging = true;
+      hasMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      const rect = launcher.getBoundingClientRect();
+      startLeft = rect.left;
+      startTop = rect.top;
+
+      launcher.style.right = 'auto';
+      launcher.style.bottom = 'auto';
+      launcher.style.left = `${startLeft}px`;
+      launcher.style.top = `${startTop}px`;
+      launcher.style.zIndex = '99999';
+
+      if (launcher.setPointerCapture) {
+        try { launcher.setPointerCapture(e.pointerId); } catch(err) {}
+      }
+
+      const onPointerMove = (ev) => {
+        if (!isDragging) return;
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        if (Math.hypot(dx, dy) > 5) {
+          hasMoved = true;
+        }
+        const maxW = window.innerWidth - (launcher.offsetWidth || 180) - 10;
+        const maxH = window.innerHeight - (launcher.offsetHeight || 50) - 10;
+        let newLeft = Math.max(10, Math.min(startLeft + dx, Math.max(10, maxW)));
+        let newTop = Math.max(10, Math.min(startTop + dy, Math.max(10, maxH)));
+
+        launcher.style.left = `${newLeft}px`;
+        launcher.style.top = `${newTop}px`;
+        window.__lastCopilotPos = { left: newLeft, top: newTop };
+        ev.preventDefault();
+      };
+
+      const onPointerUp = (ev) => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        if (launcher.releasePointerCapture) {
+          try { launcher.releasePointerCapture(ev.pointerId); } catch(err) {}
+        }
+
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+        document.removeEventListener('pointercancel', onPointerUp);
+
+        if (hasMoved) {
+          launcher.__justDragged = true;
+          setTimeout(() => { launcher.__justDragged = false; }, 200);
+        }
+      };
+
+      document.addEventListener('pointermove', onPointerMove, { passive: false });
+      document.addEventListener('pointerup', onPointerUp, { passive: false });
+      document.addEventListener('pointercancel', onPointerUp, { passive: false });
+    });
+  }
+
+  // Restore previous position if moved
+  if (window.__lastCopilotPos) {
+    const maxW = window.innerWidth - (launcher.offsetWidth || 180) - 10;
+    const maxH = window.innerHeight - (launcher.offsetHeight || 50) - 10;
+    const clampedL = Math.max(10, Math.min(window.__lastCopilotPos.left, Math.max(10, maxW)));
+    const clampedT = Math.max(10, Math.min(window.__lastCopilotPos.top, Math.max(10, maxH)));
+    launcher.style.left = `${clampedL}px`;
+    launcher.style.top = `${clampedT}px`;
+    launcher.style.right = 'auto';
+    launcher.style.bottom = 'auto';
+  }
+
+  launcher.onclick = (e) => {
+    if (launcher.__justDragged) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      return;
+    }
+    window.toggleAutonomousCopilot();
+  };
   launcher.title = isHi ? "क्रिस एआई स्वायत्त कोपायलट खोलें (पर्यवेक्षक मोड) [Alt+C]" : "Open CRIS AI Autonomous Copilot (Supervisor Mode) [Alt+C]";
   launcher.innerHTML = `
     <div class="fab-badge-indicator"></div>
@@ -23769,25 +25588,45 @@ window.mountCopilotDOM = function() {
     </div>
   `;
 
-  // 2. Mount Drawer Panel if not present
+  // 1.5 Mount Backdrop Overlay if not present
+  let backdrop = document.querySelector("#crisCopilotBackdrop");
+  if (!backdrop) {
+    backdrop = document.createElement("div");
+    backdrop.id = "crisCopilotBackdrop";
+    backdrop.className = "cris-copilot-backdrop";
+    backdrop.onclick = () => window.toggleAutonomousCopilot(false);
+    document.body.appendChild(backdrop);
+  }
+
+  // 2. Mount Drawer Panel if not present or needs updated DOM
   let drawer = document.querySelector("#crisCopilotDrawer");
-  if (!drawer) {
-    drawer = document.createElement("div");
-    drawer.id = "crisCopilotDrawer";
-    drawer.className = "cris-copilot-drawer";
+  if (!drawer || !drawer.querySelector(".cris-copilot-bottom-bar")) {
+    if (!drawer) {
+      drawer = document.createElement("div");
+      drawer.id = "crisCopilotDrawer";
+      drawer.className = "cris-copilot-drawer";
+      document.body.appendChild(drawer);
+    }
     drawer.innerHTML = `
       <div class="cris-copilot-header">
         <div class="cris-copilot-header-info">
           <h3><span>🏛️</span> ${isHi ? 'क्रिस परिचालन एआई कोपायलट' : 'CRIS Operations AI Copilot'}</h3>
           <div class="sub">${isHi ? 'स्वायत्त ब्लॉक योजना एवं सिग्नलिंग डिस्पैच नियंत्रक' : 'Autonomous Block Planning &amp; Signalling Dispatch Controller'}</div>
           <div class="engine-tag">
-            <span>●</span> ${isHi ? 'जीबीडीटी गिरावट मॉडल एवं सीएसपी कॉम्बिनेटोरियल सॉल्वर ऑनलाइन' : 'GBDT Degradation Model &amp; CSP Combinatorial Solver Online'}
+            <span>●</span> ${isHi ? 'जीबीडीटी मॉडल एवं सीएसपी सॉल्वर ऑनलाइन' : 'GBDT Model &amp; CSP Solver Online'}
           </div>
-          <div style="font-size:11px;color:#cbd5e1;margin-top:6px;font-weight:700">
+          <div style="font-size:10px;color:#cbd5e1;margin-top:4px;font-weight:700">
             ${isHi ? 'पर्यवेक्षक:' : 'Supervisor:'} <b>${esc(currentOfficial.name || "Shri S. Ramanathan, IRTS")}</b> (${esc(currentOfficial.designation || "Sr. DOM")})
           </div>
         </div>
-        <button class="cris-copilot-close" onclick="window.toggleAutonomousCopilot(false)" title="${isHi ? 'कोपायलट बंद करें' : 'Close Copilot'}">✕</button>
+        <div class="cris-copilot-header-actions">
+          <button class="cris-copilot-ctrl-btn min-btn" onclick="window.toggleMinimizeCopilot(event)" title="${isHi ? 'न्यूनतम करें' : 'Minimize'}">
+            ${window.isCopilotMinimized ? '□' : '—'}
+          </button>
+          <button class="cris-copilot-ctrl-btn close-btn" onclick="window.toggleAutonomousCopilot(false)" title="${isHi ? 'कोपायलट बंद करें (Esc)' : 'Close Copilot (Esc)'}">
+            ✖
+          </button>
+        </div>
       </div>
 
       <div class="cris-copilot-chips-bar">
@@ -23800,22 +25639,82 @@ window.mountCopilotDOM = function() {
       </div>
 
       <div class="cris-copilot-messages" id="crisCopilotMessages">
-        <div class="copilot-msg bot">
-          <div class="copilot-avatar">⚡</div>
+        <div class="copilot-msg assistant">
           <div class="copilot-bubble">
             ${isHi 
               ? `नमस्ते <b>${esc(currentOfficial.name.split(' ')[0])}</b> महोदय। मैं क्रिस ऑटोनॉमस ऑपरेशंस कोपायलट हूँ। भारतीय रेल नेटवर्क पर वास्तविक समय हेडवे, ब्लॉक टकराव और लागत विश्लेषण में आपकी सहायता के लिए तैयार हूँ।` 
               : `Namaste <b>${esc(currentOfficial.name.split(' ')[0])}</b> Sir. I am CRIS Autonomous Operations Copilot. Ready to analyze real-time headway, block conflicts, and corridor economics across Indian Railways.`}
           </div>
+          <div class="copilot-msg-meta">CRIS Autonomous Controller • Just now</div>
         </div>
       </div>
 
-      <div class="cris-copilot-input-bar">
-        <input type="text" id="crisCopilotInput" placeholder="${isHi ? 'भारतीय रेल परिचालन या ब्लॉक के संबंध में कुछ भी पूछें...' : 'Ask about rail corridors, train schedules, or cost savings...'}" onkeydown="if(event.key==='Enter') window.submitCopilotChat()" />
-        <button id="crisCopilotSendBtn" onclick="window.submitCopilotChat()">${isHi ? 'भेजें' : 'Send'}</button>
+      <div class="cris-copilot-bottom-bar">
+        <div class="cris-copilot-prompt-suggestions" id="crisCopilotPromptSuggestions">
+          <button class="prompt-chip" onclick="window.sendCopilotMessage('How much cost can we save on 12675 Kovai Express?')">💰 12675 Savings</button>
+          <button class="prompt-chip" onclick="window.sendCopilotMessage('Block has occurred between Katpadi and Jolarpettai')">🚨 Report Block</button>
+          <button class="prompt-chip" onclick="window.sendCopilotMessage('Explain Kavach ATP Safety System')">🛡️ Kavach System</button>
+          <button class="prompt-chip" onclick="window.sendCopilotMessage('What is the speed limit between Chennai and Katpadi?')">⚡ Speed Limits</button>
+          <button class="prompt-chip" onclick="window.sendCopilotMessage('Tambaram station platform capacity')">🚉 Tambaram Hub</button>
+        </div>
+        <div class="cris-copilot-input-bar">
+          <button class="copilot-voice-btn" onclick="window.simulateVoiceInput()" title="Voice Command / Preset Prompt">
+            <span class="mic-icon">🎙️</span>
+          </button>
+          <div class="copilot-input-wrap">
+            <input 
+              type="text" 
+              id="crisCopilotInput" 
+              autocomplete="off"
+              placeholder="${isHi ? 'भारतीय रेल परिचालन या ब्लॉक के संबंध में कुछ भी पूछें...' : 'Ask about trains, blocks, speeds, costs...'}" 
+              onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.submitCopilotChat(); }"
+              oninput="window.handleCopilotInputChange(this)"
+            />
+            <button class="copilot-clear-btn" id="crisCopilotClearBtn" onclick="window.clearCopilotInput()" title="Clear text" style="display:none">✕</button>
+          </div>
+          <button id="crisCopilotSendBtn" class="copilot-send-btn" onclick="window.submitCopilotChat()" title="Send Message (Enter)">
+            <span class="send-icon">➤</span>
+            <span class="send-text">${isHi ? 'भेजें' : 'Send'}</span>
+          </button>
+        </div>
+        <div class="copilot-input-hint">
+          <span>💡 Type any train number, corridor, or maintenance question</span>
+          <span class="kbd-badge">Enter ↵</span>
+        </div>
       </div>
     `;
-    document.body.appendChild(drawer);
+
+    // Make floating copilot window draggable by its header
+    if (typeof window.makeDraggable === 'function') {
+      window.makeDraggable(drawer, '.cris-copilot-header', {
+        zIndex: '10001',
+        onEnd: (moved) => {
+          if (moved) {
+            const r = drawer.getBoundingClientRect();
+            window.__lastCopilotDrawerPos = { left: r.left, top: r.top };
+          }
+        }
+      });
+    }
+
+    // Click on header while minimized restores window
+    const headerEl = drawer.querySelector(".cris-copilot-header");
+    if (headerEl && !headerEl.__minClickAttached) {
+      headerEl.__minClickAttached = true;
+      headerEl.addEventListener('click', (e) => {
+        if (window.isCopilotMinimized && !e.target.closest('button')) {
+          window.toggleMinimizeCopilot(e);
+        }
+      });
+    }
+  }
+
+  // Restore position if previously moved
+  if (drawer && window.__lastCopilotDrawerPos) {
+    drawer.style.right = 'auto';
+    drawer.style.bottom = 'auto';
+    drawer.style.left = `${window.__lastCopilotDrawerPos.left}px`;
+    drawer.style.top = `${window.__lastCopilotDrawerPos.top}px`;
   }
 };
 
@@ -24896,7 +26795,6 @@ const COMMAND_PALETTE_DATABASE = [
   { category: "STATIONS", title: "CBE - Coimbatore Main", subtitle: "Premier Western Tamil Nadu Terminal • 6 Platforms", icon: "🚉", badge: "STATION", badgeClass: "cmd-badge-stn", action: () => window.navigateToStation("CBE") },
 
   // 5. System Actions
-  { category: "ACTIONS", title: "Toggle Theme (Light / Dark Mode)", subtitle: "Switch between High-Tech Dark Navy & Indian Railways Executive Light", icon: "🌓", badge: "ACTION", action: () => window.toggleTheme() },
   { category: "ACTIONS", title: "Declare Emergency Block", subtitle: "Initiate immediate 2-hour safety-critical track possession", icon: "🚨", badge: "ACTION", action: () => window.triggerEmergencyBlockModal() },
   { category: "ACTIONS", title: "Open RailBlock Autonomous Copilot", subtitle: "Direct conversational AI dispatcher (Alt + C)", icon: "🤖", badge: "ACTION", action: () => window.toggleAutonomousCopilot(true) },
   { category: "ACTIONS", title: "Generate Proforma T/A 912 Sanction Memo", subtitle: "Ministry of Railways official block permit & caution advice", icon: "📄", badge: "ACTION", action: () => { if (typeof showSanctionMemo === "function") showSanctionMemo(); } },
@@ -25066,15 +26964,121 @@ window.renderCommandPaletteItems = () => {
   }
 };
 
-// Global keyboard shortcut listener for Cmd+K and Ctrl+K
+// Global keyboard shortcut listeners (Cmd+K/Ctrl+K for Command Palette, Esc for Modal/Copilot/Fullscreen)
 if (typeof window !== "undefined" && !window.__cmdPaletteKeyBound) {
   window.__cmdPaletteKeyBound = true;
   window.addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
       e.preventDefault();
       window.toggleCommandPalette();
+    } else if (e.key === "Escape") {
+      const fullMap = document.querySelector("#smartMapMainContainer.fullscreen-map-mode");
+      if (fullMap && typeof window.toggleMapFullscreen === "function") {
+        window.toggleMapFullscreen();
+        return;
+      }
+      if (typeof isCopilotOpen !== "undefined" && isCopilotOpen && typeof window.toggleAutonomousCopilot === "function") {
+        window.toggleAutonomousCopilot(false);
+      }
     }
   });
+}
+
+if (typeof window !== "undefined" && !window.executeAuthorizeTrainMaintenance) {
+  window.executeAuthorizeTrainMaintenance = function(trainNo, stationCode, netBenefit, savingsPct) {
+    const trainNum = String(trainNo || "12675").trim();
+    const stn = String(stationCode || "MAS").trim().toUpperCase();
+    const benefitVal = Number(netBenefit) || 167420;
+    const pct = savingsPct || "73.8%";
+    const bpcSerial = `BPC/IR-SR/${stn}/2026/09/${Math.floor(1000 + Math.random() * 9000)}`;
+    const curTime = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const curDate = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+    // Dismiss any open modal overlay
+    document.querySelectorAll(".modal-overlay").forEach(m => m.remove());
+
+    const bannerData = {
+      trainNo: trainNum,
+      trainName: trainNum === "12675" ? "Kovai Superfast Express" : (trainNum === "20607" ? "Vande Bharat Express" : (trainNum === "12637" ? "Pandian Superfast Express" : `Express Fleet #${trainNum}`)),
+      stationCode: stn,
+      stationName: stn === "MAS" ? "Chennai Central (BBQ Coaching Yard)" : (stn === "CBE" ? "Coimbatore Junction Yard" : (stn === "SA" ? "Salem Yard" : `${stn} Coaching Yard`)),
+      pitLine: "Coaching Pit-Line Bay #4",
+      netBenefit: benefitVal,
+      savingsPct: pct,
+      grossAvoidedLoss: 227000,
+      directRepairCost: 59580,
+      avoidedBreakdown: [
+        { label: "Avoided Dead Haulage & Light Engine Moves", amount: 65000 },
+        { label: "Avoided Mid-Section En-Route Punctuality Penalties", amount: 77000 },
+        { label: "Avoided Daytime Dedicated Corridor Line Possession", amount: 85000 }
+      ],
+      debitAccountHead: "IR-SR-REV-08-200",
+      recoveryMechanism: "Inter-Railway Settlement through CRIS Zonal Reconciliation Billing",
+      bpcNo: bpcSerial,
+      timestamp: curTime,
+      date: curDate,
+      authorizer: (typeof currentOfficial !== "undefined" && currentOfficial?.name) ? currentOfficial.name : "Chief Passenger Transportation Manager (CPTM) / Sr. DOM",
+      status: "OFFICIAL SANCTION ACTIVE & SYNCHRONIZED"
+    };
+
+    window.dashboardAuthorizedBanner = bannerData;
+    try {
+      sessionStorage.setItem("dashboardAuthorizedBanner", JSON.stringify(bannerData));
+      localStorage.setItem("dashboardAuthorizedBanner", JSON.stringify(bannerData));
+    } catch (e) {}
+
+    if (!window.authorizedBPCRecords) window.authorizedBPCRecords = [];
+    window.authorizedBPCRecords.unshift(bannerData);
+    try {
+      localStorage.setItem("authorizedBPCRecords", JSON.stringify(window.authorizedBPCRecords));
+    } catch (e) {}
+
+    // Show immediate toast confirmation
+    if (typeof window.showToast === "function") {
+      window.showToast(`✓ BPC #${bpcSerial} Authorized! Redirecting to Executive Dashboard...`);
+    }
+
+    // Inject into Copilot if function exists
+    if (typeof window.appendCopilotMessage === "function") {
+      window.appendCopilotMessage("bot", `📋 <b>Executive Sanction Issued:</b> Electronic BPC <code>${bpcSerial}</code> authorized for Train #${trainNum} at ${stn}. Net economic savings of ₹${benefitVal.toLocaleString('en-IN')} locked into CRIS operations ledger.`);
+    }
+
+    // Navigate to Dashboard
+    if (typeof window.navigateTo === "function") {
+      window.navigateTo("Dashboard");
+    }
+
+    // Ensure banner is mounted immediately and viewport is scrolled to top
+    setTimeout(() => {
+      const authMount = document.querySelector("#dashboardAuthBannerMount");
+      if (authMount && typeof window.renderDashboardAuthorizedBanner === "function") {
+        authMount.innerHTML = window.renderDashboardAuthorizedBanner();
+      }
+      const c = document.querySelector(".content");
+      if (c) c.scrollTop = 0;
+      if (typeof window.scrollTo === "function") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      const bannerEl = document.getElementById("dashboardAuthBannerCard");
+      if (bannerEl) {
+        bannerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      if (window.leafletMapInstance) {
+        const stnCoords = {
+          MAS: [13.0827, 80.2707],
+          CBE: [11.0016, 76.9629],
+          SA: [11.6643, 78.1460],
+          TPJ: [10.7870, 79.1378],
+          MDU: [9.9195, 78.1140]
+        };
+        const pt = stnCoords[stn] || [13.0827, 80.2707];
+        try {
+          window.leafletMapInstance.flyTo(pt, 13, { animate: true, duration: 1.2 });
+        } catch (e) {}
+      }
+    }, 100);
+  };
 }
 
 

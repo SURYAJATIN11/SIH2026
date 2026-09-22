@@ -493,6 +493,52 @@ class AutonomousAIController:
                 }
             }
 
+        # Intent 6.5: Human Greetings & Capable Tasks
+        elif any(w in msg.split() for w in ["hi", "hello", "hey", "namaste", "vanakkam", "pranam", "sup", "greetings"]) or msg.strip() in ["hi", "hello", "hey"]:
+            return {
+                "reply": (
+                    f"Hello there! I am your CRIS Operations & Autonomous AI Assistant for Southern Railway.\n\n"
+                    f"These are my **capable tasks**, tell me what to do:\n\n"
+                    f"1. **🧭 App Navigation & Control:** Ask me to open any page (Dashboard, Schedule, Corridors & Sections, Corridor Map, Stations Master, Station Planning, Asset Maintenance, Cost Maintenance, Dynamic Dispatch AI, Conflicts, Block Optimization).\n"
+                    f"2. **🚨 Emergency Line Possession:** Command me to 'declare emergency block', 'surrender active block', or 'extend block by 30 mins'.\n"
+                    f"3. **⚡ 1-Click Operations Demos:** Say 'run demos' to launch the presentation demo suite.\n"
+                    f"4. **🛰️ Live Train Running & RTIS:** Say 'live train status' or 'where is train 12675' to view real-time satellite GPS tracking.\n"
+                    f"5. **💰 330-Train & Infra Cost Cuttings:** Ask for train economics ('12675 cost cutting', '20608 savings', or 'infrastructure costs').\n"
+                    f"6. **🚦 Station Capacity & Headways:** Ask about platform berthing ('Tambaram station capacity' or 'Coimbatore headway').\n"
+                    f"7. **📄 Official Paperwork & Audits:** Ask me to 'show sanction memo T/A 912', 'open audit report', or 'open fleet manager'.\n"
+                    f"8. **🌓 Display & Console Controls:** Say 'toggle theme' (Dark/Light), 'open command palette' (⌘K), 'switch to Hindi/English', or 'close chat'.\n\n"
+                    f"Just tell me what you would like to do, and I will execute it inside the app immediately!"
+                ),
+                "intent": "GREETING_CAPABLE_TASKS",
+                "action_card": {
+                    "title": "Autonomous Command Center Ready",
+                    "description": "Tell me any action or select an option below.",
+                    "action_type": "SHOW_TOAST",
+                    "message": "CRIS AI Operations Ready.",
+                    "button_label": "⚡ Ready For Instructions"
+                }
+            }
+
+        # Intent 6.6: Human Small Talk
+        elif any(phrase in msg for phrase in ["how are you", "how r u", "how do you do", "how is it going"]):
+            return {
+                "reply": (
+                    f"I'm operating at peak efficiency across all 6 Southern Railway divisions (MAS, SA, TPJ, MDU, PGT, TVC)! 🚂\n\n"
+                    f"• 100% track circuit nominality\n"
+                    f"• 99.4% punctuality index on main trunk routes\n"
+                    f"• Autonomous Solver synchronized with live COA & NTES feeds\n\n"
+                    f"How can I assist your operations today? Just tell me what you want to do in the app!"
+                ),
+                "intent": "CONVERSATIONAL_STATUS",
+                "action_card": {
+                    "title": "All Systems Nominal",
+                    "description": "Ready to execute your operational instructions.",
+                    "action_type": "SHOW_TOAST",
+                    "message": "Systems Nominal",
+                    "button_label": "⚡ Ready"
+                }
+            }
+
         # Default: General Advisory
         else:
             return {

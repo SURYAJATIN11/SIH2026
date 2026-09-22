@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap');
 
 /* ==========================================================================
-   THEME COLOR ENGINE (DARK & LIGHT MODE PALETTES)
+   PERMANENT TACTICAL DARK MODE COLOR ENGINE
    ========================================================================== */
-:root, [data-theme="dark"], body.theme-dark {
+:root, [data-theme], body, body.theme-dark {
   --bg-app: #030a14;
   --bg-topbar: #07172b;
   --bg-sidebar: linear-gradient(180deg, #07172b 0%, #030a14 100%);
@@ -40,32 +40,6 @@
   --status-blue: #3498db;
   --sidebar-w: 270px;
   --sidebar-w-col: 76px;
-}
-
-[data-theme="light"], body.theme-light {
-  --bg-app: #f8fafc;
-  --bg-topbar: #ffffff;
-  --bg-sidebar: linear-gradient(180deg, #0b2546 0%, #061528 100%);
-  --bg-brand: #07172b;
-  --bg-panel: #ffffff;
-  --bg-panel-alt: #f8fafc;
-  --bg-panel-deep: #f1f5f9;
-  --bg-card-inner: #ffffff;
-  --bg-input: #ffffff;
-  --border-main: #e2e8f0;
-  --border-light: #cbd5e1;
-  --border-subtle: #f1f5f9;
-  --text-main: #0f172a;
-  --text-muted: #475569;
-  --text-dim: #64748b;
-  --text-heading: #0f172a;
-  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  
-  --table-head-bg: #f1f5f9;
-  --table-head-color: #0f172a;
-  --table-row-bg: #ffffff;
-  --table-row-hover: #f1f5f9;
-  --table-border: #e2e8f0;
 }
 
 * { box-sizing: border-box; }
@@ -223,33 +197,6 @@ select option:checked, select option:hover, select option:focus {
   color: #ffffff;
 }
 
-body.theme-light .theme-toggle-btn {
-  background: #ffffff;
-  border-color: #ff9933;
-  color: #ea580c;
-}
-body.theme-light .theme-toggle-btn:hover {
-  background: #ff9933;
-  color: #ffffff;
-}
-
-.gov-access-btn {
-  background: #051426;
-  border: 1px solid #1c426d;
-  color: #c7dcf1;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  cursor: pointer;
-  font-weight: 700;
-  transition: all 0.12s;
-}
-.gov-access-btn:hover {
-  background: #12345c;
-  color: #fff;
-  border-color: #3b74af;
-}
-
 .gov-security-badge {
   background: #2e0d11;
   border: 1px solid #73222a;
@@ -292,17 +239,6 @@ body.theme-light .theme-toggle-btn:hover {
 }
 .gov-lang-btn:hover:not(.active) {
   background: #143e70;
-  color: #ffffff;
-}
-body.theme-light .gov-lang-group {
-  background: #f1f5f9;
-  border-color: #94a3b8;
-}
-body.theme-light .gov-lang-btn {
-  color: #334155;
-}
-body.theme-light .gov-lang-btn.active {
-  background: #ff9933;
   color: #ffffff;
 }
 
@@ -891,7 +827,7 @@ body.theme-light .gov-lang-btn.active {
   flex: 1 !important;
   min-width: 0 !important;
   flex-wrap: nowrap !important;
-  overflow-x: auto !important;
+  overflow: visible !important;
   scrollbar-width: none !important;
   padding: 0 4px !important;
 }
@@ -966,56 +902,67 @@ body.theme-light .gov-lang-btn.active {
 
 /* ── "More" overflow dropdown ── */
 .btn-topbar-more {
-  position: relative;
+  position: relative !important;
+  display: inline-block !important;
 }
 .btn-topbar-more-menu {
   display: none;
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  right: 0 !important;
+  min-width: 220px !important;
+  background: #06172e !important;
+  border: 1.5px solid #1e4976 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 16px 45px rgba(0,0,0,0.7), 0 0 20px rgba(56,189,248,0.2) !important;
+  z-index: 100005 !important;
+  padding: 6px !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+.btn-topbar-more-menu::before {
+  content: '';
   position: absolute;
-  top: calc(100% + 8px);
+  top: -8px;
+  left: 0;
   right: 0;
-  min-width: 196px;
-  background: #07192f;
-  border: 1.5px solid #1a3c63;
-  border-radius: 10px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.6);
-  z-index: 9999;
-  padding: 6px;
-  flex-direction: column;
-  gap: 2px;
+  height: 8px;
 }
 .btn-topbar-more:hover .btn-topbar-more-menu,
-.btn-topbar-more-menu:hover {
-  display: flex;
+.btn-topbar-more-menu:hover,
+.btn-topbar-more-menu.open {
+  display: flex !important;
 }
 .more-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: #cbd5e1;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 9px 12px;
-  border-radius: 7px;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.12s, color 0.12s;
-  font-family: inherit;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  color: #cbd5e1 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 9px 12px !important;
+  border-radius: 7px !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  transition: background 0.12s, color 0.12s !important;
+  font-family: inherit !important;
+  white-space: nowrap !important;
 }
 .more-menu-item:hover {
-  background: rgba(56,189,248,0.12);
-  color: #ffffff;
+  background: rgba(56,189,248,0.14) !important;
+  color: #ffffff !important;
 }
 .more-menu-item.active {
-  background: rgba(14,165,233,0.2);
-  color: #38bdf8;
+  background: rgba(14,165,233,0.2) !important;
+  color: #38bdf8 !important;
 }
 .more-menu-divider {
-  height: 1px;
-  background: #1a3c63;
-  margin: 4px 0;
+  height: 1px !important;
+  background: #1e3a5f !important;
+  margin: 4px 0 !important;
 }
 
 .status-badge-pill {
@@ -1249,7 +1196,6 @@ body.theme-light .gov-lang-btn.active {
 .panel h2, .panel h3 { margin: 0; font-family: "Barlow Condensed", sans-serif; letter-spacing: 0.6px; }
 .panel h2 { font-size: 21px; color: var(--text-heading); }
 .panel h3 { font-size: 17px; color: #5eaeff; }
-body.theme-light .panel h3 { color: #1d4ed8; }
 .panel p { margin: 3px 0 0; color: var(--text-muted); font-size: 12px; }
 
 .page-intro-formal {
@@ -1582,19 +1528,24 @@ body.theme-light .panel h3 { color: #1d4ed8; }
 }
 
 .map-floating-bottom-bar {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  z-index: 1000;
-  display: flex;
-  gap: 6px;
-  background: rgba(6, 18, 36, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 6px 8px;
-  border-radius: 8px;
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  position: absolute !important;
+  top: 10px !important;
+  left: 54px !important;
+  bottom: auto !important;
+  right: auto !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: rgba(6, 18, 36, 0.9) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  padding: 5px 8px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+  max-width: calc(100% - 64px) !important;
 }
 .map-floating-btn {
   background: rgba(255, 255, 255, 0.08);
@@ -1616,13 +1567,49 @@ body.theme-light .panel h3 { color: #1d4ed8; }
   color: #ffffff;
 }
 
+.maint-zoom-pill {
+  cursor: pointer;
+  background: rgba(15, 23, 42, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #cbd5e1 !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  user-select: none;
+}
+.maint-zoom-pill:hover {
+  background: rgba(30, 58, 138, 0.85) !important;
+  border-color: #60a5fa !important;
+  color: #ffffff !important;
+}
+.maint-zoom-status {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.maint-zoom-status.warning {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.9);
+  animation: pulse-dot 1.5s infinite ease-in-out;
+}
+.maint-zoom-status.active {
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.9);
+}
+@keyframes pulse-dot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
 /* Floating Train Route Detail Badge */
 .train-route-floating-badge {
   position: absolute;
-  top: 14px;
+  top: 56px;
   left: 14px;
-  z-index: 1000;
-  background: rgba(8, 20, 38, 0.92);
+  z-index: 1001;
+  background: rgba(8, 20, 38, 0.94);
   backdrop-filter: blur(10px);
   border: 1.5px solid #2563eb;
   border-radius: 8px;
@@ -1860,7 +1847,7 @@ body.theme-dark .quick-access-btn:hover {
    ========================================================================== */
 .dashboard-map-station-container {
   display: flex;
-  height: 660px;
+  height: clamp(480px, 58vh, 600px);
   width: 100%;
   position: relative;
   background: #030a14;
@@ -3266,15 +3253,6 @@ table.clean-table tr:hover td { background: var(--table-row-hover); }
 .badge.IN_PROGRESS, .badge.MEDIUM, .badge.FAIR { background: #382408; color: #f39c12; border: 1.5px solid #754e12; }
 .badge.HIGH, .badge.CRITICAL, .badge.FAILED, .badge.POOR { background: #380d12; color: #ff6b62; border: 1.5px solid #821f28; }
 
-body.theme-light .badge.ACTIVE, body.theme-light .badge.GOOD, body.theme-light .badge.COMPLETED, body.theme-light .badge.LOW {
-  background: #dcfce7; color: #15803d; border-color: #86efac;
-}
-body.theme-light .badge.IN_PROGRESS, body.theme-light .badge.MEDIUM, body.theme-light .badge.FAIR {
-  background: #fef3c7; color: #b45309; border-color: #fde68a;
-}
-body.theme-light .badge.HIGH, body.theme-light .badge.CRITICAL, body.theme-light .badge.FAILED, body.theme-light .badge.POOR {
-  background: #fee2e2; color: #b91c1c; border-color: #fca5a5;
-}
 
 /* ==========================================================================
    7. RTIS ISRO-GPS LIVE TRAIN TRACKING DASHBOARD
@@ -3408,11 +3386,6 @@ body.theme-light .badge.HIGH, body.theme-light .badge.CRITICAL, body.theme-light
   background: #06261d;
   border-color: #2ecc71;
   color: #2ecc71;
-}
-body.theme-light .rtis-step.passed .rtis-step-dot {
-  background: #dcfce7;
-  border-color: #16a34a;
-  color: #15803d;
 }
 .rtis-step.current .rtis-step-dot {
   background: #382408;
@@ -5904,9 +5877,9 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
 /* Floating Collapsible Layers Panel */
 .smart-layers-panel {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  max-height: calc(100% - 64px);
+  top: 86px;
+  left: 14px;
+  max-height: calc(100% - 150px);
   width: 220px;
   background: rgba(8, 21, 38, 0.94);
   backdrop-filter: blur(14px);
@@ -5915,9 +5888,18 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+}
+
+.smart-layers-header {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.smart-layers-header:active {
+  cursor: grabbing;
 }
 
 .smart-layers-panel.collapsed {
@@ -5946,7 +5928,7 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: all 0.25s ease-out;
+  transition: width 0.22s ease-out, height 0.22s ease-out, max-height 0.22s ease-out;
   animation: slideInRight 0.25s ease-out;
 }
 
@@ -5959,22 +5941,44 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   display: none;
 }
 
-/* Floating Quick-Corridor Selector Bar on Top of Map */
-.smart-map-floating-corridors {
+/* Unified Floating Corridor & HUD Cluster (Prevents Any Text/Button Overlap) */
+.smart-map-floating-header-stack {
   position: absolute;
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 999;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  max-width: calc(100% - 160px);
+  pointer-events: none;
+  transition: max-width 0.2s ease, top 0.2s ease;
+}
+.smart-map-floating-header-stack > * {
+  pointer-events: auto;
+}
+
+/* Floating Quick-Corridor Selector Bar on Top of Map */
+.smart-map-floating-corridors {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(8, 21, 38, 0.88);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  padding: 4px 10px;
+  background: rgba(8, 21, 38, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(59, 130, 246, 0.4);
+  padding: 5px 12px;
   border-radius: 30px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.55);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.smart-map-floating-corridors::-webkit-scrollbar {
+  display: none;
 }
 
 .smart-corridor-pill {
@@ -6144,12 +6148,67 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   flex-shrink: 0;
 }
 
+/* Corridor Map Dynamic Zoom-Adaptive HUD */
+.corridor-zoom-hud {
+  position: relative;
+  background: rgba(3, 10, 20, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 5px 14px;
+  border-radius: 20px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+.corridor-zoom-hud:hover {
+  background: rgba(7, 23, 43, 0.98);
+  border-color: #38bdf8;
+  box-shadow: 0 4px 24px rgba(56, 189, 248, 0.35);
+  transform: translateY(-1px);
+}
+.corridor-zoom-hud.active {
+  border-color: rgba(34, 197, 94, 0.5);
+  color: #f1f5f9;
+}
+.corridor-zoom-hud.active:hover {
+  border-color: #22c55e;
+  box-shadow: 0 4px 24px rgba(34, 197, 94, 0.3);
+}
+.corridor-zoom-hud .hud-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+  flex-shrink: 0;
+}
+.corridor-zoom-hud.active .hud-dot {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
 /* Fullscreen Map Mode */
 .fullscreen-map-mode .smart-map-topbar {
   display: none !important;
 }
 .fullscreen-map-mode .smart-map-legend-bar {
   bottom: 0 !important;
+}
+.fullscreen-map-mode .smart-map-floating-header-stack {
+  top: 16px !important;
+  max-width: calc(100% - 100px) !important;
 }
 .fullscreen-map-mode {
   position: fixed !important;
@@ -6178,13 +6237,18 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   border-radius: 40px;
   padding: 10px 18px;
   color: #ffffff;
-  cursor: pointer;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(20, 184, 166, 0.25);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: inherit;
 }
+.cris-copilot-fab:active {
+  cursor: grabbing;
+}
 .cris-copilot-fab:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: #2dd4bf;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(20, 184, 166, 0.45);
 }
@@ -6258,130 +6322,213 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   font-weight: 600;
 }
 
-/* Copilot Slide-over Drawer */
-.cris-copilot-drawer {
+/* Copilot Backdrop Overlay - Non-blocking pointer events so user can freely interact with page */
+.cris-copilot-backdrop {
   position: fixed;
   top: 0;
-  right: -500px;
-  width: 480px;
-  max-width: 100vw;
+  left: 0;
+  width: 100vw;
   height: 100vh;
-  background: #0b1329;
-  border-left: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: -15px 0 45px rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.cris-copilot-backdrop.open {
+  opacity: 0; /* Keep non-blocking for free-roaming experience */
+  pointer-events: none;
+}
+
+/* Copilot Floating Window - Sleek, Compact & Free-Roaming */
+.cris-copilot-drawer {
+  position: fixed;
+  bottom: 75px;
+  right: 20px;
+  width: 410px;
+  max-width: calc(100vw - 28px);
+  height: 580px;
+  max-height: calc(100vh - 90px);
+  background: linear-gradient(180deg, #0d152a 0%, #070c1a 100%);
+  border: 1.5px solid rgba(59, 130, 246, 0.45);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 30px rgba(37, 99, 235, 0.25);
   z-index: 10000;
   display: flex;
   flex-direction: column;
-  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden !important;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.95) translateY(15px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, width 0.25s ease, height 0.25s ease;
   font-family: inherit;
 }
 .cris-copilot-drawer.open {
-  right: 0;
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1) translateY(0);
 }
+
+/* Minimized Floating State */
+.cris-copilot-drawer.minimized {
+  height: 48px !important;
+  width: 330px !important;
+  max-height: 48px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.75), 0 0 15px rgba(59, 130, 246, 0.35) !important;
+}
+.cris-copilot-drawer.minimized > *:not(.cris-copilot-header) {
+  display: none !important;
+}
+.cris-copilot-drawer.minimized .cris-copilot-header {
+  border-bottom: none !important;
+}
+
+/* Header with Draggable Handle */
 .cris-copilot-header {
-  padding: 16px 18px;
-  background: #0f172a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  flex-shrink: 0 !important;
+  padding: 10px 14px;
+  background: #0e172e;
+  border-bottom: 1.5px solid rgba(59, 130, 246, 0.3);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
+  gap: 10px;
+  cursor: move;
+  user-select: none;
+}
+.cris-copilot-header-info {
+  flex: 1;
+  min-width: 0;
 }
 .cris-copilot-header-info h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: 13.5px;
   font-weight: 900;
   color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .cris-copilot-header-info .sub {
-  font-size: 11px;
+  font-size: 10.5px;
   color: #94a3b8;
-  margin-top: 3px;
+  margin-top: 2px;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .cris-copilot-header-info .engine-tag {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 6px;
+  gap: 4px;
+  margin-top: 4px;
   background: rgba(34, 197, 94, 0.12);
   border: 1px solid rgba(34, 197, 94, 0.3);
   color: #4ade80;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: 4px;
 }
-.cris-copilot-close {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #94a3b8;
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
+.cris-copilot-header-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
-.cris-copilot-close:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-  border-color: #ef4444;
+.cris-copilot-ctrl-btn {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+.cris-copilot-ctrl-btn:hover {
+  background: rgba(59, 130, 246, 0.35);
+  color: #ffffff;
+  border-color: #3b82f6;
+  transform: scale(1.08);
+}
+.cris-copilot-ctrl-btn:active {
+  transform: scale(0.95);
+}
+.cris-copilot-ctrl-btn.close-btn:hover {
+  background: #ef4444;
+  border-color: #f87171;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
 }
 
 /* Quick Action Chips */
 .cris-copilot-chips-bar {
-  padding: 10px 14px;
+  padding: 8px 12px;
   background: #090e1d;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
   white-space: nowrap;
+  scrollbar-width: none;
+  flex-shrink: 0;
 }
 .cris-copilot-chips-bar::-webkit-scrollbar {
-  height: 4px;
-}
-.cris-copilot-chips-bar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 2px;
+  display: none;
 }
 .cris-copilot-chip {
   background: #1e293b;
   border: 1px solid rgba(59, 130, 246, 0.25);
   color: #cbd5e1;
-  padding: 5px 11px;
-  border-radius: 20px;
-  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 10.5px;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 .cris-copilot-chip:hover {
   background: #2563eb;
   color: #ffffff;
   border-color: #3b82f6;
+  transform: translateY(-1px);
 }
 
 /* Message Stream */
 .cris-copilot-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 .copilot-msg {
   display: flex;
   flex-direction: column;
-  max-width: 92%;
+  max-width: 94%;
   animation: fadeInMsg 0.2s ease-out;
 }
 @keyframes fadeInMsg {
@@ -6395,10 +6542,10 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   align-self: flex-end;
 }
 .copilot-bubble {
-  padding: 12px 14px;
+  padding: 10px 13px;
   border-radius: 10px;
-  font-size: 12.5px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.48;
 }
 .copilot-msg.assistant .copilot-bubble {
   background: #131d36;
@@ -6407,16 +6554,51 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   border-top-left-radius: 2px;
 }
 .copilot-msg.user .copilot-bubble {
-  background: #2563eb;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
   color: #ffffff;
   border-top-right-radius: 2px;
   font-weight: 600;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
 }
 .copilot-msg-meta {
-  font-size: 10px;
+  font-size: 9.5px;
   color: #64748b;
-  margin-top: 4px;
-  padding: 0 4px;
+  margin-top: 3px;
+  padding: 0 3px;
+}
+
+/* Animated Typing Indicator */
+.copilot-typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 0;
+}
+.copilot-typing-indicator span {
+  width: 6px;
+  height: 6px;
+  background: #38bdf8;
+  border-radius: 50%;
+  display: inline-block;
+  animation: copilotDotPulse 1.2s infinite ease-in-out;
+}
+.copilot-typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+  background: #60a5fa;
+}
+.copilot-typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+  background: #818cf8;
+}
+@keyframes copilotDotPulse {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
 }
 
 /* Copilot Action Cards */
@@ -6438,22 +6620,22 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   background: rgba(59, 130, 246, 0.2);
   color: #60a5fa;
   border: 1px solid rgba(59, 130, 246, 0.4);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 900;
   padding: 2px 6px;
   border-radius: 4px;
   text-transform: uppercase;
 }
 .copilot-action-title {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
   color: #ffffff;
   margin-bottom: 4px;
 }
 .copilot-action-desc {
-  font-size: 11.5px;
+  font-size: 11px;
   color: #94a3b8;
-  line-height: 1.4;
+  line-height: 1.35;
   margin-bottom: 10px;
 }
 .copilot-approve-btn {
@@ -6461,9 +6643,9 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   background: #22c55e;
   border: none;
   color: #ffffff;
-  padding: 8px 12px;
+  padding: 7px 12px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
   cursor: pointer;
   display: flex;
@@ -6482,46 +6664,168 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   cursor: default;
 }
 
-/* Copilot Input Bar */
-.cris-copilot-input-box {
-  padding: 12px 14px;
-  background: #0f172a;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+/* ==========================================================================
+   REDESIGNED MODERN CONVERSATION BAR & INPUT CONTAINER
+   ========================================================================== */
+.cris-copilot-bottom-bar {
+  padding: 8px 12px 10px 12px;
+  background: rgba(10, 16, 32, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(59, 130, 246, 0.2);
   display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.cris-copilot-prompt-suggestions {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.cris-copilot-prompt-suggestions::-webkit-scrollbar {
+  display: none;
+}
+.prompt-chip {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.prompt-chip:hover {
+  background: rgba(37, 99, 235, 0.25);
+  color: #60a5fa;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+.cris-copilot-input-bar {
+  display: flex;
+  align-items: center;
   gap: 8px;
+  background: #0f172a;
+  border: 1.5px solid rgba(59, 130, 246, 0.35);
+  border-radius: 12px;
+  padding: 4px 6px 4px 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.04);
+  transition: all 0.2s ease;
+}
+.cris-copilot-input-bar:focus-within {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25), 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+.copilot-voice-btn {
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+.copilot-voice-btn:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  transform: scale(1.1);
+}
+.copilot-input-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
   align-items: center;
 }
-.cris-copilot-input {
-  flex: 1;
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  padding: 9px 12px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  font-family: inherit;
-}
-.cris-copilot-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-}
-.cris-copilot-send-btn {
-  background: #2563eb;
+.copilot-input-wrap input {
+  width: 100%;
+  background: transparent;
   border: none;
   color: #ffffff;
-  width: 38px;
-  height: 38px;
-  border-radius: 6px;
-  font-size: 15px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  padding: 6px 22px 6px 0;
+}
+.copilot-input-wrap input::placeholder {
+  color: #64748b;
+  font-size: 11.5px;
+}
+.copilot-clear-btn {
+  position: absolute;
+  right: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  color: #cbd5e1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s ease;
+  transition: background 0.15s;
 }
-.cris-copilot-send-btn:hover {
-  background: #1d4ed8;
+.copilot-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.4);
+  color: #fff;
+}
+.copilot-send-btn {
+  background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
+  border: none;
+  color: #ffffff;
+  padding: 6px 13px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.copilot-send-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #0369a1 100%);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+  transform: translateY(-1px);
+}
+.copilot-send-btn:active {
+  transform: scale(0.97);
+}
+.copilot-send-btn.active {
+  background: linear-gradient(135deg, #0284c7 0%, #10b981 100%);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+}
+.copilot-input-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 9.5px;
+  color: #64748b;
+  padding: 0 2px;
+}
+.kbd-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 9px;
+  color: #94a3b8;
+  font-family: monospace;
 }
 
 /* Before vs After Diff Modal Cards */
@@ -7153,27 +7457,34 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
    ============================================================================ */
 
 .smart-asset-panel {
-  position: absolute !important;
-  top: 14px !important;
-  right: 14px !important;
-  width: 410px !important;
-  max-width: calc(100vw - 28px) !important;
-  height: calc(100% - 28px) !important;
-  max-height: calc(100% - 28px) !important;
-  background: rgba(9, 21, 37, 0.96) !important;
-  backdrop-filter: blur(20px) !important;
-  border: 1.5px solid #1a3c63 !important;
-  border-radius: 14px !important;
-  z-index: 1001 !important;
-  box-shadow: -8px 14px 40px rgba(0, 0, 0, 0.65) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 410px;
+  max-width: calc(100vw - 28px);
+  height: calc(100% - 28px);
+  max-height: calc(100% - 28px);
+  background: rgba(9, 21, 37, 0.96);
+  backdrop-filter: blur(20px);
+  border: 1.5px solid #1a3c63;
+  border-radius: 14px;
+  z-index: 1001;
+  box-shadow: -8px 14px 40px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), height 0.22s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.smart-asset-panel.closed {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .smart-asset-panel.minimized {
-  width: 250px !important;
+  width: 260px !important;
   height: 48px !important;
   max-height: 48px !important;
   overflow: hidden !important;
@@ -7192,6 +7503,12 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
   border-bottom: 1px solid #16365c !important;
   gap: 8px !important;
   flex-shrink: 0 !important;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.smart-asset-header:active {
+  cursor: grabbing;
 }
 
 .smart-header-tabs {
@@ -7863,888 +8180,8 @@ body.theme-light .rtis-step.passed .rtis-step-dot {
 }
 
 /* ==========================================================================
-   HIGH-CONTRAST LIGHT MODE ARCHITECTURE & COMPONENT OVERRIDES
+   PERMANENT TACTICAL DARK MODE OPTIMIZATION (HIGH-VISIBILITY RAILWAY PALETTE)
    ========================================================================== */
-
-/* 1. Global Light Canvas */
-body.theme-light,
-[data-theme="light"] {
-  background: var(--bg-app) !important;
-  color: var(--text-main) !important;
-}
-
-body.theme-light #app,
-[data-theme="light"] #app {
-  background: var(--bg-app) !important;
-  color: var(--text-main) !important;
-}
-
-/* 2. Top Government Tricolor Bar & Accessibility Strip */
-body.theme-light .gov-top-bar {
-  background: #ffffff !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  color: #475569 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-}
-body.theme-light .gov-portal-tag b {
-  color: #0f172a !important;
-}
-body.theme-light .gov-portal-ministry {
-  color: #b45309 !important;
-}
-body.theme-light .gov-portal-sep {
-  color: #94a3b8 !important;
-}
-body.theme-light .gov-portal-brand {
-  color: #0369a1 !important;
-}
-body.theme-light .gov-theme-toggle-btn {
-  background: #f1f5f9 !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #1e293b !important;
-}
-body.theme-light .gov-theme-toggle-btn:hover {
-  background: #e2e8f0 !important;
-  border-color: #94a3b8 !important;
-  color: #0f172a !important;
-}
-body.theme-light .gov-access-btn {
-  background: #f1f5f9 !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #334155 !important;
-}
-body.theme-light .gov-access-btn:hover {
-  background: #e2e8f0 !important;
-  color: #0f172a !important;
-  border-color: #94a3b8 !important;
-}
-body.theme-light .gov-security-badge {
-  background: #fee2e2 !important;
-  border: 1px solid #fca5a5 !important;
-  color: #991b1b !important;
-}
-body.theme-light .gov-lang-group {
-  background: #f1f5f9 !important;
-  border: 1.5px solid #cbd5e1 !important;
-}
-body.theme-light .gov-lang-btn {
-  color: #334155 !important;
-}
-body.theme-light .gov-lang-btn.active {
-  background: #ff9933 !important;
-  color: #000000 !important;
-  font-weight: 800 !important;
-}
-
-/* 3. Formal Header / Top Bar */
-body.theme-light .topbar-formal {
-  background: #ffffff !important;
-  border-bottom: 1.5px solid #e2e8f0 !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
-}
-body.theme-light .sidebar-toggle-btn {
-  background: #f8fafc !important;
-  border: 1.5px solid #cbd5e1 !important;
-  color: #1e293b !important;
-}
-body.theme-light .sidebar-toggle-btn:hover {
-  background: #e2e8f0 !important;
-  border-color: #0284c7 !important;
-  color: #0284c7 !important;
-}
-body.theme-light .header-title-block h1 {
-  color: #0f172a !important;
-}
-body.theme-light .header-title-block p {
-  color: #0284c7 !important;
-  font-weight: 700 !important;
-}
-body.theme-light .btn-topbar-action {
-  background: #f8fafc !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #334155 !important;
-}
-body.theme-light .btn-topbar-action:hover {
-  background: #f1f5f9 !important;
-  border-color: #94a3b8 !important;
-  color: #0f172a !important;
-}
-body.theme-light .btn-topbar-action.active {
-  background: #e0f2fe !important;
-  border-color: #0284c7 !important;
-  color: #0369a1 !important;
-  box-shadow: 0 0 10px rgba(2, 132, 199, 0.25) !important;
-}
-body.theme-light .btn-top-theme {
-  background: #f8fafc !important;
-  border: 1.5px solid #cbd5e1 !important;
-  color: #0f172a !important;
-  font-weight: 800 !important;
-}
-body.theme-light .btn-top-theme:hover {
-  background: #e2e8f0 !important;
-  border-color: #ff9933 !important;
-  color: #ea580c !important;
-}
-body.theme-light .btn-notification-bell {
-  background: #f8fafc !important;
-  border: 1.5px solid #cbd5e1 !important;
-  color: #475569 !important;
-}
-body.theme-light .btn-notification-bell:hover {
-  background: #e2e8f0 !important;
-  border-color: #0284c7 !important;
-  color: #0284c7 !important;
-}
-body.theme-light .clock-formal strong {
-  color: #0f172a !important;
-}
-body.theme-light .clock-formal small {
-  color: #64748b !important;
-}
-
-/* 4. Sidebar Navigation - Deep Executive Railway Blue Across All Themes */
-body.theme-light .sidebar,
-.sidebar {
-  background: linear-gradient(180deg, #0b2546 0%, #061528 100%) !important;
-  border-right: 1.5px solid #16365c !important;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25) !important;
-}
-body.theme-light .brand-formal,
-.brand-formal {
-  background: #07172b !important;
-  border-bottom: 1.5px solid #16365c !important;
-}
-body.theme-light .brand-gov-title,
-.brand-gov-title {
-  color: #ff9933 !important;
-  font-weight: 900 !important;
-}
-body.theme-light .brand-railway-title,
-.brand-railway-title {
-  color: #ffffff !important;
-  font-weight: 900 !important;
-}
-body.theme-light .brand-sub-title,
-.brand-sub-title {
-  color: #60a5fa !important;
-  font-weight: 700 !important;
-}
-body.theme-light .nav-group-title,
-.nav-group-title {
-  color: #7ea4cc !important;
-  font-weight: 800 !important;
-  letter-spacing: 1px !important;
-}
-body.theme-light .nav-item,
-.nav-item {
-  color: #cde2f5 !important;
-  font-weight: 600 !important;
-}
-body.theme-light .nav-item svg,
-.nav-item svg {
-  stroke: #7ea4cc !important;
-}
-body.theme-light .nav-item:hover,
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #ffffff !important;
-  border-color: rgba(56, 189, 248, 0.35) !important;
-}
-body.theme-light .nav-item:hover svg,
-.nav-item:hover svg {
-  stroke: #38bdf8 !important;
-}
-body.theme-light .nav-item.active,
-.nav-item.active {
-  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%) !important;
-  border-color: #38bdf8 !important;
-  color: #ffffff !important;
-  font-weight: 800 !important;
-  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.45) !important;
-}
-body.theme-light .nav-item.active svg,
-.nav-item.active svg {
-  stroke: #ffffff !important;
-}
-body.theme-light .sidebar-official-box,
-.sidebar-official-box {
-  background: #051322 !important;
-  border-top: 1.5px solid #16365c !important;
-}
-body.theme-light .sidebar-user-pill-clean,
-.sidebar-user-pill-clean {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-body.theme-light .sidebar-user-pill-clean:hover,
-.sidebar-user-pill-clean:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(56, 189, 248, 0.3) !important;
-}
-body.theme-light .user-avatar-circle,
-.user-avatar-circle {
-  background: #0284c7 !important;
-  color: #ffffff !important;
-}
-body.theme-light .user-avatar-circle svg,
-.user-avatar-circle svg {
-  stroke: #ffffff !important;
-}
-body.theme-light .user-text-meta strong,
-.user-text-meta strong {
-  color: #ffffff !important;
-}
-body.theme-light .user-text-meta span,
-.user-text-meta span {
-  color: #93c5fd !important;
-}
-body.theme-light .user-dropdown-chevron,
-.user-dropdown-chevron {
-  color: #93c5fd !important;
-}
-body.theme-light .official-crest-icon,
-.official-crest-icon {
-  background: #0d2747 !important;
-  border: 1.5px solid #235185 !important;
-  color: #5eaeff !important;
-}
-body.theme-light .sidebar-official-details b,
-.sidebar-official-details b {
-  color: #ffffff !important;
-}
-body.theme-light .sidebar-official-details span,
-.sidebar-official-details span {
-  color: #93c5fd !important;
-}
-body.theme-light .sidebar-official-division,
-.sidebar-official-division {
-  background: #0d2b4d !important;
-  border: 1px solid #1e528b !important;
-  color: #5ebcff !important;
-}
-body.theme-light .sidebar-official-actions button,
-.sidebar-official-actions button {
-  background: #0a213b !important;
-  border: 1px solid #204873 !important;
-  color: #d2e4f6 !important;
-}
-body.theme-light .sidebar-official-actions button:hover,
-.sidebar-official-actions button:hover {
-  background: #143a66 !important;
-  color: #ffffff !important;
-}
-body.theme-light .sidebar-official-actions button.logout-btn,
-.sidebar-official-actions button.logout-btn {
-  background: #2b0c0f !important;
-  border-color: #63191d !important;
-  color: #ffaba5 !important;
-}
-body.theme-light .sidebar-official-actions button.logout-btn:hover,
-.sidebar-official-actions button.logout-btn:hover {
-  background: #47151a !important;
-  border-color: #b52f39 !important;
-  color: #ffffff !important;
-}
-
-/* 5. Content Canvas, Panels, and Structural Containers */
-body.theme-light .content,
-body.theme-light main,
-body.theme-light main.content {
-  background: var(--bg-app) !important;
-  color: var(--text-main) !important;
-}
-
-body.theme-light .panel,
-body.theme-light .card,
-body.theme-light .dashboard-side-panel,
-body.theme-light .map-card-snap {
-  background: #ffffff !important;
-  border: 1.5px solid #e2e8f0 !important;
-  color: #0f172a !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
-}
-
-body.theme-light .panel:not(.audit-14point-inspector) h2,
-body.theme-light .panel:not(.audit-14point-inspector) h3,
-body.theme-light h1:not(.agent-modal-wrapper *):not(.audit-14point-inspector *):not(.live-train-modal-window *):not(.modal-card *),
-body.theme-light h2:not(.agent-modal-wrapper *):not(.audit-14point-inspector *):not(.live-train-modal-window *):not(.modal-card *),
-body.theme-light h3:not(.agent-modal-wrapper *):not(.audit-14point-inspector *):not(.train-cost-cuttings-window *):not(.live-train-modal-window *):not(.modal-card *),
-body.theme-light h4:not(.agent-modal-wrapper *):not(.audit-14point-inspector *):not(.train-cost-cuttings-window *):not(.live-train-modal-window *):not(.modal-card *) {
-  color: #0f172a !important;
-}
-
-/* 6. Dynamic Overrides for Screens with Inline Dark Backgrounds (e.g. Cost Asset Maintenance) */
-body.theme-light main[style*="background:#030b17"],
-body.theme-light main[style*="background: #030b17"],
-body.theme-light div[style*="background:#030b17"],
-body.theme-light div[style*="background: #030b17"] {
-  background: #f8fafc !important;
-  color: #0f172a !important;
-}
-
-body.theme-light [style*="background:#07162b"],
-body.theme-light [style*="background: #07162b"],
-body.theme-light [style*="background:#091e36"],
-body.theme-light [style*="background: #091e36"],
-body.theme-light [style*="background:#091a30"],
-body.theme-light [style*="background: #091a30"],
-body.theme-light [style*="background:#061224"],
-body.theme-light [style*="background: #061224"],
-body.theme-light [style*="background:#062326"],
-body.theme-light [style*="background: #062326"],
-body.theme-light [style*="background:#0a223f"],
-body.theme-light [style*="background: #0a223f"],
-body.theme-light [style*="background:#0c233f"],
-body.theme-light [style*="background: #0c233f"],
-body.theme-light [style*="background:#051322"],
-body.theme-light [style*="background: #051322"],
-body.theme-light [style*="background:#051426"],
-body.theme-light [style*="background: #051426"],
-body.theme-light [style*="background:#0d2847"],
-body.theme-light [style*="background: #0d2847"],
-body.theme-light [style*="background:#092039"],
-body.theme-light [style*="background: #092039"],
-body.theme-light [style*="background:rgba(8,21,38"],
-body.theme-light [style*="background: rgba(8,21,38"],
-body.theme-light [style*="background:rgba(8, 21, 38"],
-body.theme-light [style*="background: rgba(8, 21, 38"] {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  color: #0f172a !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
-}
-
-/* Neutralize generic dark translucent overlays */
-body.theme-light [style*="background:rgba(15,23,42"],
-body.theme-light [style*="background: rgba(15,23,42"],
-body.theme-light [style*="background:rgba(15, 23, 42"],
-body.theme-light [style*="background: rgba(15, 23, 42"],
-body.theme-light [style*="background:rgba(0,0,0,0.25)"],
-body.theme-light [style*="background: rgba(0,0,0,0.25)"],
-body.theme-light [style*="background:rgba(0,0,0,0.35)"],
-body.theme-light [style*="background: rgba(0,0,0,0.35)"],
-body.theme-light [style*="background:rgba(0,0,0,0.4)"],
-body.theme-light [style*="background: rgba(0,0,0,0.4)"],
-body.theme-light [style*="background:rgba(0,0,0,0.45)"],
-body.theme-light [style*="background: rgba(0,0,0,0.45)"] {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  color: #0f172a !important;
-}
-
-/* 7. Cost Asset Maintenance: 4 Macro Financial KPI Cards */
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(1) {
-  background: #f0f9ff !important;
-  border: 1.5px solid #bae6fd !important;
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08) !important;
-}
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(1) span {
-  color: #0369a1 !important;
-}
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(1) div {
-  color: #0284c7 !important;
-}
-
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(2) {
-  background: #fffbeb !important;
-  border: 1.5px solid #fde68a !important;
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.08) !important;
-}
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(2) span {
-  color: #b45309 !important;
-}
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(2) div {
-  color: #d97706 !important;
-}
-
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(3) {
-  background: #faf5ff !important;
-  border: 1.5px solid #e9d5ff !important;
-  box-shadow: 0 4px 14px rgba(147, 51, 234, 0.08) !important;
-}
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(3) span {
-  color: #7e22ce !important;
-}
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(3) div {
-  color: #9333ea !important;
-}
-
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(4) {
-  background: #f0fdf4 !important;
-  border: 1.5px solid #bbf7d0 !important;
-  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.08) !important;
-}
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(4) span {
-  color: #15803d !important;
-}
-body.theme-light div[style*="repeat(4, 1fr)"] > div:nth-child(4) div {
-  color: #16a34a !important;
-}
-
-/* 8. Sub-Navigation Tab Bar Switcher */
-body.theme-light div[style*="background:rgba(15,23,42,0.8)"],
-body.theme-light div[style*="background: rgba(15,23,42,0.8)"],
-body.theme-light div[style*="border:1px solid #1e4976"],
-body.theme-light div[style*="border: 1px solid #1e4976"] {
-  background: #f1f5f9 !important;
-  border: 1.5px solid #e2e8f0 !important;
-}
-body.theme-light div[style*="background:rgba(15,23,42,0.8)"] button,
-body.theme-light div[style*="border:1px solid #1e4976"] button {
-  color: #475569 !important;
-}
-body.theme-light div[style*="background:rgba(15,23,42,0.8)"] button[style*="background:#0284c7"],
-body.theme-light div[style*="background:rgba(15,23,42,0.8)"] button[style*="background: #0284c7"] {
-  background: #0284c7 !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3) !important;
-}
-
-/* 9. High-Contrast Text Color Adjustments in Light Mode (Scoped strictly to avoid dark card collisions) */
-body.theme-light .panel:not(.audit-14point-inspector):not(.agent-eval-card) [style*="color:#ffffff"],
-body.theme-light .card:not(.agent-eval-card) [style*="color:#ffffff"],
-body.theme-light .dashboard-side-panel [style*="color:#ffffff"] {
-  color: #0f172a !important;
-}
-body.theme-light .panel:not(.audit-14point-inspector):not(.agent-eval-card) [style*="color:#e2e8f0"],
-body.theme-light .card:not(.agent-eval-card) [style*="color:#e2e8f0"] {
-  color: #1e293b !important;
-}
-
-/* Unconditionally protect dark command center components in ALL themes */
-.audit-14point-inspector,
-.agent-modal-wrapper,
-.train-cost-cuttings-window,
-.modal-card.modal-card-extra-wide {
-  color: #f8fafc !important;
-}
-.audit-14point-inspector h3,
-.agent-modal-wrapper h3,
-.train-cost-cuttings-window h3,
-.modal-card.modal-card-extra-wide h3 {
-  color: #ffffff !important;
-  font-family: 'Barlow Condensed', sans-serif !important;
-  font-weight: 800 !important;
-}
-.audit-14point-inspector strong,
-.agent-modal-wrapper strong,
-.train-cost-cuttings-window strong,
-.modal-card.modal-card-extra-wide strong {
-  color: #60a5fa !important;
-}
-.audit-14point-inspector b,
-.agent-modal-wrapper b,
-.train-cost-cuttings-window b,
-.modal-card.modal-card-extra-wide b {
-  color: #ffffff !important;
-}
-
-/* 10. Tables in Light Mode */
-body.theme-light table {
-  background: #ffffff !important;
-  border-collapse: collapse !important;
-  border: 1px solid #e2e8f0 !important;
-}
-body.theme-light table thead,
-body.theme-light thead[style*="background:#091a2f"],
-body.theme-light thead[style*="background: #091a2f"] {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-body.theme-light table th {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-bottom: 2px solid #cbd5e1 !important;
-  font-weight: 800 !important;
-}
-body.theme-light table td {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-body.theme-light table tr[style*="border-bottom:1px solid rgba(255,255,255"] {
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-body.theme-light table tr[style*="background:rgba(255,255,255"] {
-  background: #f8fafc !important;
-}
-body.theme-light table tbody tr:hover td {
-  background: #f1f5f9 !important;
-}
-
-/* 11. Form Controls, Inputs, and Dropdowns */
-body.theme-light input,
-body.theme-light select,
-body.theme-light textarea,
-body.theme-light input[style*="background:#030b17"],
-body.theme-light select[style*="background:#030b17"] {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border: 1.5px solid #cbd5e1 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-}
-body.theme-light input::placeholder,
-body.theme-light textarea::placeholder {
-  color: #94a3b8 !important;
-}
-body.theme-light select option {
-  background: #ffffff !important;
-  color: #0f172a !important;
-}
-body.theme-light select option:checked {
-  background: #0284c7 !important;
-  color: #ffffff !important;
-}
-body.theme-light .train-route-search-bar {
-  background: #ffffff !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-body.theme-light .train-search-input-wrap input {
-  background: #f8fafc !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
-}
-
-/* 12. Modal Windows & Popups */
-body.theme-light .modal-card:not(.modal-card-extra-wide):not(.live-train-modal-window),
-body.theme-light .railway-official-dossier {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border: 1.5px solid #e2e8f0 !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12) !important;
-}
-body.theme-light .modal-card:not(.modal-card-extra-wide):not(.live-train-modal-window) h3,
-body.theme-light .modal-card:not(.modal-card-extra-wide):not(.live-train-modal-window) h4,
-body.theme-light .modal-card:not(.modal-card-extra-wide):not(.live-train-modal-window) strong {
-  color: #0f172a !important;
-}
-
-/* 13. CRIS AI Copilot Drawer */
-body.theme-light #crisCopilotDrawer,
-body.theme-light .cris-copilot-drawer {
-  background: #ffffff !important;
-  color: #0f172a !important;
-  border-left: 1.5px solid #e2e8f0 !important;
-  box-shadow: -15px 0 45px rgba(0, 0, 0, 0.12) !important;
-}
-body.theme-light .cris-copilot-header {
-  background: #f8fafc !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-body.theme-light .cris-copilot-header-info h3 {
-  color: #0f172a !important;
-}
-body.theme-light .cris-copilot-chips-bar {
-  background: #f1f5f9 !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-body.theme-light .cris-copilot-chip {
-  background: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #334155 !important;
-}
-body.theme-light .cris-copilot-chip:hover {
-  background: #0284c7 !important;
-  border-color: #0284c7 !important;
-  color: #ffffff !important;
-}
-body.theme-light .cris-copilot-messages {
-  background: #f8fafc !important;
-}
-body.theme-light .copilot-msg.assistant .copilot-bubble {
-  background: #ffffff !important;
-  border: 1.5px solid #e2e8f0 !important;
-  color: #0f172a !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
-}
-body.theme-light .copilot-msg.user .copilot-bubble {
-  background: #0284c7 !important;
-  color: #ffffff !important;
-}
-body.theme-light .copilot-action-card {
-  background: #ffffff !important;
-  border: 1.5px solid #e2e8f0 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
-}
-body.theme-light .copilot-action-title {
-  color: #0f172a !important;
-}
-body.theme-light .cris-copilot-input-box {
-  background: #ffffff !important;
-  border-top: 1.5px solid #e2e8f0 !important;
-}
-body.theme-light .cris-copilot-input {
-  background: #f8fafc !important;
-  border: 1.5px solid #cbd5e1 !important;
-  color: #0f172a !important;
-}
-
-/* 14. Stations Sidebar & Map Overlays */
-body.theme-light .map-stations-sidebar {
-  background: #ffffff !important;
-  border-left: 1.5px solid #e2e8f0 !important;
-}
-body.theme-light .map-stations-sidebar-header {
-  background: #f8fafc !important;
-  border-bottom: 1.5px solid #e2e8f0 !important;
-}
-body.theme-light .stn-title-text {
-  color: #0f172a !important;
-}
-body.theme-light .stn-search-box input {
-  background: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-body.theme-light .stn-div-pill {
-  background: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #475569 !important;
-}
-body.theme-light .stn-div-pill.active {
-  background: #0284c7 !important;
-  border-color: #0284c7 !important;
-  color: #ffffff !important;
-}
-body.theme-light .smart-map-topbar {
-  background: #ffffff !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  color: #0f172a !important;
-}
-/* ============================================================================
-   LIGHT THEME OVERRIDES FOR SMART CORRIDOR ASSETS PANEL
-   ============================================================================ */
-body.theme-light .smart-asset-panel {
-  background: #ffffff !important;
-  border: 1.5px solid #cbd5e1 !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16) !important;
-  color: #0f172a !important;
-}
-
-body.theme-light .smart-asset-header {
-  background: #0b2546 !important;
-  border-bottom: 1px solid #16365c !important;
-}
-body.theme-light .smart-mode-tab-btn {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  color: #cde2f5 !important;
-}
-body.theme-light .smart-mode-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.22) !important;
-  color: #ffffff !important;
-}
-body.theme-light .smart-mode-tab-btn.active {
-  background: #0284c7 !important;
-  border-color: #38bdf8 !important;
-  color: #ffffff !important;
-}
-body.theme-light .smart-asset-ctrl-btn {
-  color: #cde2f5 !important;
-}
-body.theme-light .smart-asset-ctrl-btn:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: #ffffff !important;
-}
-body.theme-light .smart-detail-header-title {
-  color: #ffffff !important;
-}
-
-body.theme-light .smart-corridor-ribbon {
-  background: #f0f7ff !important;
-  border-bottom: 1px solid #bfdbfe !important;
-}
-body.theme-light .smart-corridor-label {
-  color: #475569 !important;
-}
-body.theme-light .smart-corridor-name {
-  color: #0369a1 !important;
-}
-
-body.theme-light .smart-asset-filter-bar {
-  background: #ffffff !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-body.theme-light .smart-search-input {
-  background: #f8fafc !important;
-  border: 1.5px solid #cbd5e1 !important;
-  color: #0f172a !important;
-}
-body.theme-light .smart-search-input:focus {
-  background: #ffffff !important;
-  border-color: #0284c7 !important;
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2) !important;
-}
-body.theme-light .smart-filter-pill {
-  background: #f1f5f9 !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #334155 !important;
-}
-body.theme-light .smart-filter-pill:hover {
-  background: #e2e8f0 !important;
-  color: #0f172a !important;
-}
-body.theme-light .smart-filter-pill.active {
-  background: #0284c7 !important;
-  border-color: #0284c7 !important;
-  color: #ffffff !important;
-}
-
-body.theme-light .smart-asset-list-container {
-  background: #f8fafc !important;
-  scrollbar-color: #cbd5e1 #f8fafc !important;
-}
-body.theme-light .smart-asset-empty-state {
-  color: #64748b !important;
-}
-
-body.theme-light .smart-asset-list-item {
-  background: #ffffff !important;
-  border: 1.5px solid #cbd5e1 !important;
-  color: #0f172a !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
-}
-body.theme-light .smart-asset-list-item:hover {
-  background: #f0f9ff !important;
-  border-color: #0284c7 !important;
-  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.12) !important;
-}
-body.theme-light .smart-asset-list-item.selected {
-  background: #e0f2fe !important;
-  border-color: #0284c7 !important;
-  box-shadow: 0 0 16px rgba(2, 132, 199, 0.25) !important;
-}
-body.theme-light .smart-asset-icon-badge {
-  background: #f1f5f9 !important;
-  border-color: #e2e8f0 !important;
-}
-body.theme-light .smart-asset-name-title {
-  color: #0f172a !important;
-}
-body.theme-light .smart-asset-code-badge {
-  background: #e0f2fe !important;
-  border-color: #bae6fd !important;
-  color: #0369a1 !important;
-}
-body.theme-light .smart-asset-category-tag {
-  color: #64748b !important;
-}
-
-body.theme-light .smart-asset-meta-row {
-  color: #475569 !important;
-}
-body.theme-light .smart-asset-div-badge {
-  background: #e2e8f0 !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-}
-body.theme-light .smart-asset-health-track {
-  background: #e2e8f0 !important;
-}
-body.theme-light .smart-asset-status-row {
-  color: #334155 !important;
-}
-body.theme-light .smart-asset-condition-badge {
-  color: #0f172a !important;
-}
-body.theme-light .smart-asset-window-badge {
-  color: #64748b !important;
-}
-
-body.theme-light .smart-card-actions {
-  border-top-color: #e2e8f0 !important;
-}
-body.theme-light .smart-action-btn.locate {
-  background: #e0f2fe !important;
-  color: #0369a1 !important;
-  border: 1px solid #bae6fd !important;
-}
-body.theme-light .smart-action-btn.locate:hover {
-  background: #bae6fd !important;
-}
-body.theme-light .smart-action-btn.details {
-  background: #f1f5f9 !important;
-  color: #1e293b !important;
-  border: 1px solid #cbd5e1 !important;
-}
-body.theme-light .smart-action-btn.details:hover {
-  background: #e2e8f0 !important;
-}
-
-/* Light theme detail view elements */
-body.theme-light .smart-copilot-card {
-  background: #f0f7ff !important;
-  border: 1.5px solid #bfdbfe !important;
-}
-body.theme-light .smart-copilot-card-title {
-  color: #0284c7 !important;
-}
-body.theme-light .smart-copilot-card-sub {
-  color: #475569 !important;
-}
-body.theme-light .smart-meta-table td:first-child {
-  color: #64748b !important;
-}
-body.theme-light .smart-meta-table td:last-child {
-  color: #0f172a !important;
-}
-body.theme-light .smart-div-tag {
-  background: #e0f2fe !important;
-  color: #0369a1 !important;
-}
-body.theme-light .smart-tabs-strip {
-  border-bottom-color: #e2e8f0 !important;
-}
-body.theme-light .smart-tab-btn {
-  color: #64748b !important;
-}
-body.theme-light .smart-tab-btn.active {
-  color: #0284c7 !important;
-  border-bottom-color: #0284c7 !important;
-  background: rgba(2, 132, 199, 0.08) !important;
-}
-body.theme-light .smart-specs-box,
-body.theme-light .smart-overview-box {
-  background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
-  color: #334155 !important;
-}
-body.theme-light .smart-specs-title {
-  color: #0284c7 !important;
-}
-body.theme-light .smart-shadow-block-card {
-  background: #f8fafc !important;
-  border: 1.5px solid #86efac !important;
-}
-body.theme-light .smart-shadow-type {
-  color: #0f172a !important;
-}
-body.theme-light .smart-shadow-meta {
-  color: #475569 !important;
-}
-body.theme-light .smart-block-hist-section {
-  border-top-color: #e2e8f0 !important;
-}
-body.theme-light .smart-block-hist-heading {
-  color: #0284c7 !important;
-}
-body.theme-light .smart-block-hist-table th {
-  background: #f1f5f9 !important;
-  color: #475569 !important;
-  border-bottom-color: #cbd5e1 !important;
-}
-body.theme-light .smart-block-hist-table td {
-  border-bottom-color: #e2e8f0 !important;
-  color: #334155 !important;
-}
-body.theme-light .smart-block-type-badge {
-  background: #e0f2fe !important;
-  color: #0369a1 !important;
-}
-body.theme-light .smart-block-dur-cell {
-  color: #0f172a !important;
-}
 
 /* ==========================================================================
    26. BUTTERY SMOOTH MICRO-INTERACTIONS, GLOBAL ELEVATIONS & TACTILE CONTROLS
@@ -8792,15 +8229,7 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
   background: #38bdf8;
 }
-body.theme-light * {
-  scrollbar-color: #cbd5e1 transparent;
-}
-body.theme-light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-}
-body.theme-light ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+
 
 /* Topbar Command Palette & Demo Trigger Buttons */
 .cmd-palette-trigger-btn {
@@ -9141,102 +8570,7 @@ body.theme-light ::-webkit-scrollbar-thumb:hover {
   transform: translateY(-1px);
 }
 
-/* ==========================================================================
-   29. LIGHT THEME OVERRIDES FOR COMMAND PALETTE & DEMO SCENARIOS
-   ========================================================================== */
-body.theme-light .cmd-palette-trigger-btn {
-  background: rgba(11, 37, 70, 0.08) !important;
-  border: 1px solid rgba(11, 37, 70, 0.2) !important;
-  color: #0b2546 !important;
-}
-body.theme-light .cmd-palette-trigger-btn:hover {
-  background: rgba(11, 37, 70, 0.14) !important;
-  border-color: #0284c7 !important;
-  color: #0284c7 !important;
-}
-body.theme-light .kbd-shortcut {
-  background: #e2e8f0;
-  border: 1px solid #cbd5e1;
-  color: #334155;
-}
 
-body.theme-light .cmd-palette-modal {
-  background: #ffffff !important;
-  border: 1.5px solid #cbd5e1 !important;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
-}
-body.theme-light .cmd-palette-header {
-  background: #f8fafc !important;
-  border-bottom: 1.5px solid #e2e8f0 !important;
-}
-body.theme-light .cmd-palette-search-icon {
-  color: #0284c7 !important;
-}
-body.theme-light .cmd-search-input {
-  color: #0f172a !important;
-}
-body.theme-light .cmd-search-input::placeholder {
-  color: #94a3b8 !important;
-}
-body.theme-light .cmd-palette-esc-badge {
-  background: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #475569 !important;
-}
-body.theme-light .cmd-group-title {
-  color: #64748b !important;
-}
-body.theme-light .cmd-palette-item {
-  color: #1e293b !important;
-}
-body.theme-light .cmd-palette-item:hover,
-body.theme-light .cmd-palette-item.selected {
-  background: #f0f7ff !important;
-  border-color: #bae6fd !important;
-  color: #0369a1 !important;
-}
-body.theme-light .cmd-palette-item.selected {
-  box-shadow: inset 3px 0 0 #0284c7 !important;
-}
-body.theme-light .cmd-item-subtitle {
-  color: #0284c7 !important;
-}
-body.theme-light .cmd-palette-footer {
-  background: #f8fafc !important;
-  border-top: 1.5px solid #e2e8f0 !important;
-  color: #64748b !important;
-}
-
-body.theme-light .demo-scenarios-modal-card {
-  background: #ffffff !important;
-  border: 1.5px solid #cbd5e1 !important;
-}
-body.theme-light .demo-scenario-card {
-  background: #f8fafc !important;
-  border: 1.5px solid #e2e8f0 !important;
-}
-body.theme-light .demo-scenario-card:hover {
-  background: #ffffff !important;
-  border-color: #0284c7 !important;
-  box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15) !important;
-}
-body.theme-light .demo-card-title {
-  color: #0f172a !important;
-}
-body.theme-light .demo-scenario-desc {
-  color: #475569 !important;
-}
-body.theme-light .demo-scenario-steps {
-  background: #f1f5f9 !important;
-}
-body.theme-light .demo-scenario-steps ul {
-  color: #334155 !important;
-}
-body.theme-light .toast {
-  background: rgba(15, 23, 42, 0.96) !important;
-  color: #ffffff !important;
-  border-color: #0284c7 !important;
-}
 
 /* ==========================================================================
    15. REAL-TIME LIVE TRAIN RUNNING STATUS & TELEMETRY WINDOW
@@ -9869,197 +9203,7 @@ body.theme-light .toast {
   100% { transform: scale(1.8); opacity: 0; }
 }
 
-/* LIGHT THEME SUPPORT FOR RTIS MODAL */
-body.theme-light .live-train-modal-window {
-  background: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  color: #0f172a !important;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.25) !important;
-}
 
-body.theme-light .live-train-modal-header {
-  background: #f8fafc !important;
-  border-bottom: 1.5px solid #e2e8f0 !important;
-}
-
-body.theme-light .header-train-brand h2 {
-  color: #0f172a !important;
-}
-
-body.theme-light .live-train-search-bar {
-  background: #f1f5f9 !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-
-body.theme-light .search-input-wrapper {
-  background: #ffffff !important;
-  border-color: #cbd5e1 !important;
-}
-
-body.theme-light .search-input-wrapper input {
-  color: #0f172a !important;
-}
-
-body.theme-light .train-chip {
-  background: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  color: #334155 !important;
-}
-
-body.theme-light .train-chip:hover {
-  border-color: #0284c7 !important;
-  color: #0284c7 !important;
-  background: #f0f9ff !important;
-}
-
-body.theme-light .train-chip.active {
-  background: #e0f2fe !important;
-  border-color: #0284c7 !important;
-  color: #0369a1 !important;
-  font-weight: 800 !important;
-}
-
-body.theme-light .live-telemetry-banner {
-  background: #f8fafc !important;
-  border-bottom: 1.5px solid #e2e8f0 !important;
-}
-
-body.theme-light .status-section-info span {
-  color: #475569 !important;
-}
-
-body.theme-light .status-section-info b {
-  color: #0f172a !important;
-}
-
-body.theme-light .hud-card {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-}
-
-body.theme-light .hud-label {
-  color: #64748b !important;
-}
-
-body.theme-light .hud-val {
-  color: #0f172a !important;
-}
-
-body.theme-light .hud-sub {
-  color: #475569 !important;
-}
-
-body.theme-light .timeline-stepper-panel {
-  background: #ffffff !important;
-  border-right: 1.5px solid #e2e8f0 !important;
-}
-
-body.theme-light .panel-headline,
-body.theme-light .gis-map-header {
-  background: #f8fafc !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-
-body.theme-light .headline-title {
-  color: #0f172a !important;
-}
-
-body.theme-light .live-station-table th {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-bottom: 2px solid #cbd5e1 !important;
-  font-weight: 800 !important;
-}
-
-body.theme-light .live-station-table td {
-  border-bottom: 1px solid #e2e8f0 !important;
-  color: #1e293b !important;
-}
-
-body.theme-light .live-station-table tr:hover {
-  background: #f8fafc !important;
-}
-
-body.theme-light .live-train-modal-window b {
-  color: #0f172a !important;
-}
-
-body.theme-light .live-train-modal-window .col-act b {
-  color: #0284c7 !important;
-  font-weight: 800 !important;
-}
-
-body.theme-light .col-sch {
-  color: #475569 !important;
-  font-weight: 600 !important;
-}
-
-body.theme-light .col-km {
-  color: #64748b !important;
-}
-
-body.theme-light .stn-code {
-  color: #0369a1 !important;
-  font-weight: 800 !important;
-}
-
-body.theme-light .stn-name {
-  color: #475569 !important;
-}
-
-body.theme-light .pf-badge {
-  background: #e0f2fe !important;
-  border: 1px solid #7dd3fc !important;
-  color: #0369a1 !important;
-  font-weight: 800 !important;
-}
-
-body.theme-light .row-current {
-  background: #eff6ff !important;
-  border-left: 4px solid #0284c7 !important;
-}
-
-body.theme-light .row-current td {
-  color: #0f172a !important;
-  font-weight: 700 !important;
-}
-
-body.theme-light .row-departed td {
-  color: #334155 !important;
-  opacity: 0.9 !important;
-}
-
-body.theme-light .row-upcoming td {
-  color: #64748b !important;
-}
-
-body.theme-light .status-pill.departed {
-  background: #dcfce7 !important;
-  color: #166534 !important;
-  font-weight: 800 !important;
-}
-
-body.theme-light .status-pill.current {
-  background: #0284c7 !important;
-  color: #ffffff !important;
-  font-weight: 800 !important;
-}
-
-body.theme-light .status-pill.upcoming {
-  background: #f1f5f9 !important;
-  color: #64748b !important;
-  font-weight: 700 !important;
-}
-
-body.theme-light .quick-cross-actions {
-  background: #f8fafc !important;
-  border-top-color: #e2e8f0 !important;
-}
-
-body.theme-light .live-gis-map-panel {
-  background: #081527 !important;
-}
 
 /* ==========================================================================
    16. EXECUTIVE HOME COMMAND DECK (MATCHING REFERENCE UI)
@@ -10581,22 +9725,7 @@ table tbody tr:hover td {
   background: rgba(56, 189, 248, 0.06) !important;
 }
 
-/* Light mode table overrides */
-body.theme-light table thead th {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-bottom-color: #e2e8f0 !important;
-}
-body.theme-light table tbody tr td {
-  border-bottom-color: rgba(226, 232, 240, 0.7) !important;
-  color: #1e293b !important;
-}
-body.theme-light table tbody tr:nth-child(even) td {
-  background: rgba(241, 245, 249, 0.6) !important;
-}
-body.theme-light table tbody tr:hover td {
-  background: rgba(56, 189, 248, 0.06) !important;
-}
+
 
 /* Main shell — allow content to scroll cleanly */
 .main-shell {

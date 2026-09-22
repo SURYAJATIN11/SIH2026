@@ -1563,7 +1563,7 @@ export function renderTrainCostCuttingsWindow(selectedTrain, currentStation, all
               <div style="color:#94a3b8;margin-top:3px">${costCutting.recoveryMechanism}</div>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-              <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 16px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:5px" onclick="showToast('✓ Electronic Job Card &amp; BPC authorized for Train #${tNo} at ${currentStation}. Inter-Railway debit registered.')">
+              <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 16px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:5px" onclick="window.executeAuthorizeTrainMaintenance('${tNo}', '${currentStation}', ${costCutting.netRealizedBenefit}, '${costCutting.savingsPercentage}')">
                 <span>✓</span> Authorize Concurrent Pit-Line Servicing &amp; Issue BPC
               </button>
               <button class="primary" style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:8px 14px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:5px" onclick="window.openProfessionalRepairReportModal('${tNo}', '${currentStation}')">
@@ -1960,7 +1960,7 @@ export function openAssetMaintenanceAgentModal(initialTrainNo = null, initialSta
                 <button class="primary" style="background:#0284c7;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:7px 14px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="window.openProfessionalRepairReportModal('${audit.trainNo}', '${currentStation}')">
                   <span>📑</span> View Official RDSO Repair Report
                 </button>
-                <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:7px 16px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="window.__agentAuthorizeMaintenance('${audit.trainNo}', '${currentStation}')">
+                <button class="primary" style="background:#16a34a;color:#ffffff;border:none;font-weight:800;font-size:11.5px;padding:7px 16px;border-radius:6px;display:flex;align-items:center;gap:6px;cursor:pointer" onclick="window.executeAuthorizeTrainMaintenance('${audit.trainNo}', '${currentStation}', 167420, '73.8%')">
                   <span>✓</span> Authorize Concurrent Pit-Line Servicing &amp; Issue BPC
                 </button>
               </div>
@@ -2153,10 +2153,15 @@ export function openAssetMaintenanceAgentModal(initialTrainNo = null, initialSta
   };
 
   window.__agentAuthorizeMaintenance = (no, stn) => {
-    const toastMsg = `✓ Electronic Job Card & BPC Issued for Train #${no} at ${stn} BBQ/Coaching Pit Line. Inter-Railway debit registered.`;
-    if (typeof window.showToast === "function") window.showToast(toastMsg);
-    const overlay = document.querySelector(".modal-overlay");
-    if (overlay) overlay.remove();
+    if (typeof window.executeAuthorizeTrainMaintenance === "function") {
+      window.executeAuthorizeTrainMaintenance(no, stn);
+    } else {
+      const toastMsg = `✓ Electronic Job Card & BPC Issued for Train #${no} at ${stn} BBQ/Coaching Pit Line. Inter-Railway debit registered.`;
+      if (typeof window.showToast === "function") window.showToast(toastMsg);
+      const overlay = document.querySelector(".modal-overlay");
+      if (overlay) overlay.remove();
+      if (typeof window.navigateTo === "function") window.navigateTo("Dashboard");
+    }
   };
 
   // Render in wide modal
@@ -2306,6 +2311,101 @@ export function getFleetFinancialKPIs(trainsList) {
   };
 }
 
+export function executeAuthorizeTrainMaintenance(trainNo, stationCode, netBenefit, savingsPct) {
+  const trainNum = String(trainNo || "12675").trim();
+  const stn = String(stationCode || "MAS").trim().toUpperCase();
+  const benefitVal = Number(netBenefit) || 167420;
+  const pct = savingsPct || "73.8%";
+  const bpcSerial = `BPC/IR-SR/${stn}/2026/09/${Math.floor(1000 + Math.random() * 9000)}`;
+  const curTime = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const curDate = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+  // Dismiss any open modal overlay
+  document.querySelectorAll(".modal-overlay").forEach(m => m.remove());
+
+  const bannerData = {
+    trainNo: trainNum,
+    trainName: trainNum === "12675" ? "Kovai Superfast Express" : (trainNum === "20607" ? "Vande Bharat Express" : (trainNum === "12637" ? "Pandian Superfast Express" : `Express Fleet #${trainNum}`)),
+    stationCode: stn,
+    stationName: stn === "MAS" ? "Chennai Central (BBQ Coaching Yard)" : (stn === "CBE" ? "Coimbatore Junction Yard" : (stn === "SA" ? "Salem Yard" : `${stn} Coaching Yard`)),
+    pitLine: "Coaching Pit-Line Bay #4",
+    netBenefit: benefitVal,
+    savingsPct: pct,
+    grossAvoidedLoss: 227000,
+    directRepairCost: 59580,
+    avoidedBreakdown: [
+      { label: "Avoided Dead Haulage & Light Engine Moves", amount: 65000 },
+      { label: "Avoided Mid-Section En-Route Punctuality Penalties", amount: 77000 },
+      { label: "Avoided Daytime Dedicated Corridor Line Possession", amount: 85000 }
+    ],
+    debitAccountHead: "IR-SR-REV-08-200",
+    recoveryMechanism: "Inter-Railway Settlement through CRIS Zonal Reconciliation Billing",
+    bpcNo: bpcSerial,
+    timestamp: curTime,
+    date: curDate,
+    authorizer: (typeof currentOfficial !== "undefined" && currentOfficial?.name) ? currentOfficial.name : "Chief Passenger Transportation Manager (CPTM) / Sr. DOM",
+    status: "OFFICIAL SANCTION ACTIVE & SYNCHRONIZED"
+  };
+
+  window.dashboardAuthorizedBanner = bannerData;
+  try {
+    sessionStorage.setItem("dashboardAuthorizedBanner", JSON.stringify(bannerData));
+    localStorage.setItem("dashboardAuthorizedBanner", JSON.stringify(bannerData));
+  } catch (e) {}
+
+  if (!window.authorizedBPCRecords) window.authorizedBPCRecords = [];
+  window.authorizedBPCRecords.unshift(bannerData);
+  try {
+    localStorage.setItem("authorizedBPCRecords", JSON.stringify(window.authorizedBPCRecords));
+  } catch (e) {}
+
+  // Show immediate toast confirmation
+  if (typeof window.showToast === "function") {
+    window.showToast(`✓ BPC #${bpcSerial} Authorized! Redirecting to Executive Dashboard...`);
+  }
+
+  // Inject into Copilot if function exists
+  if (typeof window.appendCopilotMessage === "function") {
+    window.appendCopilotMessage("bot", `📋 <b>Executive Sanction Issued:</b> Electronic BPC <code>${bpcSerial}</code> authorized for Train #${trainNum} at ${stn}. Net economic savings of ₹${benefitVal.toLocaleString('en-IN')} locked into CRIS operations ledger.`);
+  }
+
+  // Navigate to Dashboard
+  if (typeof window.navigateTo === "function") {
+    window.navigateTo("Dashboard");
+  }
+
+  // Ensure banner is mounted immediately and viewport is scrolled to the top
+  setTimeout(() => {
+    const authMount = document.querySelector("#dashboardAuthBannerMount");
+    if (authMount && typeof window.renderDashboardAuthorizedBanner === "function") {
+      authMount.innerHTML = window.renderDashboardAuthorizedBanner();
+    }
+    const c = document.querySelector(".content");
+    if (c) c.scrollTop = 0;
+    if (typeof window.scrollTo === "function") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const bannerEl = document.getElementById("dashboardAuthBannerCard");
+    if (bannerEl) {
+      bannerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    if (window.leafletMapInstance) {
+      const stnCoords = {
+        MAS: [13.0827, 80.2707],
+        CBE: [11.0016, 76.9629],
+        SA: [11.6643, 78.1460],
+        TPJ: [10.7870, 79.1378],
+        MDU: [9.9195, 78.1140]
+      };
+      const pt = stnCoords[stn] || [13.0827, 80.2707];
+      try {
+        window.leafletMapInstance.flyTo(pt, 13, { animate: true, duration: 1.2 });
+      } catch (e) {}
+    }
+  }, 100);
+}
+
 // Attach to window object for global invocation
 if (typeof window !== "undefined") {
   window.openAssetMaintenanceAgentModal = openAssetMaintenanceAgentModal;
@@ -2318,5 +2418,7 @@ if (typeof window !== "undefined") {
   window.calculateTrainOperationalCosts = calculateTrainOperationalCosts;
   window.classifyFleetTimeline = classifyFleetTimeline;
   window.getFleetFinancialKPIs = getFleetFinancialKPIs;
+  window.executeAuthorizeTrainMaintenance = executeAuthorizeTrainMaintenance;
 }
+
 
